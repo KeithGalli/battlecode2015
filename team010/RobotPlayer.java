@@ -28,127 +28,126 @@ public class RobotPlayer {
         //Util.randInit(randseed, randseed * Clock.getRoundNum());
 
 
-		if (rc.getType() == RobotType.HQ){
-			System.out.println("I am HQ at string:" + rc.senseHQLocation().toString());
-			System.out.println("I am HQ at :" + loc);
-			theMap = MapLocation.getAllMapLocationsWithinRadiusSq(loc, 10000);
-			for (MapLocation mapLoc:theMap){
-				if (rc.senseTerrainTile(mapLoc)==TerrainTile.UNKNOWN){
-					numUnknown++;
-				}else if (rc.senseTerrainTile(mapLoc)==TerrainTile.OFF_MAP){
-					numOffmap++;
-					System.out.println(mapLoc);
-				}else if (rc.senseTerrainTile(mapLoc)==TerrainTile.NORMAL){
-					numNormal++;
-				}
-				else if (rc.senseTerrainTile(mapLoc)==TerrainTile.VOID){
-					numVoid++;
-				}
-				//System.out.println(mapLoc.toString());
-			}
-			System.out.println(numUnknown);
-			System.out.println(numOffmap);
-			System.out.println(numNormal);
-			System.out.println(numVoid);
+		// if (rc.getType() == RobotType.HQ){
+		// 	System.out.println("I am HQ at string:" + rc.senseHQLocation().toString());
+		// 	System.out.println("I am HQ at :" + loc);
+		// 	theMap = MapLocation.getAllMapLocationsWithinRadiusSq(loc, 10000);
+		// 	for (MapLocation mapLoc:theMap){
+		// 		if (rc.senseTerrainTile(mapLoc)==TerrainTile.UNKNOWN){
+		// 			numUnknown++;
+		// 		}else if (rc.senseTerrainTile(mapLoc)==TerrainTile.OFF_MAP){
+		// 			numOffmap++;
+		// 			System.out.println(mapLoc);
+		// 		}else if (rc.senseTerrainTile(mapLoc)==TerrainTile.NORMAL){
+		// 			numNormal++;
+		// 		}
+		// 		else if (rc.senseTerrainTile(mapLoc)==TerrainTile.VOID){
+		// 			numVoid++;
+		// 		}
+		// 		//System.out.println(mapLoc.toString());
+		// 	}
+		// 	System.out.println(numUnknown);
+		// 	System.out.println(numOffmap);
+		// 	System.out.println(numNormal);
+		// 	System.out.println(numVoid);
 
-		} else if (rc.getType() == RobotType.TOWER){
-			System.out.println("I am tower at :" + loc);
-		}
+		// } else if (rc.getType() == RobotType.TOWER){
+		// 	System.out.println("I am tower at :" + loc);
+		// }
 
         try {
             switch(rc.getType()) {
 
             case HQ:
             	robot = new HQRobot(rc);
-            	break;
-            }
+            	break;       
 
-            // case TOWER:
-            //         robot = new HQRobot(rc);
-            //         break;
-
+            case TOWER:
+                    robot = new TOWERRobot(rc);
+                    break;
 
 
-            // // Structures //
-            // case AEROSPACELAB:
-            //         robot = new HQRobot(rc);
-            //         break;
 
-            // case BARRACKS :
-            //         robot = new HQRobot(rc);
-            //         break;        	
+            // Structures //
+            case AEROSPACELAB:
+                    robot = new AEROSPACELABRobot(rc);
+                    break;
 
-            // case HANDWASHSTATION  :
-            //         robot = new HQRobot(rc);
-            //         break;  
+            case BARRACKS :
+                    robot = new BARRACKSRobot(rc);
+                    break;        	
 
-            // case HELIPAD:
-            //         robot = new HQRobot(rc);
-            //         break;   
+            case HANDWASHSTATION  :
+                    robot = new HANDWASHSTATIONRobot(rc);
+                    break;  
 
-            // case MINERFACTORY:
-            //         robot = new HQRobot(rc);
-            //         break;    
+            case HELIPAD:
+                    robot = new HELIPADRobot(rc);
+                    break;   
 
-            // case SUPPLYDEPOT:
-            //         robot = new HQRobot(rc);
-            //         break;             
+            case MINERFACTORY:
+                    robot = new MINERFACTORYRobot(rc);
+                    break;    
 
-            // case TANKFACTORY:
-            //         robot = new HQRobot(rc);
-            //         break;  
+            case SUPPLYDEPOT:
+                    robot = new SUPPLYDEPOTRobot(rc);
+                    break;             
 
-            // case TECHNOLOGYINSTITUTE:
-            //         robot = new HQRobot(rc);
-            //         break;                           
+            case TANKFACTORY:
+                    robot = new TANKFACTORYRobot(rc);
+                    break;  
+
+            case TECHNOLOGYINSTITUTE:
+                    robot = new TECHNOLOGYINSTITUTERobot(rc);
+                    break;                           
            	
-           	// case TRAININGFIELD:
-            //         robot = new HQRobot(rc);
-            //         break;   
-            // ///////////////
+           	case TRAININGFIELD:
+                    robot = new TRAININGFIELDRobot(rc);
+                    break;   
+            ///////////////
 
-            // // Units //
-            // case BASHER:
-            //         robot = new HQRobot(rc);
-            //         break;
+            // Units //
+            case BASHER:
+                    robot = new BASHERRobot(rc);
+                    break;
 
-            // case BEAVER:
-            //         robot = new HQRobot(rc);
-            //         break;        	
+            case BEAVER:
+                    robot = new BEAVERRobot(rc);
+                    break;        	
 
-            // case COMMANDER:
-            //         robot = new HQRobot(rc);
-            //         break;  
+            case COMMANDER:
+                    robot = new COMMANDERRobot(rc);
+                    break;  
 
-            // case COMPUTER:
-            //         robot = new HQRobot(rc);
-            //         break;   
+            case COMPUTER:
+                    robot = new COMPUTERRobot(rc);
+                    break;   
 
-            // case DRONE:
-            //         robot = new HQRobot(rc);
-            //         break;    
+            case DRONE:
+                    robot = new DRONERobot(rc);
+                    break;    
 
-            // case LAUNCHER:
-            //         robot = new HQRobot(rc);
-            //         break;             
+            case LAUNCHER:
+                    robot = new LAUNCHERRobot(rc);
+                    break;             
 
-            // case MINER:
-            //         robot = new HQRobot(rc);
-            //         break;     
+            case MINER:
+                    robot = new MINERRobot(rc);
+                    break;     
            	
-           	// case MISSILE:
-            //         robot = new HQRobot(rc);
-            //         break;   
+           	case MISSILE:
+                    robot = new MISSILERobot(rc);
+                    break;   
  
-           	// case SOLDIER:
-            //         robot = new HQRobot(rc);
-            //         break;     
+           	case SOLDIER:
+                    robot = new SOLDIERRobot(rc);
+                    break;     
 
-           	// case TANK:
-            //         robot = new HQRobot(rc);
-            //         break;                                           
-            // ///////////////
-            // }
+           	case TANK:
+                    robot = new TANKRobot(rc);
+                    break;                                           
+            ///////////////
+            }
             robot.loop();
         } catch (Exception e) {
         	//e.printStackTrace();
