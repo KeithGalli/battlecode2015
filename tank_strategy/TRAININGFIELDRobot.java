@@ -1,4 +1,4 @@
-package team010;
+package tank_strategy;
 
 import battlecode.common.Clock;
 import battlecode.common.Direction;
