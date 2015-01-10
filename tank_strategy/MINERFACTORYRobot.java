@@ -1,11 +1,6 @@
 package team010;
 
-import battlecode.common.Clock;
-import battlecode.common.Direction;
-import battlecode.common.GameActionException;
-import battlecode.common.MapLocation;
-import battlecode.common.RobotController;
-import battlecode.common.Team;
+import battlecode.common.*;
 
 public class MINERFACTORYRobot extends BaseRobot {
 
@@ -18,13 +13,21 @@ public class MINERFACTORYRobot extends BaseRobot {
 
 	@Override
 	public void run() {
-		try {
-			//
-
-		} catch (Exception e) {
-			//                    System.out.println("caught exception before it killed us:");
-			//                    System.out.println(rc.getRobot().getID());
-			//e.printStackTrace();
+		while(true) {
+			Direction[] dirs = Direction.values();
+			int count = 0;
+			int index = 0;
+			
+			//spawn a Miner if able to
+			while(count == 0 && index <= 7){
+				if(rc.isCoreReady() && rc.canSpawn(dirs[index], RobotType.MINER) && rc.senseTeamOre() > ){
+					rc.spawn(dirs[index], RobotType.MINER);
+					count++;
+				}
+				index++;
+			}
+			
+			rc.yield();
 		}
 	}
 }
