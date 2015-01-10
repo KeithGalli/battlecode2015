@@ -19,8 +19,16 @@ public class BEAVERRobot extends BaseRobot {
 	@Override
 	public void run() {
 		try {
-			//
-
+		    if (getEnemiesInAttackingRange().length>0) {
+                if (rc.isWeaponReady()) {
+                    attackLeastHealthEnemy(getEnemiesInAttackingRange());
+                }
+		    } else if (rc.isCoreReady()) {
+		        RobotPlayer.tryMove(RobotPlayer.directions[RobotPlayer.rand.nextInt(8)]);
+		    }
+		    int newBeavers = rc.readBroadcast(BEAVER_CURRENT_CHAN)+1;
+		    rc.broadcast(BEAVER_CURRENT_CHAN, newBeavers);
+		    rc.yield();
 		} catch (Exception e) {
 			//                    System.out.println("caught exception before it killed us:");
 			//                    System.out.println(rc.getRobot().getID());

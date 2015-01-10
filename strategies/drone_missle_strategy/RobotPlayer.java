@@ -23,6 +23,7 @@ public class RobotPlayer {
 		rc= rcIn;
 		BaseRobot robot = null;
 		loc = rc.getLocation();
+		rand = new Random(rc.getID());
 
 		//int randseed = rc.getID();
         //Util.randInit(randseed, randseed * Clock.getRoundNum());
@@ -154,7 +155,12 @@ public class RobotPlayer {
         	//e.printStackTrace();
     	}
     }
-	
+    static void attackSomething() throws GameActionException {
+        RobotInfo[] enemies = rc.senseNearbyRobots(myRange, enemyTeam);
+        if (enemies.length > 0) {
+            rc.attackLocation(enemies[0].location);
+        }
+    }
 	   
     static void tryMove(Direction d) throws GameActionException {
         int offsetIndex = 0;
@@ -168,6 +174,34 @@ public class RobotPlayer {
             rc.move(directions[(dirint+offsets[offsetIndex]+8)%8]);
         }
     }
+    
+    static void trySpawn(Direction d, RobotType type) throws GameActionException {
+        int offsetIndex = 0;
+        int[] offsets = {0,1,-1,2,-2,3,-3,4};
+        int dirint = directionToInt(d);
+        boolean blocked = false;
+        while (offsetIndex < 8 && !rc.canSpawn(directions[(dirint+offsets[offsetIndex]+8)%8], type)) {
+            offsetIndex++;
+        }
+        if (offsetIndex < 8) {
+            rc.spawn(directions[(dirint+offsets[offsetIndex]+8)%8], type);
+        }
+    }
+    
+    // This method will attempt to build in the given direction (or as close to it as possible)
+    static void tryBuild(Direction d, RobotType type) throws GameActionException {
+        int offsetIndex = 0;
+        int[] offsets = {0,1,-1,2,-2,3,-3,4};
+        int dirint = directionToInt(d);
+        boolean blocked = false;
+        while (offsetIndex < 8 && !rc.canMove(directions[(dirint+offsets[offsetIndex]+8)%8])) {
+            offsetIndex++;
+        }
+        if (offsetIndex < 8) {
+            rc.build(directions[(dirint+offsets[offsetIndex]+8)%8], type);
+        }
+    }
+    
     
     static int directionToInt(Direction d) {
         switch(d) {

@@ -11,6 +11,25 @@ import battlecode.common.RobotType;
 import battlecode.common.Team;
 
 public abstract class BaseRobot {
+    
+    public final static int BEAVER_PREVIOUS_CHAN = 1, BEAVER_CURRENT_CHAN = 2;
+    public final static int SUPPLY_DEPOT_PREVIOUS_CHAN = 3, SUPPLY_DEPOT_CURRENT_CHAN = 4;
+    public final static int TECH_INST_PREVIOUS_CHAN = 5, TECH_INST_CURRENT_CHAN = 6;
+    public final static int COMP_PREVIOUS_CHAN = 7, COMP_CURRENT_CHAN = 8;
+    public final static int TRAIN_PREVIOUS_CHAN = 9, TRAIN_CURRENT_CHAN = 10;
+    public final static int COMMANDER_PREVIOUS_CHAN = 11, COMMANDER_CURRENT_CHAN = 12;
+    public final static int BARRACKS_PREVIOUS_CHAN = 13, BARRACKS_CURRENT_CHAN = 14;
+    public final static int SOLDIER_PREVIOUS_CHAN = 15, SOLDIER_CURRENT_CHAN = 16;
+    public final static int TANK_FACT_PREVIOUS_CHAN = 17, TANK_FACT_CURRENT_CHAN = 18;
+    public final static int TANK_PREVIOUS_CHAN = 19, TANK_CURRENT_CHAN = 20;
+    public final static int BASHER_PREVIOUS_CHAN = 21, BASHER_CURRENT_CHAN = 22;
+    public final static int HELIPAD_PREVIOUS_CHAN = 23, HELIPAD_CURRENT_CHAN = 24;
+    public final static int DRONE_PREVIOUS_CHAN = 25, DRONE_CURRENT_CHAN = 26;
+    public final static int AERO_LAB_PREVIOUS_CHAN = 27, AERO_LAB_CURRENT_CHAN = 28;
+    public final static int LAUNCHER_PREVIOUS_CHAN = 29, LAUNCHER_CURRENT_CHAN = 30;
+    public final static int HAND_STATION_PREVIOUS_CHAN = 31, HAND_STATION_CURRENT_CHAN = 32;
+    public final static int MINER_FACT_PREVIOUS_CHAN = 33, MINER_FACT_CURRENT_CHAN = 34;
+    public final static int MINER_PREVIOUS_CHAN = 35, MINER_CURRENT_CHAN = 36;
 
 	public static RobotController rc;
 	public static int id;
