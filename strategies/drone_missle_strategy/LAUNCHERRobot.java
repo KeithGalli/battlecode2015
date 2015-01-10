@@ -19,7 +19,13 @@ public class LAUNCHERRobot extends BaseRobot {
 	@Override
 	public void run() {
 		try {
-			//
+		    Direction directionTowardEnemyHQ = rc.getLocation().directionTo(this.theirHQ);
+			if (rc.canLaunch(directionTowardEnemyHQ)) {
+			    rc.launchMissile(directionTowardEnemyHQ);
+			}
+			if (rc.isCoreReady()) {
+			    
+			}
 
 		} catch (Exception e) {
 			//                    System.out.println("caught exception before it killed us:");
