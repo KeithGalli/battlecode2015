@@ -19,11 +19,11 @@ public class TOWERRobot extends BaseRobot {
 	@Override
 	public void run() {
 		try {
-
-			//
-			// CODE HERE
-			//
-
+            if (getEnemiesInAttackingRange().length>0) {
+                if (rc.isWeaponReady()) {
+                    attackLeastHealthEnemy(getEnemiesInAttackingRange());
+                }
+            }
 		} catch (Exception e) {
 			//                    System.out.println("caught exception before it killed us:");
 			//                    System.out.println(rc.getRobot().getID());

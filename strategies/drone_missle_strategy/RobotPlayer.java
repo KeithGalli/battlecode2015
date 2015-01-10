@@ -1,9 +1,8 @@
 package drone_missle_strategy;
 
 import battlecode.common.*;
+
 import java.util.*;
-import java.util.ArrayList;
-import java.util.Random;
 
 public class RobotPlayer {
 	static RobotController rc;
@@ -13,6 +12,7 @@ public class RobotPlayer {
 	static int myRange;
 	static Random rand;
 	static MapLocation[] theMap;
+    static Direction[] directions = {Direction.NORTH, Direction.NORTH_EAST, Direction.EAST, Direction.SOUTH_EAST, Direction.SOUTH, Direction.SOUTH_WEST, Direction.WEST, Direction.NORTH_WEST};
 
 	static int numUnknown=0;
 	static int numOffmap=0;
@@ -148,10 +148,48 @@ public class RobotPlayer {
                     break;                                           
             ///////////////
             }
+            
             robot.loop();
         } catch (Exception e) {
         	//e.printStackTrace();
     	}
+    }
+	
+	   
+    static void tryMove(Direction d) throws GameActionException {
+        int offsetIndex = 0;
+        int[] offsets = {0,1,-1,2,-2};
+        int dirint = directionToInt(d);
+        boolean blocked = false;
+        while (offsetIndex < 5 && !rc.canMove(directions[(dirint+offsets[offsetIndex]+8)%8])) {
+            offsetIndex++;
+        }
+        if (offsetIndex < 5) {
+            rc.move(directions[(dirint+offsets[offsetIndex]+8)%8]);
+        }
+    }
+    
+    static int directionToInt(Direction d) {
+        switch(d) {
+            case NORTH:
+                return 0;
+            case NORTH_EAST:
+                return 1;
+            case EAST:
+                return 2;
+            case SOUTH_EAST:
+                return 3;
+            case SOUTH:
+                return 4;
+            case SOUTH_WEST:
+                return 5;
+            case WEST:
+                return 6;
+            case NORTH_WEST:
+                return 7;
+            default:
+                return -1;
+        }
     }
 }
 

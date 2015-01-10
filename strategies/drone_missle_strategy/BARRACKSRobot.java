@@ -20,7 +20,6 @@ public class BARRACKSRobot extends BaseRobot {
 	public void run() {
 		try {
 			//
-		    
 
 		} catch (Exception e) {
 			//                    System.out.println("caught exception before it killed us:");

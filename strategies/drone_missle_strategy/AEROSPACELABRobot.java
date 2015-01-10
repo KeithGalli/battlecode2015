@@ -1,8 +1,17 @@
 package drone_missle_strategy;
 
-import battlecode.common.*;
+import battlecode.common.Clock;
+import battlecode.common.Direction;
+import battlecode.common.GameActionException;
+import battlecode.common.MapLocation;
+import battlecode.common.RobotController;
+import battlecode.common.Team;
 
 public class AEROSPACELABRobot extends BaseRobot {
+
+
+
+
 	public AEROSPACELABRobot(RobotController rc) throws GameActionException {
 		super(rc);
 	}
