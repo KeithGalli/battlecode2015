@@ -1,4 +1,4 @@
-package tank_strategy;
+package drone_missle_strategy;
 
 import battlecode.common.Clock;
 import battlecode.common.Direction;
@@ -7,12 +7,12 @@ import battlecode.common.MapLocation;
 import battlecode.common.RobotController;
 import battlecode.common.Team;
 
-public class DRONERobot extends BaseRobot {
+public class BARRACKSRobot extends BaseRobot {
 
 
 
 
-	public DRONERobot(RobotController rc) throws GameActionException {
+	public BARRACKSRobot(RobotController rc) throws GameActionException {
 		super(rc);
 	}
 
@@ -20,6 +20,7 @@ public class DRONERobot extends BaseRobot {
 	public void run() {
 		try {
 			//
+		    
 
 		} catch (Exception e) {
 			//                    System.out.println("caught exception before it killed us:");

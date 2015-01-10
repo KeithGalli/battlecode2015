@@ -1,11 +1,11 @@
-package tank_strategy;
+package drone_missle_strategy;
 
 import battlecode.common.*;
 import java.util.*;
 import java.util.ArrayList;
 import java.util.Random;
 
-public class BroadcastSystem {
+public class DataCache {
 
 	public static BaseRobot robot;
 	public static RobotController rc;

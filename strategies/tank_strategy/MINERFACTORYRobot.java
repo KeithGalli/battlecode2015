@@ -7,12 +7,12 @@ import battlecode.common.MapLocation;
 import battlecode.common.RobotController;
 import battlecode.common.Team;
 
-public class DRONERobot extends BaseRobot {
+public class MINERFACTORYRobot extends BaseRobot {
 
 
 
 
-	public DRONERobot(RobotController rc) throws GameActionException {
+	public MINERFACTORYRobot(RobotController rc) throws GameActionException {
 		super(rc);
 	}
 

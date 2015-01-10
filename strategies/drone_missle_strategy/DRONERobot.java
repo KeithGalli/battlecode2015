@@ -1,4 +1,4 @@
-package tank_strategy;
+package drone_missle_strategy;
 
 import battlecode.common.Clock;
 import battlecode.common.Direction;
