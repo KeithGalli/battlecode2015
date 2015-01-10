@@ -20,7 +20,7 @@ public class MINERFACTORYRobot extends BaseRobot {
 			
 			//spawn a Miner if able to
 			while(count == 0 && index <= 7){
-				if(rc.isCoreReady() && rc.canSpawn(dirs[index], RobotType.MINER) && rc.senseTeamOre() > ){
+				if(rc.isCoreReady() && rc.canSpawn(dirs[index], RobotType.MINER) && rc.senseTeamOre() > 50){
 					rc.spawn(dirs[index], RobotType.MINER);
 					count++;
 				}
