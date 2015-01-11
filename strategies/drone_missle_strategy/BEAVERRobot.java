@@ -1,11 +1,6 @@
 package drone_missle_strategy;
 
-import battlecode.common.Clock;
-import battlecode.common.Direction;
-import battlecode.common.GameActionException;
-import battlecode.common.MapLocation;
-import battlecode.common.RobotController;
-import battlecode.common.Team;
+import battlecode.common.*;
 
 public class BEAVERRobot extends BaseRobot {
 
@@ -24,7 +19,11 @@ public class BEAVERRobot extends BaseRobot {
                     attackLeastHealthEnemy(getEnemiesInAttackingRange());
                 }
 		    } else if (rc.isCoreReady()) {
+		    	if(rc.getTeamOre() > 500 && rc.canBuild(Direction.NORTH, RobotType.MINERFACTORY)) {
+		    		rc.build(Direction.NORTH, RobotType.MINERFACTORY);
+		    	} else {
 		        RobotPlayer.tryMove(RobotPlayer.directions[RobotPlayer.rand.nextInt(8)]);
+		    	}
 		    }
 		    rc.broadcast(BEAVER_CURRENT_CHAN, rc.readBroadcast(BEAVER_CURRENT_CHAN)+1);
 		    rc.yield();
