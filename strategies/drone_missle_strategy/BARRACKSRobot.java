@@ -19,7 +19,7 @@ public class BARRACKSRobot extends BaseRobot {
 	@Override
 	public void run() {
 		try {
-			//
+			rc.broadcast(BARRACKS_CURRENT_CHAN, rc.readBroadcast(BARRACKS_CURRENT_CHAN)+1);
 
 		} catch (Exception e) {
 			//                    System.out.println("caught exception before it killed us:");
