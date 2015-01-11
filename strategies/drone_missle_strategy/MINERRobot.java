@@ -14,14 +14,13 @@ public class MINERRobot extends BaseRobot {
 	public void run() {
 		try {
 			if(rc.isCoreReady()) {
-				
 				if(rc.senseOre(rc.getLocation()) >= 4 && rc.canMine()) {
 					rc.mine();
 				} else {
 					moveAwayFromHQ();
-				}
-				
+				}	
 			}
+			rc.broadcast(MINER_CURRENT_CHAN, rc.readBroadcast(MINER_CURRENT_CHAN)+1);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

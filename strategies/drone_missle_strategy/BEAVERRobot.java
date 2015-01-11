@@ -23,11 +23,11 @@ public class BEAVERRobot extends BaseRobot {
 	                    attackLeastHealthEnemy(getEnemiesInAttackingRange());
 	                }
 			    } else if(minerFactories < 2 && ore>= 500){
-			    	RobotPlayer.tryBuild(directions[rand.nextInt(8)], RobotType.MINERFACTORY);
+			    	RobotPlayer.tryBuild(RobotPlayer.directions[RobotPlayer.rand.nextInt(8)], RobotType.MINERFACTORY);
 			    }  else if(rc.readBroadcast(BARRACKS_PREVIOUS_CHAN) < 2 && minerFactories >= 2 && ore >= 300){
-			    	RobotPlayer.tryBuild(directions[rand.nextInt(8)], RobotType.BARRACKS);
+			    	RobotPlayer.tryBuild(RobotPlayer.directions[RobotPlayer.rand.nextInt(8)], RobotType.BARRACKS);
 			    } else if(rc.readBroadcast(HELIPAD_PREVIOUS_CHAN) < 2 && minerFactories >= 2 && ore >= 300){
-			    	RobotPlayer.tryBuild(directions[rand.nextInt(8)], RobotType.HELIPAD);
+			    	RobotPlayer.tryBuild(RobotPlayer.directions[RobotPlayer.rand.nextInt(8)], RobotType.HELIPAD);
 			    } else if(rc.senseOre(rc.getLocation())>1){
 			        RobotPlayer.tryMove(RobotPlayer.directions[RobotPlayer.rand.nextInt(8)]);
 				    //rc.mine();

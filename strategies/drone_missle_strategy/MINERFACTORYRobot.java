@@ -22,10 +22,11 @@ public class MINERFACTORYRobot extends BaseRobot {
 	public void run() {
 		try {
 			if(rc.isCoreReady()){
-			    Direction spawnDirection = getSpawnDirection(RobotType.MINER); 
-				if(rc.getTeamOre() > 50 && rc.canSpawn(spawnDirection, RobotType.MINER)){
-						rc.spawn(spawnDirection, RobotType.MINER);
-				}
+			    if (rc.readBroadcast(MINER_PREVIOUS_CHAN)<25 && rc.getTeamOre() > 50) {
+			        Direction spawnDirection = getSpawnDirection(RobotType.MINER);
+			        if (spawnDirection != null)
+			            rc.spawn(spawnDirection, RobotType.MINER);
+			    }
 			}
 	        rc.broadcast(MINER_FACT_CURRENT_CHAN, rc.readBroadcast(MINER_FACT_CURRENT_CHAN)+1);
 	        rc.yield();
