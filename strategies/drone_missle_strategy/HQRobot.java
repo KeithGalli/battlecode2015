@@ -43,6 +43,8 @@ public class HQRobot extends BaseRobot {
             rc.broadcast(BARRACKS_CURRENT_CHAN, 0);
             int numTankFactories = rc.readBroadcast(TANK_FACT_CURRENT_CHAN);
             rc.broadcast(TANK_FACT_CURRENT_CHAN, 0);
+            int numTanks = rc.readBroadcast(TANK_CURRENT_CHAN);
+            rc.broadcast(TANK_CURRENT_CHAN, 0);
             
             rc.broadcast(MINER_FACT_PREVIOUS_CHAN, numMinerFactories);
             rc.broadcast(MINER_PREVIOUS_CHAN, numMiners);
@@ -53,7 +55,7 @@ public class HQRobot extends BaseRobot {
             rc.broadcast(DRONE_PREVIOUS_CHAN, numDrones);
             rc.broadcast(BARRACKS_PREVIOUS_CHAN,numBarracks);
             rc.broadcast(TANK_FACT_PREVIOUS_CHAN, numTankFactories);
-            
+            rc.broadcast(TANK_PREVIOUS_CHAN, numTanks);
             
             
             int closestTowerX = getClosestTower().x;

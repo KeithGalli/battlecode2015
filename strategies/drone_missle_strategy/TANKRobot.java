@@ -19,7 +19,22 @@ public class TANKRobot extends BaseRobot {
 	@Override
 	public void run() {
 		try {
-			//
+			int numTank = rc.readBroadcast(TANK_CURRENT_CHAN);
+			MapLocation[] towers = rc.senseTowerLocations();
+			int numTowerProtecting = numTank % towers.length;
+			MapLocation locationToProtect = towers[numTowerProtecting];
+			if(rc.isCoreReady()){
+				if (getEnemiesInAttackingRange().length>0) {
+	                if (rc.isWeaponReady()) {
+	                    attackLeastHealthEnemy(getEnemiesInAttackingRange());
+	                }
+				} else if(locationToProtect.distanceSquaredTo(rc.getLocation())> 7){
+					RobotPlayer.tryMove(rc.getLocation().directionTo(locationToProtect));
+				} else{
+					RobotPlayer.tryMove(RobotPlayer.directions[RobotPlayer.rand.nextInt(8)]);
+				}
+			} 
+			rc.broadcast(TANK_CURRENT_CHAN, numTank+1);
 
 		} catch (Exception e) {
 			//                    System.out.println("caught exception before it killed us:");
