@@ -23,7 +23,7 @@ public class BEAVERRobot extends BaseRobot {
 		    	if(rc.getTeamOre() > 500 && rc.canBuild(Direction.NORTH, RobotType.MINERFACTORY)) {
 		    		rc.build(Direction.NORTH, RobotType.MINERFACTORY);
 		    	} else {
-		        RobotPlayer.tryMove(RobotPlayer.directions[RobotPlayer.rand.nextInt(8)]);
+		            RobotPlayer.tryMove(RobotPlayer.directions[RobotPlayer.rand.nextInt(8)]);
 		    	}
 		    }
 		    rc.broadcast(BEAVER_CURRENT_CHAN, rc.readBroadcast(BEAVER_CURRENT_CHAN)+1);
