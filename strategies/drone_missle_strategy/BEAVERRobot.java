@@ -1,13 +1,12 @@
 package drone_missle_strategy;
 
 
+import java.util.Random;
+
 import drone_missle_strategy.RobotPlayer;
 import battlecode.common.*;
 
 public class BEAVERRobot extends BaseRobot {
-
-
-
 
 	public BEAVERRobot(RobotController rc) throws GameActionException {
 		super(rc);
@@ -18,14 +17,17 @@ public class BEAVERRobot extends BaseRobot {
 		try {
 		    if(rc.isCoreReady()){
 				double ore = rc.getTeamOre();
+				int minerFactories = rc.readBroadcast(MINER_FACT_PREVIOUS_CHAN);
 			    if (getEnemiesInAttackingRange().length>0) {
 	                if (rc.isWeaponReady()) {
 	                    attackLeastHealthEnemy(getEnemiesInAttackingRange());
 	                }
-			    } else if(rc.readBroadcast(MINER_FACT_PREVIOUS_CHAN) < 3 && rc.readBroadcast(MINER_FACT_CURRENT_CHAN) < 3 && ore >= 500){
-			    	RobotPlayer.tryBuild(RobotPlayer.directions[RobotPlayer.rand.nextInt(8)], RobotType.MINERFACTORY);
-			    } else if(rc.readBroadcast(HELIPAD_PREVIOUS_CHAN) < 3 && rc.readBroadcast(MINER_FACT_PREVIOUS_CHAN) >= 3 && ore >= 300){
-			    	RobotPlayer.tryBuild(RobotPlayer.directions[RobotPlayer.rand.nextInt(8)], RobotType.HELIPAD);
+			    } else if(minerFactories < 2 && ore>= 500){
+			    	RobotPlayer.tryBuild(directions[rand.nextInt(8)], RobotType.MINERFACTORY);
+			    }  else if(rc.readBroadcast(BARRACKS_PREVIOUS_CHAN) < 2 && minerFactories >= 2 && ore >= 300){
+			    	RobotPlayer.tryBuild(directions[rand.nextInt(8)], RobotType.BARRACKS);
+			    } else if(rc.readBroadcast(HELIPAD_PREVIOUS_CHAN) < 2 && minerFactories >= 2 && ore >= 300){
+			    	RobotPlayer.tryBuild(directions[rand.nextInt(8)], RobotType.HELIPAD);
 			    } else if(rc.senseOre(rc.getLocation())>1){
 			        RobotPlayer.tryMove(RobotPlayer.directions[RobotPlayer.rand.nextInt(8)]);
 				    //rc.mine();
