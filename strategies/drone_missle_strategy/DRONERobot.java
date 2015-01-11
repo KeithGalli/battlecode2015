@@ -37,6 +37,7 @@ public class DRONERobot extends BaseRobot {
 		        }
 		        RobotPlayer.tryMove(rc.getLocation().directionTo(closest));
 		    }
+            rc.broadcast(DRONE_CURRENT_CHAN, rc.readBroadcast(DRONE_CURRENT_CHAN)+1);
 		    rc.yield();
 		} catch (Exception e) {
 			//                    System.out.println("caught exception before it killed us:");

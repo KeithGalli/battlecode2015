@@ -26,8 +26,7 @@ public class BEAVERRobot extends BaseRobot {
 		    } else if (rc.isCoreReady()) {
 		        RobotPlayer.tryMove(RobotPlayer.directions[RobotPlayer.rand.nextInt(8)]);
 		    }
-		    int newBeavers = rc.readBroadcast(BEAVER_CURRENT_CHAN)+1;
-		    rc.broadcast(BEAVER_CURRENT_CHAN, newBeavers);
+		    rc.broadcast(BEAVER_CURRENT_CHAN, rc.readBroadcast(BEAVER_CURRENT_CHAN)+1);
 		    rc.yield();
 		} catch (Exception e) {
 			//                    System.out.println("caught exception before it killed us:");

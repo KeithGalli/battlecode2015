@@ -25,20 +25,27 @@ public class HQRobot extends BaseRobot {
 	@Override
 	public void run() {
 		try {
+		    int numMinerFactories = rc.readBroadcast(MINER_FACT_CURRENT_CHAN);
+		    rc.broadcast(MINER_FACT_CURRENT_CHAN, 0);
 		    int numMiners = rc.readBroadcast(MINER_CURRENT_CHAN);
 		    rc.broadcast(MINER_CURRENT_CHAN, 0);
-		    
 		    int numSoldiers = rc.readBroadcast(SOLDIER_CURRENT_CHAN);
             rc.broadcast(SOLDIER_CURRENT_CHAN, 0);
             int numBashers = rc.readBroadcast(BASHER_CURRENT_CHAN);
             rc.broadcast(BASHER_CURRENT_CHAN, 0);
             int numBeavers = rc.readBroadcast(BEAVER_CURRENT_CHAN);
             rc.broadcast(BEAVER_CURRENT_CHAN, 0);
+            int numHelipads = rc.readBroadcast(HELIPAD_CURRENT_CHAN);
+            rc.broadcast(HELIPAD_CURRENT_CHAN, 0);
+            int numDrones = rc.readBroadcast(DRONE_CURRENT_CHAN);
+            rc.broadcast(DRONE_CURRENT_CHAN, 0);
             
+            rc.broadcast(MINER_FACT_PREVIOUS_CHAN, numMinerFactories);
             rc.broadcast(MINER_PREVIOUS_CHAN, numMiners);
             rc.broadcast(BEAVER_PREVIOUS_CHAN, numBeavers);
             rc.broadcast(SOLDIER_PREVIOUS_CHAN, numSoldiers);
             rc.broadcast(BASHER_PREVIOUS_CHAN, numBashers);
+            rc.broadcast(HELIPAD_PREVIOUS_CHAN, numHelipads);
 
 
 

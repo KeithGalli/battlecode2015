@@ -21,15 +21,14 @@ public class MINERFACTORYRobot extends BaseRobot {
 	@Override
 	public void run() {
 		try {
-			while(true) {
-				if(rc.isCoreReady()){
-					
-					if(rc.getTeamOre() > MINERRobot.oreCost && rc.canSpawn(getSpawnDirection(RobotType.MINER), RobotType.MINER)){
-							rc.spawn(getSpawnDirection(RobotType.MINER), RobotType.MINER);
-							
-					}
+			if(rc.isCoreReady()){
+			    Direction spawnDirection = getSpawnDirection(RobotType.MINER); 
+				if(rc.getTeamOre() > 50 && rc.canSpawn(spawnDirection, RobotType.MINER)){
+						rc.spawn(spawnDirection, RobotType.MINER);
 				}
 			}
+	        rc.broadcast(MINER_FACT_CURRENT_CHAN, rc.readBroadcast(MINER_FACT_CURRENT_CHAN)+1);
+	        rc.yield();
 		} catch (GameActionException e) {
 			e.printStackTrace();
 		}
