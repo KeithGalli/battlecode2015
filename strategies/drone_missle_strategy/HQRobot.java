@@ -46,9 +46,16 @@ public class HQRobot extends BaseRobot {
             rc.broadcast(SOLDIER_PREVIOUS_CHAN, numSoldiers);
             rc.broadcast(BASHER_PREVIOUS_CHAN, numBashers);
             rc.broadcast(HELIPAD_PREVIOUS_CHAN, numHelipads);
-
-
-
+            rc.broadcast(DRONE_PREVIOUS_CHAN, numDrones);
+            
+            
+            
+            int closestTowerX = getClosestTower().x;
+            int closestTowerY = getClosestTower().y;
+            
+            rc.broadcast(50, closestTowerX);
+            rc.broadcast(51, closestTowerY);
+            
             if (rc.isCoreReady() && rc.getTeamOre() >= 100 && rc.readBroadcast(BEAVER_PREVIOUS_CHAN)<8) {
                 RobotPlayer.trySpawn(RobotPlayer.directions[RobotPlayer.rand.nextInt(8)], RobotType.BEAVER);
             }

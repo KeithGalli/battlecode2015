@@ -25,17 +25,18 @@ public class DRONERobot extends BaseRobot {
                 }
             }
 		    if (rc.isCoreReady()) {
-		        MapLocation[] enemyTowers = rc.senseEnemyTowerLocations();
-		        int distanceToClosest = rc.getLocation().distanceSquaredTo(enemyTowers[0]);
-		        MapLocation closest = enemyTowers[0];
-		        for (MapLocation tower: enemyTowers) {
-		            int distanceToTower = rc.getLocation().distanceSquaredTo(tower);
-		            if (distanceToTower<distanceToClosest) {
-		                distanceToClosest = distanceToTower;
-		                closest = tower;
+
+		        if (rc.readBroadcast(DRONE_PREVIOUS_CHAN)>15 && rc.senseNearbyRobots(16, theirTeam).length < 2) {
+		            MapLocation closestTower = new MapLocation(rc.readBroadcast(50), rc.readBroadcast(51));
+		            RobotPlayer.tryMove(rc.getLocation().directionTo(closestTower));
+		        } else {
+		            int fate = RobotPlayer.rand.nextInt(1000);
+		            if (fate<30) {
+		                RobotPlayer.tryMove(RobotPlayer.directions[RobotPlayer.rand.nextInt(8)]);
 		            }
+
 		        }
-		        RobotPlayer.tryMove(rc.getLocation().directionTo(closest));
+
 		    }
             rc.broadcast(DRONE_CURRENT_CHAN, rc.readBroadcast(DRONE_CURRENT_CHAN)+1);
 		    rc.yield();

@@ -57,6 +57,30 @@ public abstract class BaseRobot {
 		
 	}
 	
+	public MapLocation getClosestTower() {
+	    MapLocation[] enemyTowers = rc.senseEnemyTowerLocations();
+        int distanceToClosest = rc.getLocation().distanceSquaredTo(enemyTowers[0]);
+        MapLocation closest = enemyTowers[0];
+        for (MapLocation tower: enemyTowers) {
+            int distanceToTower = rc.getLocation().distanceSquaredTo(tower);
+            if (distanceToTower<distanceToClosest) {
+                distanceToClosest = distanceToTower;
+                closest = tower;
+            }
+        }
+        return closest;
+	}
+
+//	public MapLocation getMostIsolatedTower() {
+//	    MapLocation[] enemyTowers = rc.senseEnemyTowerLocations();
+//	    int xCount = 0;
+//	    int yCount = 0;
+//	    for (MapLocation tower : enemyTowers) {
+//	        xCount += tower.x;
+//	        yCount += tower.y;
+//	    }
+//	}
+	
 	public Direction[] getDirectionsToward(MapLocation dest) {
         Direction toDest = rc.getLocation().directionTo(dest);
         Direction[] dirs = {toDest,
