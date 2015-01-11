@@ -20,7 +20,7 @@ public class HELIPADRobot extends BaseRobot {
 	@Override
 	public void run() {
 		try {
-		    if (rc.isCoreReady() && rc.getTeamOre()>125) {
+		    if (rc.isCoreReady() && rc.getTeamOre()>125 && rc.readBroadcast(DRONE_PREVIOUS_CHAN) < 10) {
                 Direction newDir =  getSpawnDirection(RobotType.DRONE);
                 if (newDir != null) {
                     rc.spawn(newDir, RobotType.DRONE);

@@ -41,6 +41,8 @@ public class HQRobot extends BaseRobot {
             rc.broadcast(DRONE_CURRENT_CHAN, 0);
             int numBarracks = rc.readBroadcast(BARRACKS_CURRENT_CHAN);
             rc.broadcast(BARRACKS_CURRENT_CHAN, 0);
+            int numTankFactories = rc.readBroadcast(TANK_FACT_CURRENT_CHAN);
+            rc.broadcast(TANK_FACT_CURRENT_CHAN, 0);
             
             rc.broadcast(MINER_FACT_PREVIOUS_CHAN, numMinerFactories);
             rc.broadcast(MINER_PREVIOUS_CHAN, numMiners);
@@ -50,6 +52,7 @@ public class HQRobot extends BaseRobot {
             rc.broadcast(HELIPAD_PREVIOUS_CHAN, numHelipads);
             rc.broadcast(DRONE_PREVIOUS_CHAN, numDrones);
             rc.broadcast(BARRACKS_PREVIOUS_CHAN,numBarracks);
+            rc.broadcast(TANK_FACT_PREVIOUS_CHAN, numTankFactories);
             
             
             

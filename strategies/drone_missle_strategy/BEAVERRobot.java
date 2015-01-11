@@ -28,9 +28,10 @@ public class BEAVERRobot extends BaseRobot {
 			    	RobotPlayer.tryBuild(RobotPlayer.directions[RobotPlayer.rand.nextInt(8)], RobotType.BARRACKS);
 			    } else if(rc.readBroadcast(HELIPAD_PREVIOUS_CHAN) < 2 && minerFactories >= 2 && ore >= 300){
 			    	RobotPlayer.tryBuild(RobotPlayer.directions[RobotPlayer.rand.nextInt(8)], RobotType.HELIPAD);
+			    } else if(rc.readBroadcast(TANK_FACT_PREVIOUS_CHAN) < 2 && ore >= 500) {
+			    	RobotPlayer.tryBuild(RobotPlayer.directions[RobotPlayer.rand.nextInt(8)], RobotType.TANKFACTORY);
 			    } else if(rc.senseOre(rc.getLocation())>1){
-			        RobotPlayer.tryMove(RobotPlayer.directions[RobotPlayer.rand.nextInt(8)]);
-				    //rc.mine();
+				    rc.mine();
 				} else{
 			        RobotPlayer.tryMove(RobotPlayer.directions[RobotPlayer.rand.nextInt(8)]);
 				}
