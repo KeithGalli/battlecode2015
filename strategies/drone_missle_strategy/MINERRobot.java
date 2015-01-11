@@ -1,17 +1,11 @@
 package drone_missle_strategy;
 
-import battlecode.common.Clock;
-import battlecode.common.Direction;
-import battlecode.common.GameActionException;
-import battlecode.common.MapLocation;
-import battlecode.common.RobotController;
-import battlecode.common.Team;
+import battlecode.common.*;
 
 public class MINERRobot extends BaseRobot {
 
-
-
-
+	public static int oreCost = 50;
+	
 	public MINERRobot(RobotController rc) throws GameActionException {
 		super(rc);
 	}
@@ -19,12 +13,32 @@ public class MINERRobot extends BaseRobot {
 	@Override
 	public void run() {
 		try {
-			//
-
+			while(true) {
+				if(rc.isCoreReady()) {
+					
+					if(rc.senseOre(rc.getLocation()) >= 4 && rc.canMine()) {
+						rc.mine();
+					} else {
+						moveAwayFromHQ();
+					}
+					
+				}
+			}
 		} catch (Exception e) {
-			//                    System.out.println("caught exception before it killed us:");
-			//                    System.out.println(rc.getRobot().getID());
-			//e.printStackTrace();
+			e.printStackTrace();
 		}
+	}
+
+	private void moveAwayFromHQ() {
+		Direction dir = getDirectionAwayFromHQ();
+		try {
+			RobotPlayer.tryMove(dir);
+		} catch (GameActionException e) {
+			e.printStackTrace();
+		}
+	}
+
+	private Direction getDirectionAwayFromHQ() {
+		return (rc.getLocation().directionTo(rc.senseHQLocation()).opposite());
 	}
 }
