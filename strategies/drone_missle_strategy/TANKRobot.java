@@ -35,7 +35,6 @@ public class TANKRobot extends BaseRobot {
 				}
 			} 
 			rc.broadcast(TANK_CURRENT_CHAN, numTank+1);
-
 		} catch (Exception e) {
 			//                    System.out.println("caught exception before it killed us:");
 			//                    System.out.println(rc.getRobot().getID());
