@@ -19,8 +19,7 @@ public class TANKRobot extends BaseRobot {
 	@Override
 	public void run() {
 		try {
-			//
-
+		    
 		} catch (Exception e) {
 			//                    System.out.println("caught exception before it killed us:");
 			//                    System.out.println(rc.getRobot().getID());

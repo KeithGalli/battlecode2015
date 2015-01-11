@@ -19,7 +19,10 @@ public class BASHERRobot extends BaseRobot {
 	@Override
 	public void run() {
 		try {
-			//
+		    if (rc.isCoreReady()) {
+		        RobotPlayer.tryMove(RobotPlayer.directions[RobotPlayer.rand.nextInt(8)]);
+		    }
+			
 
 		} catch (Exception e) {
 			//                    System.out.println("caught exception before it killed us:");
