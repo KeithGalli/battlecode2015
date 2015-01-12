@@ -83,7 +83,7 @@ public abstract class BaseRobot {
 //	}
 	
 	public boolean withinRange(int unitCount1, int unitCount2, double idealValue, double threshold) {
-	    return (Math.abs(idealValue-unitCount1*1.0/unitCount2)<threshold);
+	    return ((unitCount1*1.0/unitCount2-idealValue)<threshold);
 	}
 	
 	public Direction[] getDirectionsToward(MapLocation dest) {
