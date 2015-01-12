@@ -41,10 +41,6 @@ public class DRONERobot extends BaseRobot {
                 }
             }
 		    if (rc.isCoreReady()) {
-//		    	if(Clock.getRoundNum() > 1300 && attackMode ){
-//		    		MapLocation tower = getClosestTower();
-//		    		RobotPlayer.tryMove(rc.getLocation().directionTo(tower));
-//		    	}
 		    	if ( rc.readBroadcast(DRONE_PREVIOUS_CHAN)>15 && rc.senseNearbyRobots(16, theirTeam).length < 10 & senseNearbyTowers(rc.getLocation()) <2) {
 		            MapLocation closestTower = new MapLocation(rc.readBroadcast(50), rc.readBroadcast(51));
 		            RobotPlayer.tryMove(rc.getLocation().directionTo(closestTower));
