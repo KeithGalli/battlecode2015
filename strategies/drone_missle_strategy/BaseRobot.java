@@ -146,6 +146,8 @@ public abstract class BaseRobot {
         	if(info.type == RobotType.TOWER){
         		rc.attackLocation(info.location);
         		return;
+        	} else if(info.type == RobotType.HELIPAD){
+        		rc.attackLocation(info.location);
         	}
             if (info.health < minEnergon) {
                 toAttack = info.location;

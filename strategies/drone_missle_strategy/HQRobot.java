@@ -58,13 +58,14 @@ public class HQRobot extends BaseRobot {
             rc.broadcast(BARRACKS_PREVIOUS_CHAN,numBarracks);
             rc.broadcast(TANK_FACT_PREVIOUS_CHAN, numTankFactories);
             rc.broadcast(TANK_PREVIOUS_CHAN, numTanks);
-            
-            
+
+     
             int closestTowerX = getClosestTower().x;
             int closestTowerY = getClosestTower().y;
             
             rc.broadcast(50, closestTowerX);
             rc.broadcast(51, closestTowerY);
+
             
             RobotInfo[] enemies = getEnemiesInAttackingRange();
             if(enemies.length>0 && rc.isWeaponReady()){
@@ -75,9 +76,7 @@ public class HQRobot extends BaseRobot {
             transferSupplies(rc);
 			
 		} catch (Exception e) {
-			//                    System.out.println("caught exception before it killed us:");
-			//                    System.out.println(rc.getRobot().getID());
-			//e.printStackTrace();
+			e.printStackTrace();
 		}
 	}
 	
