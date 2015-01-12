@@ -35,8 +35,11 @@ public class DRONERobot extends BaseRobot {
                 }
             }
 		    if (rc.isCoreReady()) {
-
-		        if (rc.readBroadcast(DRONE_PREVIOUS_CHAN)>15 && rc.senseNearbyRobots(16, theirTeam).length < 2) {
+//		    	if(Clock.getRoundNum() > 1300){
+//		    		MapLocation tower = getClosestTower();
+//		    		RobotPlayer.tryMove(rc.getLocation().directionTo(tower));
+//		    	}
+		    	if (rc.readBroadcast(DRONE_PREVIOUS_CHAN)>15 && rc.senseNearbyRobots(16, theirTeam).length < 2) {
 		            MapLocation closestTower = new MapLocation(rc.readBroadcast(50), rc.readBroadcast(51));
 		            RobotPlayer.tryMove(rc.getLocation().directionTo(closestTower));
 
@@ -45,7 +48,7 @@ public class DRONERobot extends BaseRobot {
 		        } else if(rc.getSupplyLevel()> 500){
 		        	moveAwayFromHQ();
 		        	transferSupplies(rc);
-		            } else{
+		        } else{
 		            	RobotPlayer.tryMove(rc.getLocation().directionTo(rc.senseHQLocation()));
 		            }
 		    }
