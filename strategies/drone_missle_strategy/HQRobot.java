@@ -3,6 +3,7 @@ package drone_missle_strategy;
 import battlecode.common.Clock;
 import battlecode.common.Direction;
 import battlecode.common.GameActionException;
+import battlecode.common.GameConstants;
 import battlecode.common.MapLocation;
 import battlecode.common.RobotController;
 import battlecode.common.RobotInfo;
@@ -25,6 +26,7 @@ public class HQRobot extends BaseRobot {
 	@Override
 	public void run() {
 		try {
+		  
 		    int numMinerFactories = rc.readBroadcast(MINER_FACT_CURRENT_CHAN);
 		    rc.broadcast(MINER_FACT_CURRENT_CHAN, 0);
 		    int numMiners = rc.readBroadcast(MINER_CURRENT_CHAN);
@@ -39,6 +41,12 @@ public class HQRobot extends BaseRobot {
             rc.broadcast(HELIPAD_CURRENT_CHAN, 0);
             int numDrones = rc.readBroadcast(DRONE_CURRENT_CHAN);
             rc.broadcast(DRONE_CURRENT_CHAN, 0);
+            int numBarracks = rc.readBroadcast(BARRACKS_CURRENT_CHAN);
+            rc.broadcast(BARRACKS_CURRENT_CHAN, 0);
+            int numTankFactories = rc.readBroadcast(TANK_FACT_CURRENT_CHAN);
+            rc.broadcast(TANK_FACT_CURRENT_CHAN, 0);
+            int numTanks = rc.readBroadcast(TANK_CURRENT_CHAN);
+            rc.broadcast(TANK_CURRENT_CHAN, 0);
             
             rc.broadcast(MINER_FACT_PREVIOUS_CHAN, numMinerFactories);
             rc.broadcast(MINER_PREVIOUS_CHAN, numMiners);
@@ -47,15 +55,28 @@ public class HQRobot extends BaseRobot {
             rc.broadcast(BASHER_PREVIOUS_CHAN, numBashers);
             rc.broadcast(HELIPAD_PREVIOUS_CHAN, numHelipads);
 
-
-
             if (rc.isCoreReady() && rc.getTeamOre() >= 100 && rc.readBroadcast(BEAVER_PREVIOUS_CHAN) < 8) {
+            rc.broadcast(DRONE_PREVIOUS_CHAN, numDrones);
+            rc.broadcast(BARRACKS_PREVIOUS_CHAN,numBarracks);
+            rc.broadcast(TANK_FACT_PREVIOUS_CHAN, numTankFactories);
+            rc.broadcast(TANK_PREVIOUS_CHAN, numTanks);
+            
+            int closestTowerX = getClosestTower().x;
+            int closestTowerY = getClosestTower().y;
+            
+            rc.broadcast(50, closestTowerX);
+            rc.broadcast(51, closestTowerY);
+            RobotInfo[] enemies = getEnemiesInAttackingRange();
+            if(enemies.length>0 && rc.isWeaponReady()){
+            	attackLeastHealthEnemy(enemies);
+            } else if (rc.isCoreReady() && rc.getTeamOre() >= 100 && rc.readBroadcast(BEAVER_PREVIOUS_CHAN)<8) {
                 RobotPlayer.trySpawn(RobotPlayer.directions[RobotPlayer.rand.nextInt(8)], RobotType.BEAVER);
             }
-            rc.yield();
+            transferSupplies(rc);
 			
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
+	
 }

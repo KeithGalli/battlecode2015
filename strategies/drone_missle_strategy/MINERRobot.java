@@ -22,6 +22,7 @@ public class MINERRobot extends BaseRobot {
 		
 		try {
 			if(rc.isCoreReady()) {
+<<<<<<< HEAD
 				
 				//ROUNDS 0->120: simply move away from HQ with .5 probability
 				if(roundNum < 120) {
@@ -47,7 +48,16 @@ public class MINERRobot extends BaseRobot {
 					}
 				}
 				
+=======
+				if(rc.senseOre(rc.getLocation()) >= 4 && rc.canMine()) {
+					rc.mine();
+				} else {
+					moveAwayFromHQ();
+				}	
+>>>>>>> 512325b0075654b4027006276bc6a1174a827170
 			}
+			transferMinerSupplies(rc);
+			rc.broadcast(MINER_CURRENT_CHAN, rc.readBroadcast(MINER_CURRENT_CHAN)+1);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
