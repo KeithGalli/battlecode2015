@@ -27,14 +27,17 @@ public class MINERFACTORYRobot extends BaseRobot {
 						RobotPlayer.trySpawn(RobotPlayer.directions[RobotPlayer.rand.nextInt(8)], RobotType.MINER);
 				}
 				
-		        rc.broadcast(MINER_FACT_CURRENT_CHAN, rc.readBroadcast(MINER_FACT_CURRENT_CHAN)+1);
-		        rc.yield();
-			    if (rc.readBroadcast(MINER_PREVIOUS_CHAN)<25 && rc.getTeamOre() > 50) {
+		        else if (rc.readBroadcast(MINER_PREVIOUS_CHAN)<25 && rc.getTeamOre() > 50) {
 			        Direction spawnDirection = getSpawnDirection(RobotType.MINER);
 			        if (spawnDirection != null)
 			            rc.spawn(spawnDirection, RobotType.MINER);
 			    }
+				
 			}
+			
+			rc.broadcast(MINER_FACT_CURRENT_CHAN, rc.readBroadcast(MINER_FACT_CURRENT_CHAN)+1);
+	        rc.yield();
+	        
 		} catch (GameActionException e) {
 			e.printStackTrace();
 		}

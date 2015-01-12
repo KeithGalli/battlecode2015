@@ -6,7 +6,7 @@ import battlecode.common.*;
 
 public class MINERRobot extends BaseRobot {
 	
-	static Random rand;
+	static Random rand = new Random();
 	public final static int MINER_COST = 50;
 	private static Direction[] directions = {Direction.NORTH, Direction.NORTH_EAST, Direction.EAST, Direction.SOUTH_EAST, Direction.SOUTH, Direction.SOUTH_WEST, Direction.WEST, Direction.NORTH_WEST};
 	
@@ -39,26 +39,26 @@ public class MINERRobot extends BaseRobot {
 				//else if enemies in range, attack
 				else if (getEnemiesInAttackingRange().length > 0 && rc.isWeaponReady()) attackLeastHealthEnemy(getEnemiesInAttackingRange());
 				
-				else if(rc.getLocation().distanceSquaredTo(rc.senseHQLocation()) < 100) tryMinerMove(groupDirections[minerGroupNum][(int) (Math.random()*8)]);
+				else if(rc.getLocation().distanceSquaredTo(rc.senseHQLocation()) < 100) tryMinerMove(groupDirections[minerGroupNum][(int) (Math.random()*3)]);
 				
 				else if(rc.getLocation().distanceSquaredTo(rc.senseHQLocation()) < 400) {
-					if(randDouble.nextDouble() < 0.3) tryMinerMove(directions[(int) (Math.random()*8)]);
-					else tryMinerMove(groupDirections[minerGroupNum][(int) (Math.random()*8)]);
+					if(randDouble.nextDouble() < 0.3) tryMinerMove(directions[(int) (Math.random()*3)]);
+					else tryMinerMove(groupDirections[minerGroupNum][(int) (Math.random()*3)]);
 				}
 				else if(rc.getLocation().distanceSquaredTo(rc.senseHQLocation()) < 625) {
-					if(randDouble.nextDouble() < 0.5) tryMinerMove(directions[(int) (Math.random()*8)]);
-					else tryMinerMove(groupDirections[minerGroupNum][(int) (Math.random()*8)]);
+					if(randDouble.nextDouble() < 0.5) tryMinerMove(directions[(int) (Math.random()*3)]);
+					else tryMinerMove(groupDirections[minerGroupNum][(int) (Math.random()*3)]);
 				}
 				else if(rc.getLocation().distanceSquaredTo(rc.senseHQLocation()) < 900) {
-					if(randDouble.nextDouble() < 0.7) tryMinerMove(directions[(int) (Math.random()*8)]);
-					else tryMinerMove(groupDirections[minerGroupNum][(int) (Math.random()*8)]);
+					if(randDouble.nextDouble() < 0.7) tryMinerMove(directions[(int) (Math.random()*3)]);
+					else tryMinerMove(groupDirections[minerGroupNum][(int) (Math.random()*3)]);
 				}
 				else tryMinerMove(directions[(int) (Math.random()*8)]);
 			}
 			transferMinerSupplies(rc);
 			rc.broadcast(MINER_CURRENT_CHAN, rc.readBroadcast(MINER_CURRENT_CHAN)+1);
 			
-		} catch (Exception e) {
+		} catch (GameActionException e) {
 			e.printStackTrace();
 		}
 	}

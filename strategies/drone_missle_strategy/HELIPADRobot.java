@@ -23,6 +23,7 @@ public class HELIPADRobot extends BaseRobot {
 		    int droneCount = rc.readBroadcast(DRONE_PREVIOUS_CHAN);
 		    int tankCount = rc.readBroadcast(TANK_PREVIOUS_CHAN);
 		    int basherCount = rc.readBroadcast(BASHER_PREVIOUS_CHAN);
+
 		    if (droneCount < 25 || (withinRange(droneCount, tankCount, 1, 0.3)&&withinRange(droneCount,basherCount, 1, .3)) && rc.isCoreReady() && rc.getTeamOre()>125) {
                 Direction newDir =  getSpawnDirection(RobotType.DRONE);
                 if (newDir != null) {

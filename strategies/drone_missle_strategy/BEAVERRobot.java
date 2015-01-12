@@ -23,6 +23,8 @@ public class BEAVERRobot extends BaseRobot {
 				}
 			}
 		    if(rc.isCoreReady()){
+
+		        
 				double ore = rc.getTeamOre();
 				int minerFactories = rc.readBroadcast(MINER_FACT_PREVIOUS_CHAN);
 				int minerFactoriesBuilt = rc.readBroadcast(40);
@@ -38,23 +40,34 @@ public class BEAVERRobot extends BaseRobot {
 	                    attackLeastHealthEnemy(getEnemiesInAttackingRange());
 	                }
 			    } else if(minerFactoriesBuilt < 2 && ore>= 500) {
-			    	RobotPlayer.tryBuild(RobotPlayer.directions[RobotPlayer.rand.nextInt(8)], RobotType.MINERFACTORY);
-			    	rc.broadcast(40, minerFactoriesBuilt+1);
-			    }  else if(barracksBuilt < 2 && minerFactories >= 2 && ore >= 300) {
-			    	RobotPlayer.tryBuild(RobotPlayer.directions[RobotPlayer.rand.nextInt(8)], RobotType.BARRACKS);
-			    	rc.broadcast(41, barracksBuilt+1);
+		            Direction buildDirection = getBuildDirection(RobotType.MINERFACTORY);
+		            if (buildDirection!=null) {
+		                rc.build(buildDirection, RobotType.MINERFACTORY);
+		                rc.broadcast(40, minerFactoriesBuilt+1);
+		            }
+			    }  else if(barracksBuilt < 2 && minerFactoriesBuilt >= 2 && ore >= 300) {
+                    Direction buildDirection = getBuildDirection(RobotType.BARRACKS);
+                    if (buildDirection!=null) {
+                        rc.build(buildDirection, RobotType.BARRACKS);
+                        rc.broadcast(41, barracksBuilt+1);
+                    }			        
                 } else if(tankFactoriesBuilt < 2 && rc.hasBuildRequirements(RobotType.TANKFACTORY)) {
-                    RobotPlayer.tryBuild(RobotPlayer.directions[RobotPlayer.rand.nextInt(8)], RobotType.TANKFACTORY);
-                    rc.broadcast(42, tankFactoriesBuilt+1);
-			    } else if(helipadsBuilt < 2 && minerFactories >= 2 && ore >= 300){
-			    	RobotPlayer.tryBuild(RobotPlayer.directions[RobotPlayer.rand.nextInt(8)], RobotType.HELIPAD);
-			    	rc.broadcast(43, helipadsBuilt+1);
+                    Direction buildDirection = getBuildDirection(RobotType.TANKFACTORY);
+                    if (buildDirection!=null) {
+                        rc.build(buildDirection, RobotType.TANKFACTORY);
+                        rc.broadcast(42, tankFactoriesBuilt+1);
+                    }           
+			    } else if(helipadsBuilt < 2 && minerFactoriesBuilt >= 2 && ore >= 300){
+                    Direction buildDirection = getBuildDirection(RobotType.HELIPAD);
+                    if (buildDirection!=null) {
+                        rc.build(buildDirection, RobotType.HELIPAD);
+                        rc.broadcast(43, helipadsBuilt+1);
+                    }       
 			    } else if(rc.senseOre(rc.getLocation())>2){
 				    rc.mine();
 				} else{
 			        RobotPlayer.tryMove(RobotPlayer.directions[RobotPlayer.rand.nextInt(8)]);
 				}
-			    
 			}
 		    if(rc.getSupplyLevel() > 20){
 		    	transferSupplies(rc);
