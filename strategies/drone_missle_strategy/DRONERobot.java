@@ -31,7 +31,7 @@ public class DRONERobot extends BaseRobot {
 		            RobotPlayer.tryMove(rc.getLocation().directionTo(closestTower));
 		        } else {
 		            int fate = RobotPlayer.rand.nextInt(1000);
-		            if (fate<30) {
+		            if (fate<200) {
 		                RobotPlayer.tryMove(RobotPlayer.directions[RobotPlayer.rand.nextInt(8)]);
 		            }
 

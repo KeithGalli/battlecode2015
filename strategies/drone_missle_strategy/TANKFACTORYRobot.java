@@ -23,7 +23,7 @@ public class TANKFACTORYRobot extends BaseRobot {
 		    int droneCount = rc.readBroadcast(DRONE_PREVIOUS_CHAN);
             int tankCount = rc.readBroadcast(TANK_PREVIOUS_CHAN);
             int basherCount = rc.readBroadcast(BASHER_PREVIOUS_CHAN);
-            if (tankCount < 5 || (withinRange(droneCount, tankCount, 1, 0.2)&&withinRange(tankCount,basherCount, .5, .2)) && rc.isCoreReady() && rc.getTeamOre()>250) {
+            if (tankCount < 10 || (withinRange(droneCount, tankCount, 1, 0.3)&&withinRange(tankCount,basherCount, 1, 0.3)) && rc.isCoreReady() && rc.getTeamOre()>250) {
                 Direction newDir =  getSpawnDirection(RobotType.TANK);
                 if (newDir != null) {
                     rc.spawn(newDir, RobotType.TANK);
