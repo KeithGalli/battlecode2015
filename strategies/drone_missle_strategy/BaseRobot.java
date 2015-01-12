@@ -143,6 +143,10 @@ public abstract class BaseRobot {
         double minEnergon = Double.MAX_VALUE;
         MapLocation toAttack = null;
         for (RobotInfo info : enemies) {
+        	if(info.type == RobotType.TOWER){
+        		rc.attackLocation(info.location);
+        		return;
+        	}
             if (info.health < minEnergon) {
                 toAttack = info.location;
                 minEnergon = info.health;
