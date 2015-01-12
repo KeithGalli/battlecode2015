@@ -1,17 +1,12 @@
 package drone_missle_strategy;
 
 import battlecode.common.*;
-
-public class BEAVERRobot extends BaseRobot {
-	
-=======
-
-import java.util.Random;
-
 import drone_missle_strategy.RobotPlayer;
 import battlecode.common.*;
 
 public class BEAVERRobot extends BaseRobot {
+	
+
 	public BEAVERRobot(RobotController rc) throws GameActionException {
 		super(rc);
 	}

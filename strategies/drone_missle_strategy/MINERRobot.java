@@ -10,6 +10,11 @@ public class MINERRobot extends BaseRobot {
 	public final static int MINER_COST = 50;
 	private static Direction[] directions = {Direction.NORTH, Direction.NORTH_EAST, Direction.EAST, Direction.SOUTH_EAST, Direction.SOUTH, Direction.SOUTH_WEST, Direction.WEST, Direction.NORTH_WEST};
 	
+	private static Direction[] directionsForGroupZero = {Direction.NORTH_WEST, Direction.NORTH, Direction.NORTH_EAST};
+	private static Direction[] directionsForGroupOne = {Direction.NORTH_EAST, Direction.EAST, Direction.SOUTH_EAST};
+	private static Direction[] directionsForGroupTwo = {Direction.SOUTH_EAST, Direction.SOUTH, Direction.SOUTH_WEST};
+	private static Direction[] directionsForGroupThree = {Direction.SOUTH_WEST, Direction.WEST, Direction.NORTH_WEST};
+	private static Direction[][] groupDirections = {directionsForGroupZero, directionsForGroupOne, directionsForGroupTwo, directionsForGroupThree};
 	
 	public MINERRobot(RobotController rc) throws GameActionException {
 		super(rc);
@@ -18,46 +23,41 @@ public class MINERRobot extends BaseRobot {
 	@Override
 	public void run() {
 		int roundNum = Clock.getRoundNum();
-		double randDouble = Math.random();
+		Random randDouble = new Random();
+		Random randInt = new Random();
 		
 		try {
+			//assign the miner a group movement number
+			int minerNum = rc.readBroadcast(MINER_CURRENT_CHAN);
+			int minerGroupNum = minerNum % 4;
+			
 			if(rc.isCoreReady()) {
-<<<<<<< HEAD
+			
+				//mine if logical (ore > 4) and possible
+				if(rc.senseOre(rc.getLocation()) >= 4 && rc.canMine()) rc.mine();
 				
-				//ROUNDS 0->120: simply move away from HQ with .5 probability
-				if(roundNum < 120) {
-					if(randDouble > 0.5 && rc.senseOre(rc.getLocation()) >= 4 && rc.canMine()) {
-						rc.mine();
-					} else {
-						minerMoveAwayFromHQ();
-					}
-				//ROUNDS 120-1000: mine if possible, otherwise move AWAY from HQ 
-				} else if(roundNum > 80 && roundNum < 1000){
-					if(rc.senseOre(rc.getLocation()) >= 4 && rc.canMine()) {
-						rc.mine();
-					} else {
-						minerMoveAwayFromHQ();
-					}
-				//ROUNDS 1000+: mine if possible, otherwise move randomly and attack (enemy zero)
-				} else {
-					if(rc.senseOre(rc.getLocation()) >= 4 && rc.canMine()) {
-						rc.mine();
-					} else {
-						attackEnemyZero();
-						minerMoveAround();
-					}
+				//else if enemies in range, attack
+				else if (getEnemiesInAttackingRange().length > 0 && rc.isWeaponReady()) attackLeastHealthEnemy(getEnemiesInAttackingRange());
+				
+				else if(rc.getLocation().distanceSquaredTo(rc.senseHQLocation()) < 100) tryMinerMove(groupDirections[minerGroupNum][(int) (Math.random()*8)]);
+				
+				else if(rc.getLocation().distanceSquaredTo(rc.senseHQLocation()) < 400) {
+					if(randDouble.nextDouble() < 0.3) tryMinerMove(directions[(int) (Math.random()*8)]);
+					else tryMinerMove(groupDirections[minerGroupNum][(int) (Math.random()*8)]);
 				}
-				
-=======
-				if(rc.senseOre(rc.getLocation()) >= 4 && rc.canMine()) {
-					rc.mine();
-				} else {
-					moveAwayFromHQ();
-				}	
->>>>>>> 512325b0075654b4027006276bc6a1174a827170
+				else if(rc.getLocation().distanceSquaredTo(rc.senseHQLocation()) < 625) {
+					if(randDouble.nextDouble() < 0.5) tryMinerMove(directions[(int) (Math.random()*8)]);
+					else tryMinerMove(groupDirections[minerGroupNum][(int) (Math.random()*8)]);
+				}
+				else if(rc.getLocation().distanceSquaredTo(rc.senseHQLocation()) < 900) {
+					if(randDouble.nextDouble() < 0.7) tryMinerMove(directions[(int) (Math.random()*8)]);
+					else tryMinerMove(groupDirections[minerGroupNum][(int) (Math.random()*8)]);
+				}
+				else tryMinerMove(directions[(int) (Math.random()*8)]);
 			}
 			transferMinerSupplies(rc);
 			rc.broadcast(MINER_CURRENT_CHAN, rc.readBroadcast(MINER_CURRENT_CHAN)+1);
+			
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

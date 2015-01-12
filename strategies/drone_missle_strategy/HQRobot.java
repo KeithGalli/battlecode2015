@@ -60,6 +60,7 @@ public class HQRobot extends BaseRobot {
             rc.broadcast(BARRACKS_PREVIOUS_CHAN,numBarracks);
             rc.broadcast(TANK_FACT_PREVIOUS_CHAN, numTankFactories);
             rc.broadcast(TANK_PREVIOUS_CHAN, numTanks);
+            }
             
             int closestTowerX = getClosestTower().x;
             int closestTowerY = getClosestTower().y;
