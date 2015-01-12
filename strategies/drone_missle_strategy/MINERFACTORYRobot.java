@@ -29,7 +29,6 @@ public class MINERFACTORYRobot extends BaseRobot {
                         rc.spawn(spawnDirection, RobotType.MINER);
 				}
 			}
-			
 			rc.broadcast(MINER_FACT_CURRENT_CHAN, rc.readBroadcast(MINER_FACT_CURRENT_CHAN)+1);
 	        rc.yield();
 	        

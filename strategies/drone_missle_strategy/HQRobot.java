@@ -1,18 +1,13 @@
 package drone_missle_strategy;
 
-import battlecode.common.Clock;
-import battlecode.common.Direction;
-import battlecode.common.GameActionException;
-import battlecode.common.GameConstants;
-import battlecode.common.MapLocation;
-import battlecode.common.RobotController;
-import battlecode.common.RobotInfo;
-import battlecode.common.RobotType;
-import battlecode.common.Team;
+import java.util.HashSet;
+
+import battlecode.common.*;
 
 public class HQRobot extends BaseRobot {	
 	public Team opp;
 	public Team team;
+	
 
 
 	public HQRobot(RobotController rc) throws GameActionException {
@@ -26,7 +21,7 @@ public class HQRobot extends BaseRobot {
 	@Override
 	public void run() {
 		try {
-		  
+			transferSupplies(rc);
 		    int numMinerFactories = rc.readBroadcast(MINER_FACT_CURRENT_CHAN);
 		    rc.broadcast(MINER_FACT_CURRENT_CHAN, 0);
 		    int numMiners = rc.readBroadcast(MINER_CURRENT_CHAN);
@@ -54,6 +49,7 @@ public class HQRobot extends BaseRobot {
             rc.broadcast(SOLDIER_PREVIOUS_CHAN, numSoldiers);
             rc.broadcast(BASHER_PREVIOUS_CHAN, numBashers);
             rc.broadcast(HELIPAD_PREVIOUS_CHAN, numHelipads);
+
             rc.broadcast(DRONE_PREVIOUS_CHAN, numDrones);
             rc.broadcast(BARRACKS_PREVIOUS_CHAN,numBarracks);
             rc.broadcast(TANK_FACT_PREVIOUS_CHAN, numTankFactories);
@@ -79,11 +75,12 @@ public class HQRobot extends BaseRobot {
             } else if (rc.isCoreReady() && rc.getTeamOre() >= 100 && rc.readBroadcast(BEAVER_PREVIOUS_CHAN)<8) {
                 RobotPlayer.trySpawn(RobotPlayer.directions[RobotPlayer.rand.nextInt(8)], RobotType.BEAVER);
             }
-            transferSupplies(rc);
+            //transferSupplies(rc);
 			
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
+
 	
 }

@@ -35,7 +35,7 @@ public class BARRACKSRobot extends BaseRobot {
                 if (newDir != null) {
                     rc.spawn(newDir, type);
                 }
-            }	    		    
+            }
 			rc.broadcast(BARRACKS_CURRENT_CHAN, rc.readBroadcast(BARRACKS_CURRENT_CHAN)+1);
 
 		} catch (Exception e) {
