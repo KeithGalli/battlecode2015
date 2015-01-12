@@ -3,8 +3,10 @@ package drone_missle_strategy;
 import battlecode.common.Clock;
 import battlecode.common.Direction;
 import battlecode.common.GameActionException;
+import battlecode.common.GameConstants;
 import battlecode.common.MapLocation;
 import battlecode.common.RobotController;
+import battlecode.common.RobotInfo;
 import battlecode.common.Team;
 
 public class DRONERobot extends BaseRobot {
@@ -19,6 +21,14 @@ public class DRONERobot extends BaseRobot {
 	@Override
 	public void run() {
 		try {
+			if(rc.getHealth() < 2){
+				RobotInfo[] nearbyAllies = rc.senseNearbyRobots(rc.getLocation(),GameConstants.SUPPLY_TRANSFER_RADIUS_SQUARED,rc.getTeam());
+				int numAllies = nearbyAllies.length;
+				double supply = rc.getSupplyLevel();
+				for (RobotInfo ri : nearbyAllies){
+					rc.transferSupplies((int) (supply/ numAllies), ri.location);
+				}
+			}
 		    if (getEnemiesInAttackingRange().length>0) {
                 if (rc.isWeaponReady()) {
                     attackLeastHealthEnemy(getEnemiesInAttackingRange());
@@ -29,21 +39,41 @@ public class DRONERobot extends BaseRobot {
 		        if (rc.readBroadcast(DRONE_PREVIOUS_CHAN)>15 && rc.senseNearbyRobots(16, theirTeam).length < 2) {
 		            MapLocation closestTower = new MapLocation(rc.readBroadcast(50), rc.readBroadcast(51));
 		            RobotPlayer.tryMove(rc.getLocation().directionTo(closestTower));
-		        } else {
-		            int fate = RobotPlayer.rand.nextInt(1000);
-		            if (fate<30) {
-		                RobotPlayer.tryMove(RobotPlayer.directions[RobotPlayer.rand.nextInt(8)]);
+		        }else if(rc.getSupplyLevel() < 60) {
+		        	RobotPlayer.tryMove(rc.getLocation().directionTo(rc.senseHQLocation()));
+		        } else if(rc.getSupplyLevel()> 500){
+//		            int fate = RobotPlayer.rand.nextInt(1000);
+//		            if (fate<30) {
+//		                RobotPlayer.tryMove(RobotPlayer.directions[RobotPlayer.rand.nextInt(8)]);
+		        	moveAwayFromHQ();
+		        	transferSupplies(rc);
+		            } else{
+		            	RobotPlayer.tryMove(rc.getLocation().directionTo(rc.senseHQLocation()));
 		            }
 
 		        }
-
-		    }
+		
+//		    if(rc.getSupplyLevel() > 30){
+//		    	transferSupplies(rc);
+//		    }
             rc.broadcast(DRONE_CURRENT_CHAN, rc.readBroadcast(DRONE_CURRENT_CHAN)+1);
-		    rc.yield();
 		} catch (Exception e) {
 			//                    System.out.println("caught exception before it killed us:");
 			//                    System.out.println(rc.getRobot().getID());
 			//e.printStackTrace();
 		}
+	}
+	
+	private void moveAwayFromHQ() {
+		Direction dir = getDirectionAwayFromHQ();
+		try {
+			RobotPlayer.tryMove(dir);
+		} catch (GameActionException e) {
+			e.printStackTrace();
+		}
+	}
+
+	private Direction getDirectionAwayFromHQ() {
+		return (rc.getLocation().directionTo(rc.senseHQLocation()).opposite());
 	}
 }

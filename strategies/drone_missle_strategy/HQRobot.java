@@ -3,6 +3,7 @@ package drone_missle_strategy;
 import battlecode.common.Clock;
 import battlecode.common.Direction;
 import battlecode.common.GameActionException;
+import battlecode.common.GameConstants;
 import battlecode.common.MapLocation;
 import battlecode.common.RobotController;
 import battlecode.common.RobotInfo;
@@ -63,11 +64,13 @@ public class HQRobot extends BaseRobot {
             
             rc.broadcast(50, closestTowerX);
             rc.broadcast(51, closestTowerY);
-            
-            if (rc.isCoreReady() && rc.getTeamOre() >= 100 && rc.readBroadcast(BEAVER_PREVIOUS_CHAN)<8) {
+            RobotInfo[] enemies = getEnemiesInAttackingRange();
+            if(enemies.length>0 && rc.isWeaponReady()){
+            	attackLeastHealthEnemy(enemies);
+            } else if (rc.isCoreReady() && rc.getTeamOre() >= 100 && rc.readBroadcast(BEAVER_PREVIOUS_CHAN)<8) {
                 RobotPlayer.trySpawn(RobotPlayer.directions[RobotPlayer.rand.nextInt(8)], RobotType.BEAVER);
             }
-            rc.yield();
+            transferSupplies(rc);
 			
 		} catch (Exception e) {
 			//                    System.out.println("caught exception before it killed us:");
@@ -75,4 +78,5 @@ public class HQRobot extends BaseRobot {
 			//e.printStackTrace();
 		}
 	}
+	
 }

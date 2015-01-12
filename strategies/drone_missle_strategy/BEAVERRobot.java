@@ -15,6 +15,14 @@ public class BEAVERRobot extends BaseRobot {
 	@Override
 	public void run() {
 		try {
+			if(rc.getHealth() < 2){
+				RobotInfo[] nearbyAllies = rc.senseNearbyRobots(rc.getLocation(),GameConstants.SUPPLY_TRANSFER_RADIUS_SQUARED,rc.getTeam());
+				int numAllies = nearbyAllies.length;
+				double supply = rc.getSupplyLevel()-2;
+				for (RobotInfo ri : nearbyAllies){
+					rc.transferSupplies((int) (supply/ numAllies), ri.location);
+				}
+			}
 		    if(rc.isCoreReady()){
 				double ore = rc.getTeamOre();
 				int minerFactories = rc.readBroadcast(MINER_FACT_PREVIOUS_CHAN);
@@ -37,8 +45,10 @@ public class BEAVERRobot extends BaseRobot {
 				}
 			    
 			}
+		    if(rc.getSupplyLevel() > 20){
+		    	transferSupplies(rc);
+		    }
 		    rc.broadcast(BEAVER_CURRENT_CHAN, rc.readBroadcast(BEAVER_CURRENT_CHAN)+1);
-		    rc.yield();
 		} catch (Exception e) {
 			//                    System.out.println("caught exception before it killed us:");
 			//                    System.out.println(rc.getRobot().getID());

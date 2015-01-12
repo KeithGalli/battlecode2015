@@ -20,6 +20,7 @@ public class MINERRobot extends BaseRobot {
 					moveAwayFromHQ();
 				}	
 			}
+			transferMinerSupplies(rc);
 			rc.broadcast(MINER_CURRENT_CHAN, rc.readBroadcast(MINER_CURRENT_CHAN)+1);
 		} catch (Exception e) {
 			e.printStackTrace();
