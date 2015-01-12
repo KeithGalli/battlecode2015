@@ -46,7 +46,7 @@ public class BEAVERRobot extends BaseRobot {
 		                rc.build(buildDirection, RobotType.MINERFACTORY);
 		                rc.broadcast(40, minerFactoriesBuilt+1);
 		            }
-			    }  else if(barracksBuilt < 2 && minerFactories >= 2 && ore >= 300) {
+			    }  else if(barracksBuilt < 2 && minerFactoriesBuilt >= 2 && ore >= 300) {
                     Direction buildDirection = getBuildDirection(RobotType.BARRACKS);
                     if (buildDirection!=null) {
                         rc.build(buildDirection, RobotType.BARRACKS);
@@ -58,7 +58,7 @@ public class BEAVERRobot extends BaseRobot {
                         rc.build(buildDirection, RobotType.TANKFACTORY);
                         rc.broadcast(42, tankFactoriesBuilt+1);
                     }           
-			    } else if(helipadsBuilt < 2 && minerFactories >= 2 && ore >= 300){
+			    } else if(helipadsBuilt < 2 && minerFactoriesBuilt >= 2 && ore >= 300){
                     Direction buildDirection = getBuildDirection(RobotType.HELIPAD);
                     if (buildDirection!=null) {
                         rc.build(buildDirection, RobotType.HELIPAD);
