@@ -31,8 +31,6 @@ public class BASHERRobot extends BaseRobot {
                 RobotPlayer.tryMove(rc.getLocation().directionTo(centerMap));    
             }
 	        rc.broadcast(BASHER_CURRENT_CHAN, rc.readBroadcast(BASHER_CURRENT_CHAN)+1);
-			
-
 		} catch (Exception e) {
 			//                    System.out.println("caught exception before it killed us:");
 			//                    System.out.println(rc.getRobot().getID());
