@@ -22,7 +22,7 @@ public class MINERRobot extends BaseRobot {
 			}
 			transferMinerSupplies(rc);
 			rc.broadcast(MINER_CURRENT_CHAN, rc.readBroadcast(MINER_CURRENT_CHAN)+1);
-		} catch (Exception e) {
+		} catch (GameActionException e) {
 			e.printStackTrace();
 		}
 	}
