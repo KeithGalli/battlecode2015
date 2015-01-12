@@ -11,7 +11,7 @@ import battlecode.common.Team;
 
 public class DRONERobot extends BaseRobot {
 
-
+	public static boolean attackMode = false;
 
 
 	public DRONERobot(RobotController rc) throws GameActionException {
@@ -21,6 +21,12 @@ public class DRONERobot extends BaseRobot {
 	@Override
 	public void run() {
 		try {
+			int numDrones = rc.readBroadcast(DRONE_PREVIOUS_CHAN);
+			if(numDrones < 6){
+				attackMode = false;
+			} else if(numDrones >= 15) {
+				attackMode = true;
+			}
 			if(rc.getHealth() < 2){
 				RobotInfo[] nearbyAllies = rc.senseNearbyRobots(rc.getLocation(),GameConstants.SUPPLY_TRANSFER_RADIUS_SQUARED,rc.getTeam());
 				int numAllies = nearbyAllies.length;
@@ -35,24 +41,20 @@ public class DRONERobot extends BaseRobot {
                 }
             }
 		    if (rc.isCoreReady()) {
-//		    	if(Clock.getRoundNum() > 1300){
-//		    		MapLocation tower = getClosestTower();
-//		    		RobotPlayer.tryMove(rc.getLocation().directionTo(tower));
-//		    	}
-		    	if (rc.readBroadcast(DRONE_PREVIOUS_CHAN)>15 && rc.senseNearbyRobots(16, theirTeam).length < 2) {
+		    	if ( rc.readBroadcast(DRONE_PREVIOUS_CHAN)>15 && rc.senseNearbyRobots(16, theirTeam).length < 10 & senseNearbyTowers(rc.getLocation()) <2) {
 		            MapLocation closestTower = new MapLocation(rc.readBroadcast(50), rc.readBroadcast(51));
 		            RobotPlayer.tryMove(rc.getLocation().directionTo(closestTower));
 
 		        }else if(rc.getSupplyLevel() < 60) {
 		        	RobotPlayer.tryMove(rc.getLocation().directionTo(rc.senseHQLocation()));
-		        } else if(rc.getSupplyLevel()> 500){
+		        } else if(rc.getSupplyLevel()> 300){
 		        	moveAwayFromHQ();
-		        	transferSupplies(rc);
+		        	//transferMinerSupplies(rc);
 		        } else{
 		            	RobotPlayer.tryMove(rc.getLocation().directionTo(rc.senseHQLocation()));
 		            }
 		    }
-		
+		    transferMinerSupplies(rc);
             rc.broadcast(DRONE_CURRENT_CHAN, rc.readBroadcast(DRONE_CURRENT_CHAN)+1);
 		} catch (Exception e) {
 			//                    System.out.println("caught exception before it killed us:");

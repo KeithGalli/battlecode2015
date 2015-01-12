@@ -1,12 +1,11 @@
 package drone_missle_strategy;
 
-
-import java.util.Random;
-
+import battlecode.common.*;
 import drone_missle_strategy.RobotPlayer;
 import battlecode.common.*;
 
 public class BEAVERRobot extends BaseRobot {
+	
 
 	public BEAVERRobot(RobotController rc) throws GameActionException {
 		super(rc);
@@ -24,6 +23,8 @@ public class BEAVERRobot extends BaseRobot {
 				}
 			}
 		    if(rc.isCoreReady()){
+
+		        
 				double ore = rc.getTeamOre();
 				int minerFactories = rc.readBroadcast(MINER_FACT_PREVIOUS_CHAN);
 				int minerFactoriesBuilt = rc.readBroadcast(40);
@@ -39,32 +40,41 @@ public class BEAVERRobot extends BaseRobot {
 	                    attackLeastHealthEnemy(getEnemiesInAttackingRange());
 	                }
 			    } else if(minerFactoriesBuilt < 2 && ore>= 500) {
-			    	RobotPlayer.tryBuild(RobotPlayer.directions[RobotPlayer.rand.nextInt(8)], RobotType.MINERFACTORY);
-			    	rc.broadcast(40, minerFactoriesBuilt+1);
-			    }  else if(barracksBuilt < 2 && minerFactories >= 2 && ore >= 300) {
-			    	RobotPlayer.tryBuild(RobotPlayer.directions[RobotPlayer.rand.nextInt(8)], RobotType.BARRACKS);
-			    	rc.broadcast(41, barracksBuilt+1);
+		            Direction buildDirection = getBuildDirection(RobotType.MINERFACTORY);
+		            if (buildDirection!=null) {
+		                rc.build(buildDirection, RobotType.MINERFACTORY);
+		                rc.broadcast(40, minerFactoriesBuilt+1);
+		            }
+			    }  else if(barracksBuilt < 2 && minerFactoriesBuilt >= 2 && ore >= 300) {
+                    Direction buildDirection = getBuildDirection(RobotType.BARRACKS);
+                    if (buildDirection!=null) {
+                        rc.build(buildDirection, RobotType.BARRACKS);
+                        rc.broadcast(41, barracksBuilt+1);
+                    }			        
                 } else if(tankFactoriesBuilt < 2 && rc.hasBuildRequirements(RobotType.TANKFACTORY)) {
-                    RobotPlayer.tryBuild(RobotPlayer.directions[RobotPlayer.rand.nextInt(8)], RobotType.TANKFACTORY);
-                    rc.broadcast(42, tankFactoriesBuilt+1);
-			    } else if(helipadsBuilt < 2 && minerFactories >= 2 && ore >= 300){
-			    	RobotPlayer.tryBuild(RobotPlayer.directions[RobotPlayer.rand.nextInt(8)], RobotType.HELIPAD);
-			    	rc.broadcast(43, helipadsBuilt+1);
+                    Direction buildDirection = getBuildDirection(RobotType.TANKFACTORY);
+                    if (buildDirection!=null) {
+                        rc.build(buildDirection, RobotType.TANKFACTORY);
+                        rc.broadcast(42, tankFactoriesBuilt+1);
+                    }           
+			    } else if(helipadsBuilt < 2 && minerFactoriesBuilt >= 2 && ore >= 300){
+                    Direction buildDirection = getBuildDirection(RobotType.HELIPAD);
+                    if (buildDirection!=null) {
+                        rc.build(buildDirection, RobotType.HELIPAD);
+                        rc.broadcast(43, helipadsBuilt+1);
+                    }       
 			    } else if(rc.senseOre(rc.getLocation())>2){
 				    rc.mine();
 				} else{
 			        RobotPlayer.tryMove(RobotPlayer.directions[RobotPlayer.rand.nextInt(8)]);
 				}
-			    
 			}
 		    if(rc.getSupplyLevel() > 20){
 		    	transferSupplies(rc);
 		    }
 		    rc.broadcast(BEAVER_CURRENT_CHAN, rc.readBroadcast(BEAVER_CURRENT_CHAN)+1);
 		} catch (Exception e) {
-			//                    System.out.println("caught exception before it killed us:");
-			//                    System.out.println(rc.getRobot().getID());
-			//e.printStackTrace();
+			e.printStackTrace();
 		}
 	}
 }

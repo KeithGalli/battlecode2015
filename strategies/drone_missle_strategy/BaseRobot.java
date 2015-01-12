@@ -1,6 +1,7 @@
 package drone_missle_strategy;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 
 import battlecode.common.Direction;
 import battlecode.common.GameActionException;
@@ -37,6 +38,8 @@ public abstract class BaseRobot {
 	static ArrayList<MapLocation> path = new ArrayList<MapLocation>();
     protected MapLocation myHQ, theirHQ;
     protected Team myTeam, theirTeam;
+    //private static HashSet<MapLocation> enemyTerritory = new HashSet<MapLocation>();
+	
 
 
 	// Default constructor
@@ -51,11 +54,22 @@ public abstract class BaseRobot {
 		DataCache.init(this); //MUST COME FIRST
 		BroadcastSystem.init(this);
 		MapEngine.init(this);
-
-		// DataCache.init(this); // this must come first
-		// BroadcastSystem.init(this);
-		// Functions.init(rc);
 		
+	}
+	
+	public MapLocation getOurClosestTowerToThem() {
+	    MapLocation[] ourTowers = rc.senseTowerLocations();
+	    int distanceToClosest = this.theirHQ.distanceSquaredTo(ourTowers[0]);
+	    MapLocation closest = ourTowers[0];
+	    for (MapLocation tower : ourTowers) {
+	        int distanceToTower = this.theirHQ.distanceSquaredTo(tower);
+	        if (distanceToTower<distanceToClosest) {
+	            distanceToClosest = distanceToTower;
+	            closest = tower;
+	        }
+	    }
+	    MapLocation closestOffset = closest.add(rc.getLocation().directionTo(this.theirHQ), 2);
+	    return closestOffset;
 	}
 	
 	public MapLocation getClosestTower() {
@@ -71,6 +85,16 @@ public abstract class BaseRobot {
         }
         return closest;
 	}
+	
+	public int senseNearbyTowers(MapLocation location) {
+	    MapLocation[] enemyTowers = rc.senseEnemyTowerLocations();
+	    int count = 0;
+	    for (MapLocation tower : enemyTowers) {
+	        if (location.distanceSquaredTo(tower)<16)
+	            count += 1;
+	    }
+	    return count;
+	}
 
 //	public MapLocation getMostIsolatedTower() {
 //	    MapLocation[] enemyTowers = rc.senseEnemyTowerLocations();
@@ -83,7 +107,7 @@ public abstract class BaseRobot {
 //	}
 	
 	public boolean withinRange(int unitCount1, int unitCount2, double idealValue, double threshold) {
-	    return (Math.abs(idealValue-unitCount1*1.0/unitCount2)<threshold);
+	    return ((unitCount1*1.0/unitCount2-idealValue)<threshold);
 	}
 	
 	public Direction[] getDirectionsToward(MapLocation dest) {
@@ -146,6 +170,8 @@ public abstract class BaseRobot {
         	if(info.type == RobotType.TOWER){
         		rc.attackLocation(info.location);
         		return;
+        	} else if(info.type == RobotType.HELIPAD){
+        		rc.attackLocation(info.location);
         	}
             if (info.health < minEnergon) {
                 toAttack = info.location;
@@ -162,13 +188,37 @@ public abstract class BaseRobot {
 		double transferAmount = 0;
 		MapLocation suppliesToThisLocation = null;
 		for(RobotInfo ri:nearbyAllies){
+			RobotType type = ri.type;
+			if(ri.supplyLevel<lowestSupply && !(type== RobotType.BARRACKS || type == RobotType.HELIPAD || type == RobotType.MINERFACTORY || type == RobotType.TANKFACTORY || type == RobotType.HQ)){
+				lowestSupply = ri.supplyLevel;
+//				if(type == RobotType.DRONE){
+//					transferAmount = 7*(rc.getSupplyLevel()-ri.supplyLevel)/8;
+//				}
+//				if(type== RobotType.BARRACKS || type == RobotType.HELIPAD || type == RobotType.MINERFACTORY || type == RobotType.TANKFACTORY || type == RobotType.HQ){
+//					transferAmount = 0;
+//				}
+//				else{
+//					lowestSupply = ri.supplyLevel;
+//					transferAmount = (rc.getSupplyLevel()-ri.supplyLevel)/2;
+//				}
+				transferAmount = (rc.getSupplyLevel()-ri.supplyLevel)/2;
+				suppliesToThisLocation = ri.location;
+			}
+		}
+		if(suppliesToThisLocation!=null){
+			rc.transferSupplies((int)transferAmount, suppliesToThisLocation);
+		}
+	}
+    
+    public static void transferDroneSupplies(RobotController rc) throws GameActionException {
+		RobotInfo[] nearbyAllies = rc.senseNearbyRobots(rc.getLocation(),GameConstants.SUPPLY_TRANSFER_RADIUS_SQUARED,rc.getTeam());
+		double lowestSupply = rc.getSupplyLevel();
+		double transferAmount = 0;
+		MapLocation suppliesToThisLocation = null;
+		for(RobotInfo ri:nearbyAllies){
 			if(ri.supplyLevel<lowestSupply){
 				lowestSupply = ri.supplyLevel;
-				if(ri.type == RobotType.DRONE){
-					transferAmount = 7*(rc.getSupplyLevel()-ri.supplyLevel)/8;
-				} else{
-					transferAmount = (rc.getSupplyLevel()-ri.supplyLevel)/2;
-				}
+				transferAmount = (rc.getSupplyLevel()-ri.supplyLevel)/2;
 				suppliesToThisLocation = ri.location;
 			}
 		}
@@ -196,6 +246,27 @@ public abstract class BaseRobot {
 		}
     }
 
+	
+	public static boolean isLocationInEnemyTerritory(MapLocation loc) {
+		MapLocation[] enemyTowerLocations = rc.senseEnemyTowerLocations();
+		MapLocation myLocation = rc.getLocation();
+		
+		for(MapLocation towerLoc : enemyTowerLocations) {
+			if(towerLoc.distanceSquaredTo(myLocation) <= 24) {
+				rc.setIndicatorString(1, "true"); 
+				return true;
+			}
+		}
+		
+		if(rc.senseEnemyHQLocation().distanceSquaredTo(myLocation) <= 24) {
+			rc.setIndicatorString(1, "true");
+			return true;
+		}
+		rc.setIndicatorString(1, "false");
+		return false;
+		//return enemyTerritory.contains(loc);
+	}
+    
 	// Actions for a specific robot
 	abstract public void run();
 

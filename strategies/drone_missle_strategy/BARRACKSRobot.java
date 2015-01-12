@@ -23,12 +23,19 @@ public class BARRACKSRobot extends BaseRobot {
             int droneCount = rc.readBroadcast(DRONE_PREVIOUS_CHAN);
             int tankCount = rc.readBroadcast(TANK_PREVIOUS_CHAN);
             int basherCount = rc.readBroadcast(BASHER_PREVIOUS_CHAN);
-            if (basherCount < 10 || (withinRange(basherCount, tankCount, 1, 0.3)&&withinRange(tankCount,basherCount, 1, .3)) && rc.isCoreReady() && rc.getTeamOre()>80) {
-                Direction newDir =  getSpawnDirection(RobotType.BASHER);
-                if (newDir != null) {
-                    rc.spawn(newDir, RobotType.BASHER);
+            int soldierCount = rc.readBroadcast(SOLDIER_PREVIOUS_CHAN);
+            int soldAndBashCount = basherCount + soldierCount;
+            if ((soldAndBashCount < 10 || (withinRange(soldAndBashCount, tankCount, 1, 0.3)&&withinRange(soldAndBashCount, droneCount, 1, 0.3))) && rc.isCoreReady() && rc.getTeamOre()>80) {
+                int fate = RobotPlayer.rand.nextInt(1000);
+                RobotType type = RobotType.BASHER;
+                if (fate<500) {
+                    type = RobotType.SOLDIER;
                 }
-            }	    		    
+                Direction newDir =  getSpawnDirection(type);
+                if (newDir != null) {
+                    rc.spawn(newDir, type);
+                }
+            }
 			rc.broadcast(BARRACKS_CURRENT_CHAN, rc.readBroadcast(BARRACKS_CURRENT_CHAN)+1);
 
 		} catch (Exception e) {
