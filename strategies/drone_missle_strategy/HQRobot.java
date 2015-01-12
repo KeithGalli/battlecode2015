@@ -1,18 +1,13 @@
 package drone_missle_strategy;
 
-import battlecode.common.Clock;
-import battlecode.common.Direction;
-import battlecode.common.GameActionException;
-import battlecode.common.GameConstants;
-import battlecode.common.MapLocation;
-import battlecode.common.RobotController;
-import battlecode.common.RobotInfo;
-import battlecode.common.RobotType;
-import battlecode.common.Team;
+import java.util.HashSet;
+
+import battlecode.common.*;
 
 public class HQRobot extends BaseRobot {	
 	public Team opp;
 	public Team team;
+	
 
 
 	public HQRobot(RobotController rc) throws GameActionException {
@@ -74,5 +69,6 @@ public class HQRobot extends BaseRobot {
 			e.printStackTrace();
 		}
 	}
+
 	
 }

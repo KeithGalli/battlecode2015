@@ -86,12 +86,16 @@ public class MINERRobot extends BaseRobot {
         int offsetIndex = 0;
         int[] offsets = {0,1,-1,2,-2};
         int dirint = directionToInt(d);
-        while (offsetIndex < 5 && !rc.canMove(directions[(dirint+offsets[offsetIndex]+8)%8])) {
+        MapLocation myLocation = rc.getLocation();
+        
+        while ((offsetIndex < 5 && !rc.canMove(directions[(dirint+offsets[offsetIndex]+8)%8]))
+        	|| isLocationInEnemyTerritory(myLocation.add(directions[(dirint+offsets[offsetIndex]+8)%8]))){
             offsetIndex++;
+            System.out.println("isLocationInEnemyTerritory:" + isLocationInEnemyTerritory(myLocation.add(directions[(dirint+offsets[offsetIndex]+8)%8])));
         }
         if (offsetIndex < 5) {
             rc.move(directions[(dirint+offsets[offsetIndex]+8)%8]);
-        }
+        } else tryMinerMove(d.opposite());
     }
     
     static int directionToInt(Direction d) {

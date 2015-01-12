@@ -1,6 +1,7 @@
 package drone_missle_strategy;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 
 import battlecode.common.Direction;
 import battlecode.common.GameActionException;
@@ -37,6 +38,8 @@ public abstract class BaseRobot {
 	static ArrayList<MapLocation> path = new ArrayList<MapLocation>();
     protected MapLocation myHQ, theirHQ;
     protected Team myTeam, theirTeam;
+    //private static HashSet<MapLocation> enemyTerritory = new HashSet<MapLocation>();
+	
 
 
 	// Default constructor
@@ -51,10 +54,6 @@ public abstract class BaseRobot {
 		DataCache.init(this); //MUST COME FIRST
 		BroadcastSystem.init(this);
 		MapEngine.init(this);
-
-		// DataCache.init(this); // this must come first
-		// BroadcastSystem.init(this);
-		// Functions.init(rc);
 		
 	}
 	
@@ -196,6 +195,27 @@ public abstract class BaseRobot {
 		}
     }
 
+	
+	public static boolean isLocationInEnemyTerritory(MapLocation loc) {
+		MapLocation[] enemyTowerLocations = rc.senseEnemyTowerLocations();
+		MapLocation myLocation = rc.getLocation();
+		
+		for(MapLocation towerLoc : enemyTowerLocations) {
+			if(towerLoc.distanceSquaredTo(myLocation) <= 24) {
+				rc.setIndicatorString(1, "true"); 
+				return true;
+			}
+		}
+		
+		if(rc.senseEnemyHQLocation().distanceSquaredTo(myLocation) <= 24) {
+			rc.setIndicatorString(1, "true");
+			return true;
+		}
+		rc.setIndicatorString(1, "false");
+		return false;
+		//return enemyTerritory.contains(loc);
+	}
+    
 	// Actions for a specific robot
 	abstract public void run();
 
