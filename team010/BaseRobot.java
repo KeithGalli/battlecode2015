@@ -41,6 +41,7 @@ public abstract class BaseRobot {
 		DataCache.init(this); //MUST COME FIRST
 		BroadcastSystem.init(this);
 		MapEngine.init(this);
+		Functions.init(this);
 
 		// DataCache.init(this); // this must come first
 		// BroadcastSystem.init(this);

@@ -1,0 +1,41 @@
+notes
+
+unit -> can_sense range (array)
+	
+database: been sensed (array): all units broadcasted can_sense
+
+thoughts:
+
+Architecture:
+	datacache
+	broadcastingsystem
+	navsystem
+	mapengine
+
+all units have a map broadcast reading array: [channel: x*100000+y]
+as they read normal/void/offmap then they update their internal map and remove that frequency from the scanning.
+
+
+map size:
+	construct a box with min x, min y, max x, max y and associated HQs/TOWERS
+	logic gate to determine which way to test (are we min or max or combo)
+	test stepping out to find off_map hopefully.
+	if off_map, location offset + enemy offset to get map width/heigh
+
+	edge case: 
+		central:
+			just make map max height/width
+
+pathing:
+	current->desired point:
+		dirTo -> draw a line iterating over
+			as long as normal keep going
+				if void:
+					trigger pathing
+				if unknown:
+					walk towards
+
+	void objects: seen (unknowns are nodepoints as well)
+
+
+HQ or other robot does breadth first/depth first to determin node pathing.
