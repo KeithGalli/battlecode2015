@@ -39,23 +39,17 @@ public class DRONERobot extends BaseRobot {
 		        if (rc.readBroadcast(DRONE_PREVIOUS_CHAN)>15 && rc.senseNearbyRobots(16, theirTeam).length < 2) {
 		            MapLocation closestTower = new MapLocation(rc.readBroadcast(50), rc.readBroadcast(51));
 		            RobotPlayer.tryMove(rc.getLocation().directionTo(closestTower));
+
 		        }else if(rc.getSupplyLevel() < 60) {
 		        	RobotPlayer.tryMove(rc.getLocation().directionTo(rc.senseHQLocation()));
 		        } else if(rc.getSupplyLevel()> 500){
-//		            int fate = RobotPlayer.rand.nextInt(1000);
-//		            if (fate<30) {
-//		                RobotPlayer.tryMove(RobotPlayer.directions[RobotPlayer.rand.nextInt(8)]);
 		        	moveAwayFromHQ();
 		        	transferSupplies(rc);
 		            } else{
 		            	RobotPlayer.tryMove(rc.getLocation().directionTo(rc.senseHQLocation()));
 		            }
-
-		        }
+		    }
 		
-//		    if(rc.getSupplyLevel() > 30){
-//		    	transferSupplies(rc);
-//		    }
             rc.broadcast(DRONE_CURRENT_CHAN, rc.readBroadcast(DRONE_CURRENT_CHAN)+1);
 		} catch (Exception e) {
 			//                    System.out.println("caught exception before it killed us:");

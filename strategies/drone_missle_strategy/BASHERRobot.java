@@ -1,5 +1,6 @@
 package drone_missle_strategy;
 
+
 import battlecode.common.Clock;
 import battlecode.common.Direction;
 import battlecode.common.GameActionException;
@@ -19,9 +20,17 @@ public class BASHERRobot extends BaseRobot {
 	@Override
 	public void run() {
 		try {
-		    if (rc.isCoreReady()) {
-		        RobotPlayer.tryMove(RobotPlayer.directions[RobotPlayer.rand.nextInt(8)]);
-		    }
+		    if (getEnemiesInAttackingRange().length>0) {
+                if (rc.isWeaponReady()) {
+                    attackLeastHealthEnemy(getEnemiesInAttackingRange());
+                }
+            } else if (rc.isCoreReady()) {
+                int centerMapX = (this.theirHQ.x + this.myHQ.x)/2;
+                int centerMapY = (this.theirHQ.y + this.myHQ.y)/2;
+                MapLocation centerMap = new MapLocation(centerMapX, centerMapY);
+                RobotPlayer.tryMove(rc.getLocation().directionTo(centerMap));    
+            }
+	        rc.broadcast(BASHER_CURRENT_CHAN, rc.readBroadcast(BASHER_CURRENT_CHAN)+1);
 			
 
 		} catch (Exception e) {
