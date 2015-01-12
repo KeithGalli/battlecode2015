@@ -1,18 +1,13 @@
 package drone_missle_strategy;
 
-import battlecode.common.Clock;
-import battlecode.common.Direction;
-import battlecode.common.GameActionException;
-import battlecode.common.GameConstants;
-import battlecode.common.MapLocation;
-import battlecode.common.RobotController;
-import battlecode.common.RobotInfo;
-import battlecode.common.RobotType;
-import battlecode.common.Team;
+import java.util.HashSet;
+
+import battlecode.common.*;
 
 public class HQRobot extends BaseRobot {	
 	public Team opp;
 	public Team team;
+	
 
 
 	public HQRobot(RobotController rc) throws GameActionException {
@@ -55,12 +50,12 @@ public class HQRobot extends BaseRobot {
             rc.broadcast(BASHER_PREVIOUS_CHAN, numBashers);
             rc.broadcast(HELIPAD_PREVIOUS_CHAN, numHelipads);
 
-
             rc.broadcast(DRONE_PREVIOUS_CHAN, numDrones);
             rc.broadcast(BARRACKS_PREVIOUS_CHAN,numBarracks);
             rc.broadcast(TANK_FACT_PREVIOUS_CHAN, numTankFactories);
             rc.broadcast(TANK_PREVIOUS_CHAN, numTanks);
-            
+
+     
             int closestTowerX = getClosestTower().x;
             int closestTowerY = getClosestTower().y;
             
@@ -80,5 +75,6 @@ public class HQRobot extends BaseRobot {
 			e.printStackTrace();
 		}
 	}
+
 	
 }
