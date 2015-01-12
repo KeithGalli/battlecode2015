@@ -3,10 +3,7 @@ package drone_missle_strategy;
 import battlecode.common.*;
 
 public class BEAVERRobot extends BaseRobot {
-
-
-
-
+	
 	public BEAVERRobot(RobotController rc) throws GameActionException {
 		super(rc);
 	}
@@ -28,9 +25,7 @@ public class BEAVERRobot extends BaseRobot {
 		    rc.broadcast(BEAVER_CURRENT_CHAN, rc.readBroadcast(BEAVER_CURRENT_CHAN)+1);
 		    rc.yield();
 		} catch (Exception e) {
-			//                    System.out.println("caught exception before it killed us:");
-			//                    System.out.println(rc.getRobot().getID());
-			//e.printStackTrace();
+			e.printStackTrace();
 		}
 	}
 }

@@ -49,15 +49,13 @@ public class HQRobot extends BaseRobot {
 
 
 
-            if (rc.isCoreReady() && rc.getTeamOre() >= 100 && rc.readBroadcast(BEAVER_PREVIOUS_CHAN)<8) {
+            if (rc.isCoreReady() && rc.getTeamOre() >= 100 && rc.readBroadcast(BEAVER_PREVIOUS_CHAN) < 8) {
                 RobotPlayer.trySpawn(RobotPlayer.directions[RobotPlayer.rand.nextInt(8)], RobotType.BEAVER);
             }
             rc.yield();
 			
 		} catch (Exception e) {
-			//                    System.out.println("caught exception before it killed us:");
-			//                    System.out.println(rc.getRobot().getID());
-			//e.printStackTrace();
+			e.printStackTrace();
 		}
 	}
 }
