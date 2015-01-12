@@ -164,13 +164,37 @@ public abstract class BaseRobot {
 		double transferAmount = 0;
 		MapLocation suppliesToThisLocation = null;
 		for(RobotInfo ri:nearbyAllies){
+			RobotType type = ri.type;
+			if(ri.supplyLevel<lowestSupply && !(type== RobotType.BARRACKS || type == RobotType.HELIPAD || type == RobotType.MINERFACTORY || type == RobotType.TANKFACTORY || type == RobotType.HQ)){
+				lowestSupply = ri.supplyLevel;
+//				if(type == RobotType.DRONE){
+//					transferAmount = 7*(rc.getSupplyLevel()-ri.supplyLevel)/8;
+//				}
+//				if(type== RobotType.BARRACKS || type == RobotType.HELIPAD || type == RobotType.MINERFACTORY || type == RobotType.TANKFACTORY || type == RobotType.HQ){
+//					transferAmount = 0;
+//				}
+//				else{
+//					lowestSupply = ri.supplyLevel;
+//					transferAmount = (rc.getSupplyLevel()-ri.supplyLevel)/2;
+//				}
+				transferAmount = (rc.getSupplyLevel()-ri.supplyLevel)/2;
+				suppliesToThisLocation = ri.location;
+			}
+		}
+		if(suppliesToThisLocation!=null){
+			rc.transferSupplies((int)transferAmount, suppliesToThisLocation);
+		}
+	}
+    
+    public static void transferDroneSupplies(RobotController rc) throws GameActionException {
+		RobotInfo[] nearbyAllies = rc.senseNearbyRobots(rc.getLocation(),GameConstants.SUPPLY_TRANSFER_RADIUS_SQUARED,rc.getTeam());
+		double lowestSupply = rc.getSupplyLevel();
+		double transferAmount = 0;
+		MapLocation suppliesToThisLocation = null;
+		for(RobotInfo ri:nearbyAllies){
 			if(ri.supplyLevel<lowestSupply){
 				lowestSupply = ri.supplyLevel;
-				if(ri.type == RobotType.DRONE){
-					transferAmount = 7*(rc.getSupplyLevel()-ri.supplyLevel)/8;
-				} else{
-					transferAmount = (rc.getSupplyLevel()-ri.supplyLevel)/2;
-				}
+				transferAmount = (rc.getSupplyLevel()-ri.supplyLevel)/2;
 				suppliesToThisLocation = ri.location;
 			}
 		}

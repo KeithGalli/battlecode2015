@@ -11,7 +11,7 @@ import battlecode.common.Team;
 
 public class DRONERobot extends BaseRobot {
 
-	public static boolean attackMode = true;
+	public static boolean attackMode = false;
 
 
 	public DRONERobot(RobotController rc) throws GameActionException {
@@ -51,14 +51,14 @@ public class DRONERobot extends BaseRobot {
 
 		        }else if(rc.getSupplyLevel() < 60) {
 		        	RobotPlayer.tryMove(rc.getLocation().directionTo(rc.senseHQLocation()));
-		        } else if(rc.getSupplyLevel()> 500){
+		        } else if(rc.getSupplyLevel()> 300){
 		        	moveAwayFromHQ();
-		        	transferSupplies(rc);
+		        	//transferMinerSupplies(rc);
 		        } else{
 		            	RobotPlayer.tryMove(rc.getLocation().directionTo(rc.senseHQLocation()));
 		            }
 		    }
-		
+		    transferMinerSupplies(rc);
             rc.broadcast(DRONE_CURRENT_CHAN, rc.readBroadcast(DRONE_CURRENT_CHAN)+1);
 		} catch (Exception e) {
 			//                    System.out.println("caught exception before it killed us:");
