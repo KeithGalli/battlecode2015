@@ -49,13 +49,18 @@ public class HQRobot extends BaseRobot {
             rc.broadcast(SOLDIER_PREVIOUS_CHAN, numSoldiers);
             rc.broadcast(BASHER_PREVIOUS_CHAN, numBashers);
             rc.broadcast(HELIPAD_PREVIOUS_CHAN, numHelipads);
-
-            if (rc.isCoreReady() && rc.getTeamOre() >= 100 && rc.readBroadcast(BEAVER_PREVIOUS_CHAN) < 8) {
             rc.broadcast(DRONE_PREVIOUS_CHAN, numDrones);
             rc.broadcast(BARRACKS_PREVIOUS_CHAN,numBarracks);
             rc.broadcast(TANK_FACT_PREVIOUS_CHAN, numTankFactories);
             rc.broadcast(TANK_PREVIOUS_CHAN, numTanks);
-            }
+
+     
+            int closestTowerX = getClosestTower().x;
+            int closestTowerY = getClosestTower().y;
+            
+            rc.broadcast(50, closestTowerX);
+            rc.broadcast(51, closestTowerY);
+
             
             RobotInfo[] enemies = getEnemiesInAttackingRange();
             if(enemies.length>0 && rc.isWeaponReady()){
