@@ -58,6 +58,21 @@ public abstract class BaseRobot {
 		
 	}
 	
+	public MapLocation getOurClosestTowerToThem() {
+	    MapLocation[] ourTowers = rc.senseTowerLocations();
+	    int distanceToClosest = this.theirHQ.distanceSquaredTo(ourTowers[0]);
+	    MapLocation closest = ourTowers[0];
+	    for (MapLocation tower : ourTowers) {
+	        int distanceToTower = this.theirHQ.distanceSquaredTo(tower);
+	        if (distanceToTower<distanceToClosest) {
+	            distanceToClosest = distanceToTower;
+	            closest = tower;
+	        }
+	    }
+	    MapLocation closestOffset = closest.add(rc.getLocation().directionTo(this.theirHQ), 2);
+	    return closestOffset;
+	}
+	
 	public MapLocation getClosestTower() {
 	    MapLocation[] enemyTowers = rc.senseEnemyTowerLocations();
         int distanceToClosest = rc.getLocation().distanceSquaredTo(enemyTowers[0]);
@@ -70,6 +85,16 @@ public abstract class BaseRobot {
             }
         }
         return closest;
+	}
+	
+	public int senseNearbyTowers(MapLocation location) {
+	    MapLocation[] enemyTowers = rc.senseEnemyTowerLocations();
+	    int count = 0;
+	    for (MapLocation tower : enemyTowers) {
+	        if (location.distanceSquaredTo(tower)<16)
+	            count += 1;
+	    }
+	    return count;
 	}
 
 //	public MapLocation getMostIsolatedTower() {

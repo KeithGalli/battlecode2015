@@ -65,6 +65,12 @@ public class HQRobot extends BaseRobot {
             
             rc.broadcast(50, closestTowerX);
             rc.broadcast(51, closestTowerY);
+            
+            int ourClosestTowerToThemX = getOurClosestTowerToThem().x;
+            int ourClosestTowerToThemY = getOurClosestTowerToThem().y;
+            
+            rc.broadcast(52, ourClosestTowerToThemX);
+            rc.broadcast(53, ourClosestTowerToThemY);
 
             
             RobotInfo[] enemies = getEnemiesInAttackingRange();

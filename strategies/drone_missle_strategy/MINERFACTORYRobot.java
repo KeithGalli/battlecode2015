@@ -23,16 +23,11 @@ public class MINERFACTORYRobot extends BaseRobot {
 		try {
 			if(rc.isCoreReady()){
 				//might be worth considering spawning miners AWAY from the HQ 
-				if(rc.readBroadcast(MINER_PREVIOUS_CHAN) < MAX_MINERS && rc.getTeamOre() >= MINERRobot.MINER_COST){
-						RobotPlayer.trySpawn(RobotPlayer.directions[RobotPlayer.rand.nextInt(8)], RobotType.MINER);
+				if(Clock.getRoundNum()<1100 && rc.readBroadcast(MINER_PREVIOUS_CHAN) < MAX_MINERS && rc.getTeamOre() >= MINERRobot.MINER_COST){
+				    Direction spawnDirection = getSpawnDirection(RobotType.MINER);
+                    if (spawnDirection != null)
+                        rc.spawn(spawnDirection, RobotType.MINER);
 				}
-				
-		        else if (rc.readBroadcast(MINER_PREVIOUS_CHAN)<25 && rc.getTeamOre() > 50) {
-			        Direction spawnDirection = getSpawnDirection(RobotType.MINER);
-			        if (spawnDirection != null)
-			            rc.spawn(spawnDirection, RobotType.MINER);
-			    }
-				
 			}
 			
 			rc.broadcast(MINER_FACT_CURRENT_CHAN, rc.readBroadcast(MINER_FACT_CURRENT_CHAN)+1);

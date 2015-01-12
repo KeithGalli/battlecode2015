@@ -45,7 +45,7 @@ public class DRONERobot extends BaseRobot {
 //		    		MapLocation tower = getClosestTower();
 //		    		RobotPlayer.tryMove(rc.getLocation().directionTo(tower));
 //		    	}
-		    	if ( rc.readBroadcast(DRONE_PREVIOUS_CHAN)>15 && rc.senseNearbyRobots(16, theirTeam).length < 2) {
+		    	if ( rc.readBroadcast(DRONE_PREVIOUS_CHAN)>15 && rc.senseNearbyRobots(16, theirTeam).length < 10 & senseNearbyTowers(rc.getLocation()) <2) {
 		            MapLocation closestTower = new MapLocation(rc.readBroadcast(50), rc.readBroadcast(51));
 		            RobotPlayer.tryMove(rc.getLocation().directionTo(closestTower));
 
@@ -58,7 +58,6 @@ public class DRONERobot extends BaseRobot {
 		            	RobotPlayer.tryMove(rc.getLocation().directionTo(rc.senseHQLocation()));
 		            }
 		    }
-		
             rc.broadcast(DRONE_CURRENT_CHAN, rc.readBroadcast(DRONE_CURRENT_CHAN)+1);
 		} catch (Exception e) {
 			//                    System.out.println("caught exception before it killed us:");
