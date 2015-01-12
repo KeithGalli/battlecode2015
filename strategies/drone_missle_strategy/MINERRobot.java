@@ -39,4 +39,6 @@ public class MINERRobot extends BaseRobot {
 	private Direction getDirectionAwayFromHQ() {
 		return (rc.getLocation().directionTo(rc.senseHQLocation()).opposite());
 	}
+	
+
 }
