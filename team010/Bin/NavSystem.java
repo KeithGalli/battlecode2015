@@ -32,6 +32,11 @@ public class NavSystem {
 	///////////////////////////////////////////////////////////////////////////
 	//Snail Navigation
 	///////////////////////////////////////////////////////////////////////////
+	public static void dumbNav(MapLocation loc){
+		snailNav(DataCache.currentLoc.directionTo(loc));
+	}
+
+
 	public static void snailNav(Direction chosenDirection) throws GameActionException{
 		tryToMove(chosenDirection, true, rc, directionalLooks, allDirections);
 	}
