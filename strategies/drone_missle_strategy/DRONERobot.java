@@ -11,7 +11,7 @@ import battlecode.common.Team;
 
 public class DRONERobot extends BaseRobot {
 
-
+	public static boolean attackMode = true;
 
 
 	public DRONERobot(RobotController rc) throws GameActionException {
@@ -21,6 +21,12 @@ public class DRONERobot extends BaseRobot {
 	@Override
 	public void run() {
 		try {
+			int numDrones = rc.readBroadcast(DRONE_PREVIOUS_CHAN);
+			if(numDrones < 4){
+				attackMode = false;
+			} else if(numDrones >= 15) {
+				attackMode = true;
+			}
 			if(rc.getHealth() < 2){
 				RobotInfo[] nearbyAllies = rc.senseNearbyRobots(rc.getLocation(),GameConstants.SUPPLY_TRANSFER_RADIUS_SQUARED,rc.getTeam());
 				int numAllies = nearbyAllies.length;
@@ -35,11 +41,11 @@ public class DRONERobot extends BaseRobot {
                 }
             }
 		    if (rc.isCoreReady()) {
-//		    	if(Clock.getRoundNum() > 1300){
-//		    		MapLocation tower = getClosestTower();
-//		    		RobotPlayer.tryMove(rc.getLocation().directionTo(tower));
-//		    	}
-		    	if (rc.readBroadcast(DRONE_PREVIOUS_CHAN)>15 && rc.senseNearbyRobots(16, theirTeam).length < 2) {
+		    	if(Clock.getRoundNum() > 1300 && attackMode ){
+		    		MapLocation tower = getClosestTower();
+		    		RobotPlayer.tryMove(rc.getLocation().directionTo(tower));
+		    	}
+		    	else if (rc.readBroadcast(DRONE_PREVIOUS_CHAN)>15 && rc.senseNearbyRobots(16, theirTeam).length < 2) {
 		            MapLocation closestTower = new MapLocation(rc.readBroadcast(50), rc.readBroadcast(51));
 		            RobotPlayer.tryMove(rc.getLocation().directionTo(closestTower));
 
