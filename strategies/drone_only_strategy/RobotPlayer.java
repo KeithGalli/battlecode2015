@@ -4,28 +4,6 @@ import battlecode.common.*;
 
 import java.util.*;
 
-import tank_drone_strategy.AEROSPACELABRobot;
-import tank_drone_strategy.BARRACKSRobot;
-import tank_drone_strategy.BASHERRobot;
-import tank_drone_strategy.BEAVERRobot;
-import tank_drone_strategy.BaseRobot;
-import tank_drone_strategy.COMMANDERRobot;
-import tank_drone_strategy.COMPUTERRobot;
-import tank_drone_strategy.DRONERobot;
-import tank_drone_strategy.HANDWASHSTATIONRobot;
-import tank_drone_strategy.HELIPADRobot;
-import tank_drone_strategy.HQRobot;
-import tank_drone_strategy.LAUNCHERRobot;
-import tank_drone_strategy.MINERFACTORYRobot;
-import tank_drone_strategy.MINERRobot;
-import tank_drone_strategy.MISSILERobot;
-import tank_drone_strategy.SOLDIERRobot;
-import tank_drone_strategy.SUPPLYDEPOTRobot;
-import tank_drone_strategy.TANKFACTORYRobot;
-import tank_drone_strategy.TANKRobot;
-import tank_drone_strategy.TECHNOLOGYINSTITUTERobot;
-import tank_drone_strategy.TOWERRobot;
-import tank_drone_strategy.TRAININGFIELDRobot;
 
 public class RobotPlayer {
     static RobotController rc;
