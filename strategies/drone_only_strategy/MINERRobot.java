@@ -9,7 +9,7 @@ import battlecode.common.Team;
 
 public class MINERRobot extends BaseRobot {
 
-
+	public final static int MINER_COST = 50;
 
 
 	public MINERRobot(RobotController rc) throws GameActionException {
