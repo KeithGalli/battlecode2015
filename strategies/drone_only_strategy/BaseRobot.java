@@ -184,6 +184,7 @@ public abstract class BaseRobot {
                 return;
             } else if(info.type == RobotType.HQ){
                 rc.attackLocation(info.location);
+                return;
             }
             if (info.health < minEnergon) {
                 toAttack = info.location;
@@ -206,10 +207,11 @@ public abstract class BaseRobot {
               if(type == RobotType.DRONE){
                   transferAmount = 6*(rc.getSupplyLevel()-ri.supplyLevel)/8;
               } else {
-                  transferAmount = (rc.getSupplyLevel()-ri.supplyLevel)/2;
+                  transferAmount = (rc.getSupplyLevel()-ri.supplyLevel)/4;
               }
                 suppliesToThisLocation = ri.location;
             }
+
         }
         if(suppliesToThisLocation!=null){
             rc.transferSupplies((int)transferAmount, suppliesToThisLocation);
@@ -239,16 +241,23 @@ public abstract class BaseRobot {
         double transferAmount = 0;
         MapLocation suppliesToThisLocation = null;
         for(RobotInfo ri:nearbyAllies){
-            if(ri.supplyLevel<lowestSupply){
+            if(ri.type == type && ri.supplyLevel<lowestSupply ){
                 lowestSupply = ri.supplyLevel;
-                if(ri.type == type){
-                    transferAmount = (rc.getSupplyLevel()-ri.supplyLevel)/2;
-                    suppliesToThisLocation = ri.location;
-                    if(suppliesToThisLocation!=null){
-                        rc.transferSupplies((int)transferAmount, suppliesToThisLocation);
-                    }
-                }
+                transferAmount = (rc.getSupplyLevel()-ri.supplyLevel)/2;
+                suppliesToThisLocation = ri.location;
+//                if(ri.type == type){
+//                    transferAmount = (rc.getSupplyLevel()-ri.supplyLevel)/2;
+//                    suppliesToThisLocation = ri.location;
+//                    if(suppliesToThisLocation!=null){
+//                        rc.transferSupplies((int)transferAmount, suppliesToThisLocation);
+//                    }
+//                }
             }
+        }
+        if(Clock.getBytecodesLeft() > 520){
+		    if(suppliesToThisLocation!=null){
+		        rc.transferSupplies((int)transferAmount, suppliesToThisLocation);
+		    }
         }
     }
 

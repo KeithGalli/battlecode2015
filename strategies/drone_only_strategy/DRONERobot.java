@@ -60,7 +60,7 @@ public class DRONERobot extends BaseRobot {
 
 		    }
 		    
-		    //transferSpecificSupplies(RobotType.DRONE, rc);
+		    transferSpecificSupplies(RobotType.DRONE, rc);
             rc.broadcast(DRONE_CURRENT_CHAN, rc.readBroadcast(DRONE_CURRENT_CHAN)+1);
 		} catch (Exception e) {
 			//                    System.out.println("caught exception before it killed us:");
