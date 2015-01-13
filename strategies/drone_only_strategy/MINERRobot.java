@@ -34,6 +34,7 @@ public class MINERRobot extends BaseRobot {
 			//assign the miner a group movement number
 			int minerNum = rc.readBroadcast(MINER_CURRENT_CHAN);
 			int minerGroupNum = minerNum % 4;
+			RobotInfo[] enemyRobots = getEnemiesInAttackingRange(RobotType.MINER);
 			
 			if(rc.isCoreReady()) {
 			
@@ -41,11 +42,11 @@ public class MINERRobot extends BaseRobot {
 				if(rc.senseOre(rc.getLocation()) >= 4 && rc.canMine()) rc.mine();
 				
 				//else if enemies in range, attack
-				else if (getEnemiesInAttackingRange().length > 0 && rc.isWeaponReady()) attackLeastHealthEnemy(getEnemiesInAttackingRange());
+				else if (enemyRobots.length > 0 && rc.isWeaponReady()) attackLeastHealthEnemy(enemyRobots);
 				
-				else if(rc.getLocation().distanceSquaredTo(rc.senseHQLocation()) < 100) tryMinerMove(groupDirections[minerGroupNum][(int) (Math.random()*3)]);
+				else if (rc.getLocation().distanceSquaredTo(rc.senseHQLocation()) < 100) tryMinerMove(groupDirections[minerGroupNum][(int) (Math.random()*3)]);
 				
-				else if(rc.getLocation().distanceSquaredTo(rc.senseHQLocation()) < 400) {
+				else if (rc.getLocation().distanceSquaredTo(rc.senseHQLocation()) < 400) {
 					if(randDouble.nextDouble() < 0.3) tryMinerMove(directions[(int) (Math.random()*3)]);
 					else tryMinerMove(groupDirections[minerGroupNum][(int) (Math.random()*3)]);
 				}

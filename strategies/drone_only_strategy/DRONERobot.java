@@ -21,17 +21,18 @@ public class DRONERobot extends BaseRobot {
 	@Override
 	public void run() {
 		try {
-		    boolean towerOrHQNearby = false;
-            RobotInfo[] robotsNearby = rc.senseNearbyRobots(24, this.theirTeam);
-            for (RobotInfo robot : robotsNearby) {
-                if (robot.type == RobotType.TOWER || robot.type == RobotType.HQ) {
-                    towerOrHQNearby = true;
-                    break;
-                }
-            }
-            if (getEnemiesInAttackingRange().length>0) {
+//		    boolean towerOrHQNearby = false;
+//            RobotInfo[] robotsNearby = rc.senseNearbyRobots(24, this.theirTeam);
+//            for (RobotInfo robot : robotsNearby) {
+//                if (robot.type == RobotType.TOWER || robot.type == RobotType.HQ) {
+//                    towerOrHQNearby = true;
+//                    break;
+//                }
+//            }
+            RobotInfo[] enemyRobots = getEnemiesInAttackingRange(RobotType.DRONE);
+            if (enemyRobots.length>0) {
                 if (rc.isWeaponReady()) {
-                    attackLeastHealthEnemy(getEnemiesInAttackingRange());
+                    attackLeastHealthEnemy(enemyRobots);
                 }
             }
 		    if (Clock.getRoundNum() < 1900) {
@@ -50,10 +51,16 @@ public class DRONERobot extends BaseRobot {
 		            } else RobotPlayer.tryMove(rc.getLocation().directionTo(this.theirHQ));
 		        }
 		    } else {
-		        RobotPlayer.tryMove(rc.getLocation().directionTo(getClosestTower()));
+		        MapLocation closest  = getClosestTower();
+		        if (closest!=null) {
+		            RobotPlayer.tryMove(rc.getLocation().directionTo(closest));
+		        } else {
+		            RobotPlayer.tryMove(rc.getLocation().directionTo(this.theirHQ));
+		        }
+
 		    }
 		    
-		    transferSpecificSupplies(RobotType.DRONE, rc);
+		    //transferSpecificSupplies(RobotType.DRONE, rc);
             rc.broadcast(DRONE_CURRENT_CHAN, rc.readBroadcast(DRONE_CURRENT_CHAN)+1);
 		} catch (Exception e) {
 			//                    System.out.println("caught exception before it killed us:");
@@ -61,20 +68,4 @@ public class DRONERobot extends BaseRobot {
 			//e.printStackTrace();
 		}
 	}
-	
-    private static void tryDroneMove(Direction d) throws GameActionException {
-        int offsetIndex = 0;
-        int[] offsets = {0,1,-1,2,-2};
-        int dirint = RobotPlayer.directionToInt(d);
-        MapLocation myLocation = rc.getLocation();
-        
-        while ((offsetIndex < 5 && !rc.canMove(RobotPlayer.directions[(dirint+offsets[offsetIndex]+8)%8]))
-            || isLocationInEnemyTerritory(myLocation.add(RobotPlayer.directions[(dirint+offsets[offsetIndex]+8)%8]))){
-            offsetIndex++;
-           
-        }
-        if (offsetIndex < 5) {
-            rc.move(RobotPlayer.directions[(dirint+offsets[offsetIndex]+8)%8]);
-        } 
-    }
 }

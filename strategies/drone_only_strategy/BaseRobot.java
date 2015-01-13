@@ -166,8 +166,8 @@ public abstract class BaseRobot {
         return allies;
     }
 
-    public RobotInfo[] getEnemiesInAttackingRange() {
-        RobotInfo[] enemies = rc.senseNearbyRobots(RobotType.SOLDIER.attackRadiusSquared, theirTeam);
+    public RobotInfo[] getEnemiesInAttackingRange(RobotType type) {
+        RobotInfo[] enemies = rc.senseNearbyRobots(type.attackRadiusSquared, theirTeam);
         return enemies;
     }
 

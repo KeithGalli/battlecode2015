@@ -6,6 +6,7 @@ import battlecode.common.Direction;
 import battlecode.common.GameActionException;
 import battlecode.common.MapLocation;
 import battlecode.common.RobotController;
+import battlecode.common.RobotInfo;
 import battlecode.common.RobotType;
 import battlecode.common.Team;
 
@@ -29,10 +30,10 @@ public class BEAVERRobot extends BaseRobot {
 				int minerFactoriesBuilt = rc.readBroadcast(40);
 //				int helipads = rc.readBroadcast(HELIPAD_PREVIOUS_CHAN);
 				int helipadsBuilt = rc.readBroadcast(43);
-				
-			    if (getEnemiesInAttackingRange().length>0) {
+				RobotInfo[] enemyRobots = getEnemiesInAttackingRange(RobotType.BEAVER);
+			    if (enemyRobots.length>0) {
 	                if (rc.isWeaponReady()) {
-	                    attackLeastHealthEnemy(getEnemiesInAttackingRange());
+	                    attackLeastHealthEnemy(enemyRobots);
 	                }
 			    } else if( ore>= 500 && ((minerFactoriesBuilt < 1 ) || (minerFactoriesBuilt < 2 && helipadsBuilt > 0))) {
 		            Direction buildDirection = getBuildDirection(RobotType.MINERFACTORY);

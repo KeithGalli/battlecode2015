@@ -48,7 +48,7 @@ public class HQRobot extends BaseRobot {
             rc.broadcast(HELIPAD_PREVIOUS_CHAN, numHelipads);
             rc.broadcast(DRONE_PREVIOUS_CHAN, numDrones);
             
-            RobotInfo[] enemies = getEnemiesInAttackingRange();
+            RobotInfo[] enemies = getEnemiesInAttackingRange(RobotType.HQ);
             if(enemies.length>0 && rc.isWeaponReady()){
             	attackLeastHealthEnemy(enemies);
             } else if (rc.isCoreReady() && rc.getTeamOre() >= 100 && rc.readBroadcast(BEAVER_PREVIOUS_CHAN)<5) {
