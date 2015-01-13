@@ -52,7 +52,9 @@ public class BEAVERRobot extends BaseRobot {
 			        RobotPlayer.tryMove(rc.getLocation().directionTo(rc.senseHQLocation()));
 				} else{
 					RobotPlayer.tryMove(RobotPlayer.directions[RobotPlayer.rand.nextInt(8)]);
+
 				}
+
 			}
 			transferSupplies(rc);
 			rc.broadcast(BEAVER_CURRENT_CHAN, rc.readBroadcast(BEAVER_CURRENT_CHAN)+1);
