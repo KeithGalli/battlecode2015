@@ -39,3 +39,10 @@ pathing:
 
 
 HQ or other robot does breadth first/depth first to determin node pathing.
+
+
+////////
+Eventually multi-thread the towers
+
+codes 1-9 for 2 tile combinations to compress map data
+
