@@ -48,7 +48,7 @@ public class BEAVERRobot extends BaseRobot {
                     }       
 			    } else if(rc.senseOre(rc.getLocation())>2){
 				    rc.mine();
-				} else{
+				} else {
 			        RobotPlayer.tryMove(RobotPlayer.directions[RobotPlayer.rand.nextInt(8)]);
 				}
 			}
