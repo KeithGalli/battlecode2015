@@ -48,8 +48,10 @@ public class BEAVERRobot extends BaseRobot {
                     }       
 			    } else if(rc.senseOre(rc.getLocation())>2){
 				    rc.mine();
+				} else if(rc.getLocation().distanceSquaredTo(rc.senseHQLocation())> 14){
+			        RobotPlayer.tryMove(rc.getLocation().directionTo(rc.senseHQLocation()));
 				} else{
-			        RobotPlayer.tryMove(RobotPlayer.directions[RobotPlayer.rand.nextInt(8)]);
+					RobotPlayer.tryMove(RobotPlayer.directions[RobotPlayer.rand.nextInt(8)]);
 				}
 			}
 			transferSupplies(rc);
