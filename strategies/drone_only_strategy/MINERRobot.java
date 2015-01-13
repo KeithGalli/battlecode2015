@@ -60,7 +60,7 @@ public class MINERRobot extends BaseRobot {
 				}
 				else tryMinerMove(directions[(int) (Math.random()*8)]);
 			}
-			transferMinerSupplies(rc);
+			transferSpecificSupplies(RobotType.MINER, rc);
 			rc.broadcast(MINER_CURRENT_CHAN, rc.readBroadcast(MINER_CURRENT_CHAN)+1);
 			
 		} catch (GameActionException e) {
