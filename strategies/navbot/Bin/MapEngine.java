@@ -31,6 +31,8 @@ public class MapEngine {
 
 	public static int[][] map;
 
+	public static MapLocation internalMapCenter;
+
 	public static List<MapLocation> senseQueue=new ArrayList<MapLocation>();
 
 	public static void HQinit(RobotController myRC) {
@@ -38,11 +40,14 @@ public class MapEngine {
 		getMapParams();
 		getMapEdges();
 		setMapDim();
+		BroadcastSystem.write(BroadcastSystem.xdimBand, xdim);
+		BroadcastSystem.write(BroadcastSystem.ydimBand, ydim);
 		//System.out.println("test");
-		Functions.displayArray(map);
+		//Functions.displayArray(map);
 		//System.out.println("test2");
 		//System.out.println(xdim);
 		//System.out.println(ydim);
+		//System.out.println(Functions.locToInternalLoc(DataCache.ourHQ));
 	}
 	public static void STRUCTinit(RobotController myRC) {
 		rc = myRC;
@@ -52,16 +57,40 @@ public class MapEngine {
 
 	public static void UNITinit(RobotController myRC) {
 		rc = myRC;
+		xdim = BroadcastSystem.read(BroadcastSystem.xdimBand);
+		ydim = BroadcastSystem.read(BroadcastSystem.ydimBand);
+		internalMapCenter = new MapLocation(xdim/2, ydim/2);
 	}
 
 	public static void scanTiles(MapLocation[] inputTiles){
-		
+		for (MapLocation tile: inputTiles){
+			MapLocation internalTile = Functions.locToInternalLoc(tile);
+			if (internalTile.x<xdim && internalTile.y<ydim){
+			if (map[internalTile.x][internalTile.y] == 0){
+				TerrainTile tileType = rc.senseTerrainTile(tile);
+				if (tileType == TerrainTile.NORMAL){
+					map[internalTile.x][internalTile.y] = 1;
+				} else if (tileType == TerrainTile.VOID){
+					map[internalTile.x][internalTile.y] = 2;
+				} else if (tileType == TerrainTile.OFF_MAP){
+					map[internalTile.x][internalTile.y] = 3;
+				}
+
+			}
+		}
+		}
+		BroadcastSystem.write(2001, 1);
+
 	}
 
 
 
-	public static MapLocation[] unitScan(MapLocation currLoc){
-		return MapLocation.getAllMapLocationsWithinRadiusSq(currLoc, 24);
+	public static MapLocation[] unitScan(MapLocation unitLoc){
+		return MapLocation.getAllMapLocationsWithinRadiusSq(unitLoc, 24);
+	}
+
+	public static MapLocation[] structScan(MapLocation unitLoc){
+		return MapLocation.getAllMapLocationsWithinRadiusSq(unitLoc, 35);
 	}
 
 	public static void setMapDim(){
@@ -78,6 +107,7 @@ public class MapEngine {
 		}
 		//initialized to 0. we'll do 1 for void and 2 for normal. 0 for unknown.
 		map = new int[xdim][ydim];
+		internalMapCenter = new MapLocation(xdim/2, ydim/2);
 
 	}
 

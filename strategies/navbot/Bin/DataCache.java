@@ -14,10 +14,15 @@ public class DataCache {
 	public static MapLocation enemyHQ;
 	public static MapLocation ourHQ;
 
+	public static MapLocation mapCenter;
+
 	public static MapLocation[] enemyTowers;
 	public static MapLocation[] ourTowers;
 
 	public static MapLocation currentLoc;
+
+	public static int xmodifier;
+	public static int ymodifier;
 
 	public static List<MapLocation> seenLocs=new ArrayList<MapLocation>();
 
@@ -29,6 +34,12 @@ public class DataCache {
 		ourHQ = rc.senseHQLocation();
 		enemyTowers = rc.senseEnemyTowerLocations();
 		ourTowers = rc.senseTowerLocations();
+
+		mapCenter = new MapLocation((ourHQ.x+enemyHQ.x)/2, (ourHQ.y+enemyHQ.y)/2);
+		xmodifier = ourHQ.x;
+		ymodifier = ourHQ.y;
+		//System.out.println(mapCenter);
+
 	}
 
 	public static void updateRoundVariables() throws GameActionException {

@@ -19,6 +19,7 @@ public class BEAVERRobot extends BaseRobot {
 	public static MapLocation tile;
 	public static MapLocation[] visibleTiles;
 
+	public static int downloadReady;
 	public static List<MapLocation> newLocs=new ArrayList<MapLocation>();
 
 	public BEAVERRobot(RobotController rc) throws GameActionException {
@@ -32,8 +33,12 @@ public class BEAVERRobot extends BaseRobot {
 		try {
 
 			DataCache.updateRoundVariables();
+			downloadReady = BroadcastSystem.read(2001);
+			//System.out.println(DataCache.currentLoc);
 
-			rc.broadcast(TESTCHANNEL, Functions.locToInt(DataCache.currentLoc));
+			//System.out.println(Functions.locToInternalLoc(DataCache.currentLoc));
+
+			rc.broadcast(TESTCHANNEL, Functions.locToInt(Functions.locToInternalLoc(DataCache.currentLoc)));
 			
 			tarDir = rc.getLocation().directionTo(DataCache.enemyHQ);
 			
@@ -45,6 +50,14 @@ public class BEAVERRobot extends BaseRobot {
 			// DataCache.updateSeenLocs(newLocs);
 			// newLocs=new ArrayList<MapLocation>();
 			// //DataCache.displaySeenLocs();
+
+			if (downloadReady==1){
+				MapEngine.map = BroadcastSystem.downloadMapArray(REFCHANNEL);
+			}
+
+			// System.out.println("/////////////////////////");
+   //      	Functions.displayArray(MapEngine.map);
+   //      	System.out.println("/////////////////////////");
 			
 			NavSystem.dumbNav(DataCache.enemyHQ);
 
