@@ -26,23 +26,35 @@ public class MapEngine {
 	public static int xmod = 0;
 	public static int ymod = 0;
 
+	public static int voidID=3;
+
 	public static int xdim;
 	public static int ydim;
 
 	public static int[][] map;
 
+	public static MapLocation internalMapCenter;
+
 	public static List<MapLocation> senseQueue=new ArrayList<MapLocation>();
+
+	public static Dictionary<Integer,ArrayList<MapLocation>> waypointDictHQ = new Hashtable<Integer,ArrayList<MapLocation>>();
+	public static Dictionary<Integer,MapLocation[]> waypointDict = new Hashtable<Integer,MapLocation[]>();
+
+
 
 	public static void HQinit(RobotController myRC) {
 		rc = myRC;
 		getMapParams();
 		getMapEdges();
 		setMapDim();
+		BroadcastSystem.write(BroadcastSystem.xdimBand, xdim);
+		BroadcastSystem.write(BroadcastSystem.ydimBand, ydim);
 		//System.out.println("test");
-		Functions.displayArray(map);
+		//Functions.displayArray(map);
 		//System.out.println("test2");
 		//System.out.println(xdim);
 		//System.out.println(ydim);
+		//System.out.println(Functions.locToInternalLoc(DataCache.ourHQ));
 	}
 	public static void STRUCTinit(RobotController myRC) {
 		rc = myRC;
@@ -52,16 +64,215 @@ public class MapEngine {
 
 	public static void UNITinit(RobotController myRC) {
 		rc = myRC;
+		xdim = BroadcastSystem.read(BroadcastSystem.xdimBand);
+		ydim = BroadcastSystem.read(BroadcastSystem.ydimBand);
+		internalMapCenter = new MapLocation(xdim/2, ydim/2);
 	}
 
 	public static void scanTiles(MapLocation[] inputTiles){
-		
+		for (MapLocation tile: inputTiles){
+			MapLocation internalTile = Functions.locToInternalLoc(tile);
+			if (internalTile.x<xdim && internalTile.y<ydim){
+			if (map[internalTile.x][internalTile.y] == 0){
+				TerrainTile tileType = rc.senseTerrainTile(tile);
+				if (tileType == TerrainTile.NORMAL){
+					map[internalTile.x][internalTile.y] = 1;
+				} else if (tileType == TerrainTile.VOID){
+					map[internalTile.x][internalTile.y] = 2;
+				} else if (tileType == TerrainTile.OFF_MAP){
+					map[internalTile.x][internalTile.y] = -1;
+				}
+
+			}
+		}
+		}
+		resetVoidNums();
+		setVoidNums();
+		BroadcastSystem.write(2001, 1);
+
 	}
 
+	public static void resetVoidNums(){
+		for(int x=xdim;--x>=0;){
+			for(int y=ydim;--y>=0;){
+				if (map[x][y]>1){
+					map[x][y]=2;
+				}
+			}
+		}
+		waypointDictHQ = new Hashtable<Integer,ArrayList<MapLocation>>();
+	}
+
+	public static void setVoidNums(){
+		voidID = 3;
+		for(int x=xdim;--x>=0;){
+			for(int y=ydim;--y>=0;){
+				// If find unlabeled void than propagate through void labeling each square
+				if (map[x][y]==2) {
+					waypointDictHQ.put(voidID, new ArrayList<MapLocation>());
+					propagateVoid(x,y,voidID);
+					voidID++;
+				}
+			}
+		}
+	}
+
+	private static int propagateVoid(int x, int y, int id) {
+		// Make sure square is void and it has yet to be labeled
+		if (x>-1 & y>-1 & x<xdim & y<ydim){
+			if (map[x][y]>1){
+				if (map[x][y]==2){
+
+					map[x][y] = id;
+					int sum = 0; 
+					sum |= propagateVoid(x-1, y, id);
+					sum |= propagateVoid(x, y-1, id) << 1;
+					sum |= propagateVoid(x+1, y, id) << 2;
+					sum |= propagateVoid(x, y+1, id) << 3;
+					// add waypoint if we are at corner of void
+
+					switch (sum) {
+					case 0:
+						addWayPoint(x+1, y-1, id);
+						addWayPoint(x+1, y+1, id);
+						addWayPoint(x-1, y-1, id);
+						addWayPoint(x-1, y+1, id);
+						break;
+					case 1:
+						addWayPoint(x+1, y-1, id);
+						addWayPoint(x+1, y+1, id);
+						break;
+					case 2:
+						addWayPoint(x-1, y+1, id);
+						addWayPoint(x+1, y+1, id);
+						break;
+					case 3: 
+						addWayPoint(x+1,y+1,id);
+						break;
+					case 4:
+						addWayPoint(x-1, y-1, id);
+						addWayPoint(x-1, y+1, id);
+						break;
+					case 6: 
+						addWayPoint(x-1,y+1,id);
+						break;
+					case 8:
+						addWayPoint(x-1, y-1, id);
+						addWayPoint(x+1, y-1, id);
+						break;
+					case 9: 
+						addWayPoint(x+1,y-1,id);
+						break;
+					case 12: 
+						addWayPoint(x-1,y-1,id);
+						break;
+					}
+				}
+				return 1;
+			}
+			return 0;
+			
+		}
+		return 0;
+	}
+
+	private static void addWayPoint(int x, int y, int id) {
+		if (x>-1 & y>-1 & x<xdim & y<ydim) {
+			ArrayList<MapLocation> locs = waypointDictHQ.get(id);
+			if(!locs.contains(new MapLocation(x,y))){
+			locs.add(new MapLocation(x,y));
+			waypointDictHQ.put(id, locs);
+			}
+			//1/15/15 why is this here?
+			else{
+				locs.remove(new MapLocation(x,y));
+				waypointDictHQ.put(id, locs);
+			}
+		}
+	}
+
+	// public static void scanTiles(MapLocation[] inputTiles){
+	// 	for (MapLocation tile: inputTiles){
+	// 		MapLocation internalTile = Functions.locToInternalLoc(tile);
+	// 		if (internalTile.x<xdim && internalTile.y<ydim){
+	// 		if (map[internalTile.x][internalTile.y] == 0){
+	// 			TerrainTile tileType = rc.senseTerrainTile(tile);
+	// 			if (tileType == TerrainTile.NORMAL){
+	// 				map[internalTile.x][internalTile.y] = 1;
+	// 			} else if (tileType == TerrainTile.VOID){
+	// 				int voidNum = checkAdjVoidTiles(internalTile);
+	// 				if (voidNum==0){
+	// 					map[internalTile.x][internalTile.y] = voidCounter;
+	// 					voidCounter++;
+	// 				} else{
+	// 					map[internalTile.x][internalTile.y] = voidNum;
+	// 				}
+	// 			} else if (tileType == TerrainTile.OFF_MAP){
+	// 				map[internalTile.x][internalTile.y] = -1;
+	// 			}
+
+	// 		}
+	// 	}
+	// 	}
+	// 	resetVoidNums();
+	// 	BroadcastSystem.write(2001, 1);
+
+	// }
+
+	// public static int checkAdjVoidTiles(MapLocation inputTile){
+	// 	if (map[inputTile.x-1][inputTile.y]>1){
+	// 		return map[inputTile.x-1][inputTile.y];
+	// 	} else if (map[inputTile.x+1][inputTile.y]>1){
+	// 		return map[inputTile.x+1][inputTile.y];
+	// 	} else if (map[inputTile.x][inputTile.y-1]>1){
+	// 		return map[inputTile.x][inputTile.y-1];
+	// 	} else if (map[inputTile.x][inputTile.y+1]>1){
+	// 		return map[inputTile.x][inputTile.y+1];
+	// 	} else {
+	// 		return 0;
+	// 	}
+	// }
+
+	// public static void resetVoidNums(){
+	// 	//this is probably useless
+	// 	for (int x=1;x<xdim;x++){
+	// 		if (map[x][0]>1){
+	// 			if (map[x-1][0]>1 && map[x][0]!=map[x-1][0]){
+	// 				map[x][0] = map[x-1][0];
+	// 			}
+	// 		}
+	// 	}
+	// 	//this is probably useless too
+	// 	for (int y=1;y<ydim;y++){
+	// 		if (map[0][y]>1){
+	// 			if (map[0][y-1]>1 && map[0][y]!=map[0][y-1]){
+	// 				map[0][y] = map[0][y-1];
+	// 			}
+	// 		}
+	// 	}
+
+	// 	for (int x=1;x<xdim;x++){
+	// 		for (int y=1;y<ydim;y++){
+	// 			if (map[x][y]>1){
+	// 				if (map[x-1][y]>1 && map[x][y]!=map[x-1][y]){
+	// 					map[x][y] = map[x-1][y];
+	// 				}
+	// 				else if (map[x][y-1]>1 && map[x][y]!=map[x][y-1]){
+	// 					map[x][y] = map[x][y-1];
+	// 				}
+	// 			}
+	// 		}
+	// 	}
+	// }
 
 
-	public static MapLocation[] unitScan(MapLocation currLoc){
-		return MapLocation.getAllMapLocationsWithinRadiusSq(currLoc, 24);
+
+	public static MapLocation[] unitScan(MapLocation unitLoc){
+		return MapLocation.getAllMapLocationsWithinRadiusSq(unitLoc, 24);
+	}
+
+	public static MapLocation[] structScan(MapLocation unitLoc){
+		return MapLocation.getAllMapLocationsWithinRadiusSq(unitLoc, 35);
 	}
 
 	public static void setMapDim(){
@@ -78,6 +289,7 @@ public class MapEngine {
 		}
 		//initialized to 0. we'll do 1 for void and 2 for normal. 0 for unknown.
 		map = new int[xdim][ydim];
+		internalMapCenter = new MapLocation(xdim/2, ydim/2);
 
 	}
 
