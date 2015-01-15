@@ -19,6 +19,9 @@ public class BroadcastSystem {
 	
 	public static int waypointBand = 20000;
 
+	public static int xdimBand = 205;
+	public static int ydimBand = 206;
+
 	public static void init(BaseRobot myRobot) {
 		robot = myRobot;
 		rc = robot.rc;
@@ -47,14 +50,14 @@ public class BroadcastSystem {
 		}
 	}
 
-	// static void broadcastMapArray(int refchannel, int[][] dataArray) throws GameActionException{
-	// 	for(int x=DataCache.mapWidth;--x>=0;){
-	// 		for(int y=DataCache.mapHeight;--y>=0;){
-	// 			int index = y*DataCache.mapWidth+x+refchannel;
-	// 			rc.broadcast(index, dataArray[x][y]);
-	// 		}
-	// 	}
-	// }
+	static void broadcastMapArray(int refchannel, int[][] dataArray) throws GameActionException{
+		for(int x=MapEngine.xdim;--x>=0;){
+			for(int y=MapEngine.ydim;--y>=0;){
+				int index = y*MapEngine.xdim+x+refchannel;
+				rc.broadcast(index, dataArray[x][y]);
+			}
+		}
+	}
 	
 	// static void broadcast2MapArrays(int refchannel, int[][] dataArray1,  int[][] dataArray2) throws GameActionException{
 	// 	for(int x=DataCache.mapWidth;--x>=0;){
@@ -65,16 +68,16 @@ public class BroadcastSystem {
 	// 	}
 	// }
 	
-	// static int[][] downloadMapArray(int refchannel) throws GameActionException {
-	// 	int[][] dataArray = new int[DataCache.mapWidth][DataCache.mapHeight];
-	// 	for(int x=DataCache.mapWidth;--x>=0;){
-	// 		for(int y=DataCache.mapHeight;--y>=0;){
-	// 			int index = y*DataCache.mapWidth+x+refchannel;
-	// 			dataArray[x][y] = rc.readBroadcast(index);
-	// 		}
-	// 	}
-	// 	return dataArray;
-	// }
+	static int[][] downloadMapArray(int refchannel) throws GameActionException {
+		int[][] dataArray = new int[MapEngine.xdim][MapEngine.ydim];
+		for(int x=MapEngine.xdim;--x>=0;){
+			for(int y=MapEngine.ydim;--y>=0;){
+				int index = y*MapEngine.xdim+x+refchannel;
+				dataArray[x][y] = rc.readBroadcast(index);
+			}
+		}
+		return dataArray;
+	}
 	
 	// static int[][][] download2MapArray(int refchannel) throws GameActionException {
 	// 	int[][][] dataArray = new int[2][DataCache.mapWidth][DataCache.mapHeight];

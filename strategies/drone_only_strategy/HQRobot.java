@@ -29,8 +29,12 @@ public class HQRobot extends BaseRobot {
 	@Override
 	public void run() {
 		try {
-
-			transferSupplies(rc);
+			
+			if(Clock.getBytecodeNum() < 900){
+				transferSupplies(rc);
+			} else{
+				transferSpecificSupplies(RobotType.DRONE,rc);
+			}
 		    int numMinerFactories = rc.readBroadcast(MINER_FACT_CURRENT_CHAN);
 		    rc.broadcast(MINER_FACT_CURRENT_CHAN, 0);
 		    int numMiners = rc.readBroadcast(MINER_CURRENT_CHAN);

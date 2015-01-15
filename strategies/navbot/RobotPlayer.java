@@ -4,6 +4,7 @@ import battlecode.common.*;
 import java.util.*;
 import java.util.ArrayList;
 import java.util.Random;
+//export PATH=/usr/local/apache-ant/bin:"$PATH"
 
 public class RobotPlayer {
 	static RobotController rc;
