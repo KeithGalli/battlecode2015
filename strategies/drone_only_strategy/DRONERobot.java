@@ -48,7 +48,9 @@ public class DRONERobot extends BaseRobot {
 		                  Direction[] directions = getDirectionsToward(this.theirHQ);
 		                  Direction direction = directions[fate];
 		                  RobotPlayer.tryMove(direction);
-		            } else RobotPlayer.tryMove(rc.getLocation().directionTo(this.theirHQ));
+		            } else {
+		                RobotPlayer.tryMove(rc.getLocation().directionTo(this.theirHQ));
+		            }
 		        }
 		    } else {
 		        MapLocation closest  = getClosestTower();
@@ -60,7 +62,7 @@ public class DRONERobot extends BaseRobot {
 
 		    }
 		    
-		    //transferSpecificSupplies(RobotType.DRONE, rc);
+		    transferSpecificSupplies(RobotType.DRONE, rc);
             rc.broadcast(DRONE_CURRENT_CHAN, rc.readBroadcast(DRONE_CURRENT_CHAN)+1);
 		} catch (Exception e) {
 			//                    System.out.println("caught exception before it killed us:");
