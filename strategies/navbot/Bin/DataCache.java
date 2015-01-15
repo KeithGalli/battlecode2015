@@ -20,6 +20,7 @@ public class DataCache {
 	public static MapLocation[] ourTowers;
 
 	public static MapLocation currentLoc;
+	public static MapLocation internalLoc;
 
 	public static int xmodifier;
 	public static int ymodifier;
@@ -44,6 +45,7 @@ public class DataCache {
 
 	public static void updateRoundVariables() throws GameActionException {
 		currentLoc = rc.getLocation();
+		internalLoc = Functions.locToInternalLoc(currentLoc);
 	}
 
 	public static void updateSeenLocs(List<MapLocation> newLocs){
