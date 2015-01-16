@@ -41,7 +41,7 @@ public abstract class BaseRobot {
 	public static int COMPUTER_COST = 10;
 	public static int SOLDIER_COST = 60;
 	public static int BASHER_COST = 80;
-	public static int MINER_COST = 50;
+	public static int MINER_COST = 60;
 	public static int DRONE_COST = 125;
 	public static int TANK = 250;
 	public static int COMMANDER = 100;

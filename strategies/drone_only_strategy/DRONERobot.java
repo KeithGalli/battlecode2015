@@ -21,14 +21,7 @@ public class DRONERobot extends BaseRobot {
 	@Override
 	public void run() {
 		try {
-//		    boolean towerOrHQNearby = false;
-//            RobotInfo[] robotsNearby = rc.senseNearbyRobots(24, this.theirTeam);
-//            for (RobotInfo robot : robotsNearby) {
-//                if (robot.type == RobotType.TOWER || robot.type == RobotType.HQ) {
-//                    towerOrHQNearby = true;
-//                    break;
-//                }
-//            }
+
             RobotInfo[] enemyRobots = getEnemiesInAttackingRange(RobotType.DRONE);
             if (enemyRobots.length>0) {
                 if (rc.isWeaponReady()) {
@@ -54,7 +47,7 @@ public class DRONERobot extends BaseRobot {
 		        }
 		    } else {
 		        MapLocation closest  = getClosestTower();
-		        if (closest!=null) {
+		        if (closest != null) {
 		            RobotPlayer.tryMove(rc.getLocation().directionTo(closest));
 		        } else {
 		            RobotPlayer.tryMove(rc.getLocation().directionTo(this.theirHQ));
