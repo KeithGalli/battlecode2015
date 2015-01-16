@@ -1,6 +1,8 @@
 package drone_only_strategy;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
@@ -9,17 +11,18 @@ import battlecode.common.*;
 public class MINERRobot extends BaseRobot {
 	
 	static Random rand = new Random();
-	public final static int MINER_COST = 50;
-	private final static Direction[] directions = {Direction.NORTH, Direction.NORTH_EAST, Direction.EAST, Direction.SOUTH_EAST, Direction.SOUTH, Direction.SOUTH_WEST, Direction.WEST, Direction.NORTH_WEST};
-	static boolean willMove = true;
+	public final static int MINER_COST = 60;
+	
+    private final static Direction[] directions = {Direction.NORTH, Direction.NORTH_EAST, Direction.EAST, Direction.SOUTH_EAST, Direction.SOUTH, Direction.SOUTH_WEST, Direction.WEST, Direction.NORTH_WEST};
+//	static boolean willMove = true;
 	public boolean supplied;
-	
-	private static Direction[] directionsForGroupZero = {Direction.NORTH_WEST, Direction.NORTH, Direction.NORTH_EAST};
-	private static Direction[] directionsForGroupOne = {Direction.NORTH_EAST, Direction.EAST, Direction.SOUTH_EAST};
-	private static Direction[] directionsForGroupTwo = {Direction.SOUTH_EAST, Direction.SOUTH, Direction.SOUTH_WEST};
-	private static Direction[] directionsForGroupThree = {Direction.SOUTH_WEST, Direction.WEST, Direction.NORTH_WEST};
-	private static Direction[][] groupDirections = {directionsForGroupZero, directionsForGroupOne, directionsForGroupTwo, directionsForGroupThree};
-	
+//	
+//	private static Direction[] directionsForGroupZero = {Direction.NORTH_WEST, Direction.NORTH, Direction.NORTH_EAST};
+//	private static Direction[] directionsForGroupOne = {Direction.NORTH_EAST, Direction.EAST, Direction.SOUTH_EAST};
+//	private static Direction[] directionsForGroupTwo = {Direction.SOUTH_EAST, Direction.SOUTH, Direction.SOUTH_WEST};
+//	private static Direction[] directionsForGroupThree = {Direction.SOUTH_WEST, Direction.WEST, Direction.NORTH_WEST};
+//	private static Direction[][] groupDirections = {directionsForGroupZero, directionsForGroupOne, directionsForGroupTwo, directionsForGroupThree};
+//	
 	
 	
 	public MINERRobot(RobotController rc) throws GameActionException {
@@ -29,15 +32,15 @@ public class MINERRobot extends BaseRobot {
 
 	@Override
 	public void run() {
-		int roundNum = Clock.getRoundNum();
-		Random randDouble = new Random();
-		Random randInt = new Random();
+
 		
 		try {
 			//assign the miner a group movement number
-			int minerNum = rc.readBroadcast(MINER_CURRENT_CHAN);
-			int minerGroupNum = minerNum % 4;
+//			int minerNum = rc.readBroadcast(MINER_CURRENT_CHAN);
+//			int minerGroupNum = minerNum % 4;
 			RobotInfo[] enemyRobots = getEnemiesInAttackingRange(RobotType.MINER);
+	        MapLocation currentLocation = rc.getLocation();
+	        double oreCurrentLocation = rc.senseOre(currentLocation);
 			if(rc.getSupplyLevel() > 15) supplied = true;
 			if(rc.getSupplyLevel() < 15 && supplied){
 				int endChannel = rc.readBroadcast(SUPPLIER_END_QUEUE_CHAN);
@@ -52,30 +55,26 @@ public class MINERRobot extends BaseRobot {
 //					rc.mine();
 //				}
 			}
-			else if(rc.isCoreReady() && supplied) {
-			
-				//mine if logical (ore > 4) and possible
-				if(rc.senseOre(rc.getLocation()) >= 4 && rc.canMine()) rc.mine();
-				
-				//else if enemies in range, attack
-				else if (enemyRobots.length > 0 && rc.isWeaponReady()) attackLeastHealthEnemy(enemyRobots);
-				
-				else if (rc.getLocation().distanceSquaredTo(rc.senseHQLocation()) < 100) tryMinerMove(groupDirections[minerGroupNum][(int) (Math.random()*3)]);
-				
-				else if (rc.getLocation().distanceSquaredTo(rc.senseHQLocation()) < 400) {
-					if(randDouble.nextDouble() < 0.3) tryMinerMove(directions[(int) (Math.random()*3)]);
-					else tryMinerMove(groupDirections[minerGroupNum][(int) (Math.random()*3)]);
-				}
-				else if(rc.getLocation().distanceSquaredTo(rc.senseHQLocation()) < 625) {
-					if(randDouble.nextDouble() < 0.5) tryMinerMove(directions[(int) (Math.random()*3)]);
-					else tryMinerMove(groupDirections[minerGroupNum][(int) (Math.random()*3)]);
-				}
-				else if(rc.getLocation().distanceSquaredTo(rc.senseHQLocation()) < 900) {
-					moveToMaxAdjacentOre();
-					//if(randDouble.nextDouble() < 0.7) tryMinerMove(directions[(int) (Math.random()*3)]);
-					//else tryMinerMove(groupDirections[minerGroupNum][(int) (Math.random()*3)]);
-				}
-				else tryMinerMove(directions[(int) (Math.random()*8)]);
+			if(rc.isCoreReady()) {
+			    if (rc.senseOre(rc.getLocation())>4 && rc.canMine()) {
+                    rc.mine();
+                } else if (enemyRobots.length > 0 && rc.isWeaponReady()) {
+                    attackLeastHealthEnemy(enemyRobots);
+                } else {
+                    Direction[] directions = getDirectionsAway(this.myHQ);
+                    Direction direction = moveToMaxOrRandom(directions);
+                    if(rc.canMove(direction) && senseNearbyTowersMiners(currentLocation, direction)==0) {
+                        rc.move(direction);
+                    } else {
+                        int rv = RobotPlayer.rand.nextInt(8);
+                        Direction randomDirection = RobotPlayer.directions[rv];
+                        if (senseNearbyTowersMiners(currentLocation, randomDirection)==0) {
+                            if (rc.canMove(randomDirection)) {
+                                rc.move(randomDirection);
+                            }
+                        }
+                    }
+                }			    
 			}
 			transferSpecificSupplies(RobotType.MINER, rc);
 			rc.broadcast(MINER_CURRENT_CHAN, rc.readBroadcast(MINER_CURRENT_CHAN)+1);
@@ -85,40 +84,54 @@ public class MINERRobot extends BaseRobot {
 		}
 	}
 
-	private void minerMoveAwayFromHQ() {
-		Direction dir = getDirectionAwayFromHQ();
-		MapLocation startingLocation = rc.getLocation();
-		try {
-			tryMinerMove(dir);
-			
-			if(rc.getLocation() == startingLocation) {
-				tryMinerMove(dir.opposite());
-			}
-			
-		} catch (GameActionException e) {
-			e.printStackTrace();
-		}
-	}
+    private Direction moveToMaxOrRandom(Direction[] dirs) throws GameActionException {
+        MapLocation myLocation = rc.getLocation();      
+        int fate = RobotPlayer.rand.nextInt(5);
+        Direction dir = dirs[fate];
+        Collections.shuffle(Arrays.asList(directions));
+        
+        for (Direction direction : directions) {
+            if (!rc.canMove(dir) || (rc.canMove(direction)&& rc.senseOre(myLocation.add(direction))> rc.senseOre(myLocation.add(dir)))) {
+                dir = direction;
+            }
+        }
+        return dir;
+    }
+    	
+//	private void minerMoveAwayFromHQ() {
+//		Direction dir = getDirectionAwayFromHQ();
+//		MapLocation startingLocation = rc.getLocation();
+//		try {
+//			tryMinerMove(dir);
+//			
+//			if(rc.getLocation() == startingLocation) {
+//				tryMinerMove(dir.opposite());
+//			}
+//			
+//		} catch (GameActionException e) {
+//			e.printStackTrace();
+//		}
+//	}
 
 	private Direction getDirectionAwayFromHQ() {
 		return (rc.getLocation().directionTo(rc.senseHQLocation()).opposite());
 	}
 	
-    private static void tryMinerMove(Direction d) throws GameActionException {
-        int offsetIndex = 0;
-        int[] offsets = {0,1,-1,2,-2};
-        int dirint = directionToInt(d);
-        MapLocation myLocation = rc.getLocation();
-        
-        while ((offsetIndex < 5 && !rc.canMove(directions[(dirint+offsets[offsetIndex]+8)%8]))
-        	|| isLocationInEnemyTerritory(myLocation.add(directions[(dirint+offsets[offsetIndex]+8)%8]))){
-            offsetIndex++;
-            System.out.println("isLocationInEnemyTerritory:" + isLocationInEnemyTerritory(myLocation.add(directions[(dirint+offsets[offsetIndex]+8)%8])));
-        }
-        if (offsetIndex < 5) {
-            rc.move(directions[(dirint+offsets[offsetIndex]+8)%8]);
-        } else tryMinerMove(d.opposite());
-    }
+//    private static void tryMinerMove(Direction d) throws GameActionException {
+//        int offsetIndex = 0;
+//        int[] offsets = {0,1,-1,2,-2};
+//        int dirint = directionToInt(d);
+//        MapLocation myLocation = rc.getLocation();
+//        
+//        while ((offsetIndex < 5 && !rc.canMove(directions[(dirint+offsets[offsetIndex]+8)%8]))
+//        	|| isLocationInEnemyTerritory(myLocation.add(directions[(dirint+offsets[offsetIndex]+8)%8]))){
+//            offsetIndex++;
+//            System.out.println("isLocationInEnemyTerritory:" + isLocationInEnemyTerritory(myLocation.add(directions[(dirint+offsets[offsetIndex]+8)%8])));
+//        }
+//        if (offsetIndex < 5) {
+//            rc.move(directions[(dirint+offsets[offsetIndex]+8)%8]);
+//        } else tryMinerMove(d.opposite());
+//    }
     
     static int directionToInt(Direction d) {
         switch(d) {
@@ -143,43 +156,43 @@ public class MINERRobot extends BaseRobot {
         }
     }
     
-	private static void minerMoveAround() throws GameActionException {
-		Random generator = new Random();
-		Direction nextDir = directions[generator.nextInt(8)];
-		
-		if(rand.nextDouble()<0.05){
-			if(rand.nextDouble()<0.5) nextDir = nextDir.rotateLeft();
-			else nextDir = nextDir.rotateRight();
-		}
-		
-		//check that we are not facing off the edge of the map
-		if(rc.senseTerrainTile(rc.getLocation().add(nextDir))!=TerrainTile.NORMAL){
-			nextDir = nextDir.rotateLeft();
-		}
-		
-		//try to move in the facing direction
-		if(rc.isCoreReady()&&rc.canMove(nextDir)){
-			rc.move(nextDir);
-		}
-	}
+//	private static void minerMoveAround() throws GameActionException {
+//		Random generator = new Random();
+//		Direction nextDir = directions[generator.nextInt(8)];
+//		
+//		if(rand.nextDouble()<0.05){
+//			if(rand.nextDouble()<0.5) nextDir = nextDir.rotateLeft();
+//			else nextDir = nextDir.rotateRight();
+//		}
+//		
+//		//check that we are not facing off the edge of the map
+//		if(rc.senseTerrainTile(rc.getLocation().add(nextDir))!=TerrainTile.NORMAL){
+//			nextDir = nextDir.rotateLeft();
+//		}
+//		
+//		//try to move in the facing direction
+//		if(rc.isCoreReady()&&rc.canMove(nextDir)){
+//			rc.move(nextDir);
+//		}
+//	}
 	
-	private static void moveToMaxAdjacentOre() throws GameActionException {
-		List<MapLocation> adjacentLocations = new ArrayList<MapLocation>();
-		MapLocation myLocation = rc.getLocation();
-		MapLocation maxAdjacentOreLocation = myLocation.add(directions[0]);
-		
-		for(int index = 1; index < 8; index ++){
-			adjacentLocations.add(myLocation.add(directions[index]));
-		}
-		
-		for(MapLocation otherLocation : adjacentLocations) {
-			if( rc.senseOre(otherLocation) > rc.senseOre(maxAdjacentOreLocation) ) {
-				maxAdjacentOreLocation = otherLocation;
-			}
-		}
-		tryMinerMove(myLocation.directionTo(maxAdjacentOreLocation));
-	}
-	
+//	private static void moveToMaxAdjacentOre() throws GameActionException {
+//		List<MapLocation> adjacentLocations = new ArrayList<MapLocation>();
+//		MapLocation myLocation = rc.getLocation();
+//		MapLocation maxAdjacentOreLocation = myLocation.add(directions[0]);
+//		
+//		for(int index = 1; index < 8; index ++){
+//			adjacentLocations.add(myLocation.add(directions[index]));
+//		}
+//		
+//		for(MapLocation otherLocation : adjacentLocations) {
+//			if( rc.senseOre(otherLocation) > rc.senseOre(maxAdjacentOreLocation) ) {
+//				maxAdjacentOreLocation = otherLocation;
+//			}
+//		}
+//		tryMinerMove(myLocation.directionTo(maxAdjacentOreLocation));
+//	}
+//	
 	private static void attackEnemyZero() throws GameActionException {
 		RobotInfo[] nearbyEnemies = rc.senseNearbyRobots(rc.getLocation(),rc.getType().attackRadiusSquared,rc.getTeam().opponent());
 		if(nearbyEnemies.length>0){//there are enemies nearby
