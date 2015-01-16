@@ -17,7 +17,7 @@ public class BroadcastSystem {
 
 	static int[] lengthOfEachPath = new int[100];
 	
-	public static int waypointBand = 20000;
+	public static int waypointBand = 10000;
 
 	public static int xdimBand = 205;
 	public static int ydimBand = 206;
@@ -52,11 +52,17 @@ public class BroadcastSystem {
 
 	static void broadcastMapArray(int refchannel, int[][] dataArray) throws GameActionException{
 		for(int x=MapEngine.xdim;--x>=0;){
+
 			for(int y=MapEngine.ydim;--y>=0;){
+
 				int index = y*MapEngine.xdim+x+refchannel;
+
 				rc.broadcast(index, dataArray[x][y]);
 			}
 		}
+		// System.out.println("////////broadcast////////");
+		// Functions.displayArray(dataArray);
+		// System.out.println("/////////////////////////");
 	}
 	
 	// static void broadcast2MapArrays(int refchannel, int[][] dataArray1,  int[][] dataArray2) throws GameActionException{
@@ -71,11 +77,15 @@ public class BroadcastSystem {
 	static int[][] downloadMapArray(int refchannel) throws GameActionException {
 		int[][] dataArray = new int[MapEngine.xdim][MapEngine.ydim];
 		for(int x=MapEngine.xdim;--x>=0;){
+
 			for(int y=MapEngine.ydim;--y>=0;){
 				int index = y*MapEngine.xdim+x+refchannel;
 				dataArray[x][y] = rc.readBroadcast(index);
 			}
 		}
+		// System.out.println("////////download/////////");
+		// Functions.displayArray(dataArray);
+		// System.out.println("/////////////////////////");
 		return dataArray;
 	}
 	
@@ -92,39 +102,41 @@ public class BroadcastSystem {
 	// }
 	
 	
-	// public static Dictionary<Integer,MapLocation[]> receiveMapDataDict(int data){
-	// 	Dictionary<Integer,MapLocation[]> datadict = new Hashtable<Integer,MapLocation[]>();
-	// 	int size = BroadcastSystem.read(waypointBand);
-	// 	int arraysize = 0;
-	// 	int count = 1;
-	// 	for (int i = 1; i<size+1; i++){
-	// 		arraysize = read(waypointBand+count);
-	// 		MapLocation[] locs = new MapLocation[arraysize];
-	// 		count++;
-	// 		for (int j = 0; j<arraysize; j++){
-	// 			locs[j] = Functions.intToLoc(read(waypointBand+count));
-	// 			count++;
-	// 		}
-	// 		datadict.put(i, locs);
+	public static Dictionary<Integer,MapLocation[]> receiveMapDataDict(){
+		Dictionary<Integer,MapLocation[]> datadict = new Hashtable<Integer,MapLocation[]>();
+		int size = BroadcastSystem.read(waypointBand);
+		int arraysize = 0;
+		int count = 1;
+		for (int i = 3; i<size; i++){
+			arraysize = read(waypointBand+count);
+			MapLocation[] locs = new MapLocation[arraysize];
+			count++;
+			for (int j = 0; j<arraysize; j++){
+				locs[j] = Functions.intToLoc(read(waypointBand+count));
+				count++;
+			}
+			datadict.put(i, locs);
 			
-	// 	}
-	// 	return datadict;
+		}
+		return datadict;
 		
 		
-	// }
+	}
 	
-	// public static void prepareandsendMapDataDict(Dictionary<Integer,ArrayList<MapLocation>> dataDict){
-	// 	write(waypointBand, dataDict.size());
-	// 	int count = 1;
-	// 	for (int i = 1; i<dataDict.size()+1; i++){
-	// 		write(waypointBand+count, dataDict.get(i).size());
-	// 		count++;
-	// 		for (int j=0; j<dataDict.get(i).size(); j++){
-	// 			write(waypointBand+count, Functions.locToInt(dataDict.get(i).get(j)));
-	// 			count++;
-	// 		}
-	// 	}
+	public static void prepareandsendMapDataDict(Dictionary<Integer,ArrayList<MapLocation>> dataDict){
+
+		write(waypointBand, MapEngine.voidID);
+
+		int count = 1;
+		for (int i = 3; i<MapEngine.voidID; i++){
+			write(waypointBand+count, dataDict.get(i).size());
+			count++;
+			for (int j=0; j<dataDict.get(i).size(); j++){
+				write(waypointBand+count, Functions.locToInt(dataDict.get(i).get(j)));
+				count++;
+			}
+		}
 		
-	// }
+	}
 }
 	

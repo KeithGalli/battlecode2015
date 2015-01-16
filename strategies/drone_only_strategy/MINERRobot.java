@@ -11,6 +11,8 @@ public class MINERRobot extends BaseRobot {
 	static Random rand = new Random();
 	public final static int MINER_COST = 50;
 	private final static Direction[] directions = {Direction.NORTH, Direction.NORTH_EAST, Direction.EAST, Direction.SOUTH_EAST, Direction.SOUTH, Direction.SOUTH_WEST, Direction.WEST, Direction.NORTH_WEST};
+	static boolean willMove = true;
+	public boolean supplied;
 	
 	private static Direction[] directionsForGroupZero = {Direction.NORTH_WEST, Direction.NORTH, Direction.NORTH_EAST};
 	private static Direction[] directionsForGroupOne = {Direction.NORTH_EAST, Direction.EAST, Direction.SOUTH_EAST};
@@ -22,6 +24,7 @@ public class MINERRobot extends BaseRobot {
 	
 	public MINERRobot(RobotController rc) throws GameActionException {
 		super(rc);
+		supplied = true;
 	}
 
 	@Override
@@ -35,8 +38,21 @@ public class MINERRobot extends BaseRobot {
 			int minerNum = rc.readBroadcast(MINER_CURRENT_CHAN);
 			int minerGroupNum = minerNum % 4;
 			RobotInfo[] enemyRobots = getEnemiesInAttackingRange(RobotType.MINER);
-			
-			if(rc.isCoreReady()) {
+			if(rc.getSupplyLevel() > 15) supplied = true;
+			if(rc.getSupplyLevel() < 15 && supplied){
+				int endChannel = rc.readBroadcast(SUPPLIER_END_QUEUE_CHAN);
+				rc.broadcast(SUPPLIER_NEEDED, 1);
+				System.out.println("start channel" + rc.readBroadcast(SUPPLIER_START_QUEUE_CHAN));
+				System.out.println("end channel" + endChannel);
+				rc.broadcast(endChannel, rc.getLocation().x);
+				rc.broadcast(endChannel+1, rc.getLocation().y);
+				rc.broadcast(SUPPLIER_END_QUEUE_CHAN, endChannel+2);
+				supplied = false;
+//				if(rc.isCoreReady() && !supplied){
+//					rc.mine();
+//				}
+			}
+			else if(rc.isCoreReady() && supplied) {
 			
 				//mine if logical (ore > 4) and possible
 				if(rc.senseOre(rc.getLocation()) >= 4 && rc.canMine()) rc.mine();

@@ -52,14 +52,27 @@ public class BEAVERRobot extends BaseRobot {
 			// //DataCache.displaySeenLocs();
 
 			if (downloadReady==1){
+
 				MapEngine.map = BroadcastSystem.downloadMapArray(REFCHANNEL);
+				// System.out.println("/////////////////////////");
+    //     		Functions.displayArray(MapEngine.map);
+	   //    		System.out.println("/////////////////////////");
+				//System.out.println("Test");
+				MapEngine.waypointDict = BroadcastSystem.receiveMapDataDict();
+				//System.out.println("Test");
 			}
 
 			// System.out.println("/////////////////////////");
    //      	Functions.displayArray(MapEngine.map);
-   //      	System.out.println("/////////////////////////");
+	  //     	System.out.println("/////////////////////////");
+			// MapLocation[] locs = MapEngine.waypointDict.get(3);
+			// for (MapLocation loc: locs){
+			// 	System.out.println(loc);
+			// }
+
+
 			
-			NavSystem.dumbNav(DataCache.enemyHQ);
+			NavSystem.smartNav(DataCache.enemyHQ);
 
 
 

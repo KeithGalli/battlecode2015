@@ -12,7 +12,7 @@ import battlecode.common.Team;
 public class DRONERobot extends BaseRobot {
 
 
-
+	//static int supplierID = 0;
 
 	public DRONERobot(RobotController rc) throws GameActionException {
 		super(rc);
@@ -21,7 +21,6 @@ public class DRONERobot extends BaseRobot {
 	@Override
 	public void run() {
 		try {
-
             RobotInfo[] enemyRobots = getEnemiesInAttackingRange(RobotType.DRONE);
             if (enemyRobots.length>0) {
                 if (rc.isWeaponReady()) {
@@ -29,9 +28,9 @@ public class DRONERobot extends BaseRobot {
                 }
             }
 		    if (Clock.getRoundNum() < 1900) {
-		        if (rc.isCoreReady() && rc.getSupplyLevel()<60 && rc.getLocation().distanceSquaredTo(this.myHQ)<40) {
-		            RobotPlayer.tryMove(rc.getLocation().directionTo(rc.senseHQLocation()));
-		        }
+//		        if (rc.isCoreReady() && rc.getSupplyLevel()<60 && rc.getLocation().distanceSquaredTo(this.myHQ)<40) {
+//		            RobotPlayer.tryMove(rc.getLocation().directionTo(rc.senseHQLocation()));
+//		        }
 		        
 		        if (rc.isCoreReady() && senseNearbyTowers(rc.getLocation())==0) {
 
@@ -63,4 +62,8 @@ public class DRONERobot extends BaseRobot {
 			//e.printStackTrace();
 		}
 	}
+	
+//	public static int getSupplierID(){
+//		return supplierID;
+//	}
 }
