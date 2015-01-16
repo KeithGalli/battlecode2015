@@ -69,6 +69,15 @@ public class MapEngine {
 		internalMapCenter = new MapLocation(xdim/2, ydim/2);
 	}
 
+	public static void resetMapAndPrep(){
+		senseQueue = new ArrayList<MapLocation>();
+		waypointDictHQ = new Hashtable<Integer,ArrayList<MapLocation>>();
+
+		resetVoidNums();
+		setVoidNums();
+		BroadcastSystem.write(2001, 1);
+	}
+
 	public static void scanTiles(MapLocation[] inputTiles){
 		for (MapLocation tile: inputTiles){
 			MapLocation internalTile = Functions.locToInternalLoc(tile);
@@ -86,10 +95,6 @@ public class MapEngine {
 			}
 		}
 		}
-		resetVoidNums();
-		setVoidNums();
-		BroadcastSystem.write(2001, 1);
-
 	}
 
 	public static void resetVoidNums(){
@@ -100,7 +105,6 @@ public class MapEngine {
 				}
 			}
 		}
-		waypointDictHQ = new Hashtable<Integer,ArrayList<MapLocation>>();
 	}
 
 	public static void setVoidNums(){

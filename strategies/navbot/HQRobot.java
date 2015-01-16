@@ -12,6 +12,9 @@ import battlecode.common.Team;
 public class HQRobot extends BaseRobot {
 
 	public static int count= 0;
+	public static int broadcastCount = 0;
+
+	public static MapLocation prevRobotLoc = new MapLocation(-1, -1);
 
 	public static MapLocation testRobotLoc;
 	public static MapLocation testRobotInternalLoc;
@@ -28,7 +31,11 @@ public class HQRobot extends BaseRobot {
 		//Init Systems//
 		NavSystem.HQinit(rc);
 		MapEngine.HQinit(rc);
-		BroadcastSystem.write(2001, 1);
+		BroadcastSystem.write(2001, 0);
+		testHQLocs = MapEngine.structScan(rc.getLocation());
+		MapEngine.scanTiles(testHQLocs);
+       	//Functions.displayArray(MapEngine.map);
+
 
 
 		
@@ -45,6 +52,13 @@ public class HQRobot extends BaseRobot {
 
 			broadcastReady = BroadcastSystem.read(2001);
 
+			// MapLocation internalHQloc = Functions.locToInternalLoc(rc.getLocation());
+			// int internalHQlocint = Functions.locToInt(internalHQloc);
+			// MapLocation internalHQloc2 = Functions.intToLoc(internalHQlocint);
+			// MapLocation tempHQloc = Functions.internallocToLoc(internalHQloc);
+			// System.out.println(internalHQloc);
+			// System.out.println(internalHQloc2);
+
 			if (rc.isCoreReady() && rc.getTeamOre() >= 100 && count ==0) {
 				rc.setIndicatorString(0, "trying to spawn");
 				rc.spawn(rc.getLocation().directionTo(DataCache.enemyHQ),RobotType.BEAVER);
@@ -52,13 +66,24 @@ public class HQRobot extends BaseRobot {
 	            	//RobotPlayer.trySpawn(RobotPlayer.directions[RobotPlayer.rand.nextInt(8)], RobotType.BEAVER);
         	}
 
-        	if (broadcastReady == 1){
+        	if (broadcastCount > 100){
+        		broadcastCount = 0;
+
 
         		//System.out.println("/////////////////////////");
+        		for (MapLocation loc: MapEngine.senseQueue){
+        			
+        			testRobotSeenLocs = MapEngine.unitScan(loc);
+        			MapEngine.scanTiles(testRobotSeenLocs);
+
+        		}
+
+
+        		MapEngine.resetMapAndPrep();
         		BroadcastSystem.broadcastMapArray(REFCHANNEL, MapEngine.map);
         		// System.out.println("Test");
         		BroadcastSystem.prepareandsendMapDataDict(MapEngine.waypointDictHQ);
-        		//testmap = BroadcastSystem.downloadMapArray(REFCHANNEL);
+        		// testmap = BroadcastSystem.downloadMapArray(REFCHANNEL);
         		
         		// int[][] thirdMap = new int[MapEngine.xdim][MapEngine.ydim];
         		// for (int x=0;x<MapEngine.xdim;x++){
@@ -72,7 +97,7 @@ public class HQRobot extends BaseRobot {
         		// 	}
         		// }
         		// System.out.println("/////////////////////////");
-        		// Functions.displayArray(testmap);
+        		// Functions.displayArray(thirdMap);
         		// System.out.println("/////////////////////////");
         		//BroadcastSystem.write(2001, 0);
         	}
@@ -82,11 +107,20 @@ public class HQRobot extends BaseRobot {
         	testRobotInternalLoc = Functions.intToLoc(rc.readBroadcast(TESTCHANNEL));
 
         	testRobotLoc = Functions.internallocToLoc(testRobotInternalLoc);
-        	//System.out.println(testRobotLoc);
-        	//System.out.println(testRobotLoc);
-        	testHQLocs = MapEngine.structScan(rc.getLocation());
 
-        	testRobotSeenLocs = MapEngine.unitScan(testRobotLoc);
+        	if (prevRobotLoc.x==testRobotLoc.x && prevRobotLoc.y==testRobotLoc.y){
+        		
+        	} else if (prevRobotLoc.x != -1 && prevRobotLoc.y != -1){
+        		MapEngine.senseQueue.add(testRobotLoc);
+        	}
+        	//System.out.println(MapEngine.senseQueue);
+        	prevRobotLoc = testRobotLoc;
+        	//System.out.println(broadcastCount);
+        	broadcastCount++;
+        	//System.out.println(testRobotLoc);
+        	//System.out.println(testRobotLoc);
+
+        	
 
         		// for (MapLocation loc: testHQLocs){
         		// 	rc.setIndicatorDot(loc, 255, 255, 255);
@@ -94,8 +128,7 @@ public class HQRobot extends BaseRobot {
 
         	//System.out.println(testRobotSeenLocs);
         	//MapEngine.scanTiles(testRobotSeenLocs);
-        	MapEngine.scanTiles(testHQLocs);
-        	MapEngine.scanTiles(testRobotSeenLocs);
+        	
 
         	//System.out.println(MapEngine.waypointDictHQ);
 

@@ -53,12 +53,14 @@ public class BEAVERRobot extends BaseRobot {
 
 			if (downloadReady==1){
 
+
 				MapEngine.map = BroadcastSystem.downloadMapArray(REFCHANNEL);
-				// System.out.println("/////////////////////////");
-    //     		Functions.displayArray(MapEngine.map);
-	   //    		System.out.println("/////////////////////////");
+				System.out.println("/////////////////////////");
+        		Functions.displayArray(MapEngine.map);
+	      		System.out.println("/////////////////////////");
 				//System.out.println("Test");
 				MapEngine.waypointDict = BroadcastSystem.receiveMapDataDict();
+				BroadcastSystem.write(2001, 0);
 				//System.out.println("Test");
 			}
 

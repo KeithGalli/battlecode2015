@@ -79,7 +79,7 @@ public class NavSystem {
 	public static void smartPathTo(MapLocation internalGoal) throws GameActionException{
 		
 		int obstacle = pathExists(DataCache.internalLoc, internalGoal);
-		System.out.println(obstacle);
+		//System.out.println(obstacle);
 		if (obstacle == 0){
 			currentWaypoint = internalGoal;
 			pathToGoal = true;
@@ -140,7 +140,10 @@ public class NavSystem {
 
 		}
 		else{
+			
+			/////STAND IN IDEALLY WE NEED ANOTHER BREAKPOINT HERE FOR BLIND
 			smartPathTo(currentWaypoint);
+			/////
 			Direction dir = DataCache.currentLoc.directionTo(Functions.internallocToLoc(currentWaypoint));
 			snailNav(dir);
 		}
