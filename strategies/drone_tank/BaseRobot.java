@@ -326,6 +326,12 @@ public abstract class BaseRobot {
     				transferAmount = Math.min((rc.getSupplyLevel()-ri.supplyLevel)/2, 1500);
     			}
     			rc.transferSupplies((int)transferAmount, ri.location);
+    		} else if(ri.type == RobotType.TANK){
+    			transferAmount = (2000 - Clock.getRoundNum()*10);
+    			if(rc.getSupplyLevel() < transferAmount){
+    				transferAmount = Math.min((rc.getSupplyLevel()-ri.supplyLevel)/2, 1500);
+    			}
+    			rc.transferSupplies((int)transferAmount, ri.location);
     		}
     	}
     }
