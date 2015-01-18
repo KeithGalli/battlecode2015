@@ -345,7 +345,7 @@ public abstract class BaseRobot {
     		} else if(ri.type == RobotType.MINER && Clock.getRoundNum() < 1000){
     			transferAmount = (2000 - Clock.getRoundNum())*4;
     			if(rc.getSupplyLevel() < transferAmount){
-    				transferAmount = Math.min((rc.getSupplyLevel()-ri.supplyLevel)/2, 1500);
+    				transferAmount = Math.min((rc.getSupplyLevel()-ri.supplyLevel)/2, 2500);
     			}
     			rc.transferSupplies((int)transferAmount, ri.location);
     		} 
