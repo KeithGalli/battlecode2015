@@ -25,35 +25,31 @@ public class TANKRobot extends BaseRobot {
 	@Override
 	public void run() {
 		try {
+		    DataCache.updateRoundVariables();
             RobotInfo[] enemyRobots = getEnemiesInAttackingRange(RobotType.TANK);
+            MapLocation currentLocation = rc.getLocation();
+            double supplyLevel = rc.getSupplyLevel();
             if (enemyRobots.length>0) {
                 if (rc.isWeaponReady()) {
                     attackLeastHealthEnemy(enemyRobots);
                 }
             }
-            if (Clock.getRoundNum() < 1000) {
+            if (Clock.getRoundNum() < 1400) {
                 if (rc.isCoreReady()) {
-                    DataCache.updateRoundVariables();
-                    MapLocation ourClosest = getOurClosestTowerToThem();
-                    tarDir = rc.getLocation().directionTo(ourClosest);
-                    NavSystem.dumbNav(ourClosest);
-
+                    if (supplyLevel < 50 && currentLocation.distanceSquaredTo(this.myHQ)<25) {
+                        NavSystem.dumbNav(this.myHQ);
+                    } else {
+                        MapLocation ourClosest = getOurClosestTowerToThem();
+                        NavSystem.dumbNav(ourClosest);
+                    }
                 }
             } else {
                 if (rc.isCoreReady()) {
                     MapLocation closest  = getClosestTower();
-                    if (closest != null) {
-                        DataCache.updateRoundVariables();
-
-                        //rc.broadcast(TESTCHANNEL, Functions.locToInt(DataCache.currentLoc));
-                        
-                        tarDir = rc.getLocation().directionTo(closest);
-                        
+                    if (closest != null) {                        
                         NavSystem.dumbNav(closest);
                     } else {
-                        DataCache.updateRoundVariables();
-                        tarDir = rc.getLocation().directionTo(this.theirHQ);
-                        NavSystem.dumbNav(this.theirHQ);
+                        NavSystem.dumbNav(DataCache.enemyHQ);
                     }
                 } 
             }

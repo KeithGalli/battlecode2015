@@ -129,9 +129,23 @@ public abstract class BaseRobot {
         return count;
     }
     
-    public int senseNearbyTowersMiners(MapLocation location, Direction direction) {
+    public int senseNearbyTowersMiners(MapLocation currentLocation, Direction direction) {
         MapLocation[] enemyTowers = rc.senseEnemyTowerLocations();
-        MapLocation newLocation = rc.getLocation().add(direction);
+        MapLocation newLocation = currentLocation.add(direction);
+        int count = 0;
+        for (MapLocation tower : enemyTowers) {
+            if (newLocation.distanceSquaredTo(tower)<=24)
+                count += 1;
+        }
+        if (newLocation.distanceSquaredTo(this.theirHQ)<=24) {
+            count+=1;
+        }
+        return count;
+    }
+    
+    public int senseNearbyTowersDrones(MapLocation currentLocation, Direction direction) {
+        MapLocation[] enemyTowers = rc.senseEnemyTowerLocations();
+        MapLocation newLocation = currentLocation.add(direction);
         int count = 0;
         for (MapLocation tower : enemyTowers) {
             if (newLocation.distanceSquaredTo(tower)<=24)
