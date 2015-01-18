@@ -46,6 +46,8 @@ public class HQRobot extends BaseRobot {
 			}
 			//hqTransferSupplies(rc);
 			hqTransferAllSuppliesForRestOfGame(rc);
+			
+			
 		    int numMinerFactories = rc.readBroadcast(MINER_FACT_CURRENT_CHAN);
 		    rc.broadcast(MINER_FACT_CURRENT_CHAN, 0);
 		    int numMiners = rc.readBroadcast(MINER_CURRENT_CHAN);

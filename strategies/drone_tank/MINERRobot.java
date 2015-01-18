@@ -60,12 +60,12 @@ public class MINERRobot extends BaseRobot {
                 } else {
                     Direction[] directions = getDirectionsAway(this.myHQ);
                     Direction direction = moveToMaxOrRandom(directions);
-                    if(rc.canMove(direction) && senseNearbyTowersMiners(currentLocation, direction)==0) {
+                    if(rc.canMove(direction) && senseNearbyTowers(currentLocation, direction)==0) {
                         rc.move(direction);
                     } else {
                         int rv = RobotPlayer.rand.nextInt(8);
                         Direction randomDirection = RobotPlayer.directions[rv];
-                        if (senseNearbyTowersMiners(currentLocation, randomDirection)==0) {
+                        if (senseNearbyTowers(currentLocation, randomDirection)==0) {
                             if (rc.canMove(randomDirection)) {
                                 rc.move(randomDirection);
                             }

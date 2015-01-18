@@ -34,7 +34,7 @@ public class DRONERobot extends BaseRobot {
                 Direction[] directions = getDirectionsToward(this.theirHQ);
                 Collections.shuffle(Arrays.asList(directions));
                 for (Direction dir : directions) {
-                    if (rc.canMove(dir) && senseNearbyTowersDrones(currentLocation, dir)==0) {
+                    if (rc.canMove(dir) && senseNearbyTowers(currentLocation, dir)==0) {
                         rc.move(dir);
                     }
                 }
