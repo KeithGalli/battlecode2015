@@ -48,6 +48,8 @@ public class HQRobot extends BaseRobot {
 //			System.out.println("end channel " + rc.readBroadcast(SUPPLIER_END_QUEUE_CHAN));
 			//hqTransferSupplies(rc);
 			hqTransferAllSuppliesForRestOfGame(rc);
+			
+			
 		    int numMinerFactories = rc.readBroadcast(MINER_FACT_CURRENT_CHAN);
 		    rc.broadcast(MINER_FACT_CURRENT_CHAN, 0);
 		    int numMiners = rc.readBroadcast(MINER_CURRENT_CHAN);

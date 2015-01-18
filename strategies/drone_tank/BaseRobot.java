@@ -100,50 +100,24 @@ public abstract class BaseRobot {
     
     public MapLocation getClosestTower() {
         MapLocation[] enemyTowers = rc.senseEnemyTowerLocations();
-        int distanceToClosest = rc.getLocation().distanceSquaredTo(enemyTowers[0]);
-        MapLocation closest = enemyTowers[0];
-        for (MapLocation tower: enemyTowers) {
-            int distanceToTower = rc.getLocation().distanceSquaredTo(tower);
-            if (distanceToTower<distanceToClosest) {
-                distanceToClosest = distanceToTower;
-                closest = tower;
+        if (enemyTowers.length ==0) {
+            return null;
+        } else {
+            int distanceToClosest = rc.getLocation().distanceSquaredTo(enemyTowers[0]);
+            MapLocation closest = enemyTowers[0];
+            for (MapLocation tower: enemyTowers) {
+                int distanceToTower = rc.getLocation().distanceSquaredTo(tower);
+                if (distanceToTower<distanceToClosest) {
+                    distanceToClosest = distanceToTower;
+                    closest = tower;
+                }
             }
+            return closest;            
         }
-        return closest;
+
     }
     
-    public int senseNearbyTowers(MapLocation location) {
-        MapLocation[] enemyTowers = rc.senseEnemyTowerLocations();
-        int count = 0;
-        MapLocation newLocation = location.add(location.directionTo(this.theirHQ));
-        MapLocation newLocation2 = location.add(location.directionTo(getClosestTower()));
-        for (MapLocation tower : enemyTowers) {
-            if (newLocation.distanceSquaredTo(tower)<=24)
-                count += 1;
-            if (newLocation2.distanceSquaredTo(tower)<=24)
-                count+= 1;
-        }
-        if (newLocation.distanceSquaredTo(this.theirHQ)<=24) {
-            count+=1;
-        }
-        return count;
-    }
-    
-    public int senseNearbyTowersMiners(MapLocation currentLocation, Direction direction) {
-        MapLocation[] enemyTowers = rc.senseEnemyTowerLocations();
-        MapLocation newLocation = currentLocation.add(direction);
-        int count = 0;
-        for (MapLocation tower : enemyTowers) {
-            if (newLocation.distanceSquaredTo(tower)<=24)
-                count += 1;
-        }
-        if (newLocation.distanceSquaredTo(this.theirHQ)<=24) {
-            count+=1;
-        }
-        return count;
-    }
-    
-    public int senseNearbyTowersDrones(MapLocation currentLocation, Direction direction) {
+    public int senseNearbyTowers(MapLocation currentLocation, Direction direction) {
         MapLocation[] enemyTowers = rc.senseEnemyTowerLocations();
         MapLocation newLocation = currentLocation.add(direction);
         int count = 0;
