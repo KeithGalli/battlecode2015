@@ -10,6 +10,7 @@ import battlecode.common.Team;
 
 
 public class HELIPADRobot extends BaseRobot {
+    
 	
 	public HELIPADRobot(RobotController rc) throws GameActionException {
 		super(rc);
@@ -18,10 +19,13 @@ public class HELIPADRobot extends BaseRobot {
 	@Override
 	public void run() {
 		try {
-            if (rc.hasSpawnRequirements(RobotType.DRONE)) {
+		    int dronesBuilt = rc.readBroadcast(46);
+		    
+            if (dronesBuilt < 6 && rc.hasSpawnRequirements(RobotType.DRONE)) {
                 Direction newDir =  getSpawnDirection(RobotType.DRONE);
                 if (newDir != null) {
-                    //rc.spawn(newDir, RobotType.DRONE);
+                    rc.spawn(newDir, RobotType.DRONE);
+                    rc.broadcast(46, dronesBuilt+1);
                 }
             }
             rc.broadcast(HELIPAD_CURRENT_CHAN, rc.readBroadcast(HELIPAD_CURRENT_CHAN)+1);

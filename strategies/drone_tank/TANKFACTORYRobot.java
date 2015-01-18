@@ -19,6 +19,8 @@ public class TANKFACTORYRobot extends BaseRobot {
 
 	@Override
 	public void run() {
+	    //int tanksBuilt 
+	    
 		try {
             if (rc.hasSpawnRequirements(RobotType.TANK)) {
                 Direction newDir =  getSpawnDirection(RobotType.TANK);
