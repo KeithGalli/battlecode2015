@@ -328,6 +328,14 @@ public abstract class BaseRobot {
 	    			transferAmount = Math.min((rc.getSupplyLevel()-ri.supplyLevel)/4, 20);
 	    			rc.transferSupplies((int)transferAmount, ri.location);
     			}
+    		} else if(ri.type == RobotType.TANK){
+    			transferAmount = (2000 - Clock.getRoundNum())*10;
+    			if(rc.getSupplyLevel() < transferAmount){
+    				transferAmount = Math.min((rc.getSupplyLevel()-ri.supplyLevel)/2, 1500);
+    				
+    			}
+    			System.out.println("transferring " + transferAmount );
+    			rc.transferSupplies((int)transferAmount, ri.location);
     		} else if(ri.type == RobotType.DRONE){
     			transferAmount = (2000 - Clock.getRoundNum())*4;
     			if(rc.getSupplyLevel() < transferAmount){
@@ -340,13 +348,7 @@ public abstract class BaseRobot {
     				transferAmount = Math.min((rc.getSupplyLevel()-ri.supplyLevel)/2, 1500);
     			}
     			rc.transferSupplies((int)transferAmount, ri.location);
-    		} else if(ri.type == RobotType.TANK){
-    			transferAmount = (2000 - Clock.getRoundNum()*10);
-    			if(rc.getSupplyLevel() < transferAmount){
-    				transferAmount = Math.min((rc.getSupplyLevel()-ri.supplyLevel)/2, 1500);
-    			}
-    			rc.transferSupplies((int)transferAmount, ri.location);
-    		}
+    		} 
     	}
     }
     
