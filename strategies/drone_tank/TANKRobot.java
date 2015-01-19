@@ -36,7 +36,7 @@ public class TANKRobot extends BaseRobot {
             }
             if (Clock.getRoundNum() < 1400) {
                 if (rc.isCoreReady()) {
-                    if (supplyLevel < 0 && currentLocation.distanceSquaredTo(this.myHQ)<25) {
+                    if (supplyLevel < 50 && currentLocation.distanceSquaredTo(this.myHQ)<30) {
                         NavSystem.dumbNav(this.myHQ);
                     } else if (rc.senseNearbyRobots(20, this.theirTeam).length < 1) {
                         MapLocation ourClosest = getOurClosestTowerToThem();
