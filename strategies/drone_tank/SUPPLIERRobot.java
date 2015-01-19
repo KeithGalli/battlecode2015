@@ -5,6 +5,7 @@ import battlecode.common.GameActionException;
 import battlecode.common.GameConstants;
 import battlecode.common.MapLocation;
 import battlecode.common.RobotController;
+import battlecode.common.RobotInfo;
 import battlecode.common.RobotType;
 
 public class SUPPLIERRobot extends BaseRobot {
@@ -29,6 +30,7 @@ public class SUPPLIERRobot extends BaseRobot {
 			int startSupplyQueue = rc.readBroadcast(SUPPLIER_START_QUEUE_CHAN);
 			int endSupplyQueue = rc.readBroadcast(SUPPLIER_END_QUEUE_CHAN);
 			System.out.println(suppliedLocation);
+			RobotInfo[] nearbyAllies = rc.senseNearbyRobots(rc.getLocation(),GameConstants.SUPPLY_TRANSFER_RADIUS_SQUARED,rc.getTeam());
 			if(Clock.getRoundNum() < 1200){
 			if(startSupplyQueue != endSupplyQueue && suppliedLocation){
 				int x = rc.readBroadcast(endSupplyQueue-2);
@@ -49,7 +51,7 @@ public class SUPPLIERRobot extends BaseRobot {
 				}
 			}
 			if(locationSupplying != null){
-				travelToAndSupplyLocation();
+				travelToAndSupplyLocation(nearbyAllies);
 			}
 			} else{
 				 MapLocation closest  = getClosestTower();
@@ -58,7 +60,7 @@ public class SUPPLIERRobot extends BaseRobot {
 			        } else {
 			            RobotPlayer.tryMove(rc.getLocation().directionTo(this.theirHQ));
 			        }
-			        transferSpecificSupplies(RobotType.DRONE, rc);
+			        transferSpecificSupplies(RobotType.DRONE, rc, nearbyAllies);
 			}
 //		if( startSupplyQueue != endSupplyQueue){
 //			int x = rc.readBroadcast(startSupplyQueue);
@@ -101,9 +103,9 @@ public class SUPPLIERRobot extends BaseRobot {
 
 	}
 	
-	public void travelToAndSupplyLocation() throws GameActionException{
+	public void travelToAndSupplyLocation(RobotInfo[] nearbyAllies) throws GameActionException{
 		if(rc.getLocation().distanceSquaredTo(locationSupplying) <= 4){
-			transferSpecificSupplies(RobotType.MINER,rc);
+			transferSpecificSupplies(RobotType.MINER,rc, nearbyAllies);
 			suppliedLocation = true;
 			locationSupplying = null;
 		} else if( rc.isCoreReady()){

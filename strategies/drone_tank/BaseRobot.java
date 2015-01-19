@@ -297,32 +297,44 @@ public abstract class BaseRobot {
     	RobotInfo[] nearbyAllies = rc.senseNearbyRobots(rc.getLocation(),GameConstants.SUPPLY_TRANSFER_RADIUS_SQUARED,rc.getTeam());
     	for(RobotInfo ri : nearbyAllies){
     		double transferAmount = 0;
-    		if(ri.type == RobotType.BEAVER && Clock.getRoundNum() < 1000){
-    			if(ri.supplyLevel < 10){
-	    			transferAmount = Math.min((rc.getSupplyLevel()-ri.supplyLevel)/4, 20);
-	    			rc.transferSupplies((int)transferAmount, ri.location);
-    			}
-    		} else if(ri.type == RobotType.TANK){
-    			transferAmount = (2000 - Clock.getRoundNum())*10;
-    			if(rc.getSupplyLevel() < transferAmount){
-    				transferAmount = Math.min((rc.getSupplyLevel()-ri.supplyLevel)/2, 1500);
+    		if(Clock.getRoundNum() > 1000){
+    			if(ri.type== RobotType.TANK){
+    				transferAmount = (2000 - Clock.getRoundNum())*45;
+    				if( rc.getSupplyLevel() < transferAmount){
+    					transferAmount = Math.min((rc.getSupplyLevel()-ri.supplyLevel)/2, 2500);
+    				}
+    				//transferAmount = (rc.getSupplyLevel()-ri.supplyLevel)/2;
+    				rc.transferSupplies((int)transferAmount, ri.location);
     				
     			}
-    			System.out.println("transferring " + transferAmount );
-    			rc.transferSupplies((int)transferAmount, ri.location);
-    		} else if(ri.type == RobotType.DRONE){
-    			transferAmount = (2000 - Clock.getRoundNum())*4;
-    			if(rc.getSupplyLevel() < transferAmount){
-    				transferAmount = Math.min((rc.getSupplyLevel()-ri.supplyLevel)/2, 1500);
-    			} 
-    			rc.transferSupplies((int)transferAmount, ri.location);
-    		} else if(ri.type == RobotType.MINER && Clock.getRoundNum() < 1000){
-    			transferAmount = (2000 - Clock.getRoundNum())*4;
-    			if(rc.getSupplyLevel() < transferAmount){
-    				transferAmount = Math.min((rc.getSupplyLevel()-ri.supplyLevel)/2, 1500);
-    			}
-    			rc.transferSupplies((int)transferAmount, ri.location);
-    		} 
+    		} else {
+	    		if(ri.type == RobotType.BEAVER && Clock.getRoundNum() < 1000){
+	    			if(ri.supplyLevel < 10){
+		    			transferAmount = Math.min((rc.getSupplyLevel()-ri.supplyLevel)/4, 20);
+		    			rc.transferSupplies((int)transferAmount, ri.location);
+	    			}
+	    		} else if(ri.type == RobotType.TANK){
+	    			transferAmount = (2000 - Clock.getRoundNum())*10;
+	    			if(rc.getSupplyLevel() < transferAmount){
+	    				transferAmount = Math.min((rc.getSupplyLevel()-ri.supplyLevel)/2, 2500);
+	    				
+	    			}
+	    			System.out.println("transferring " + transferAmount );
+	    			rc.transferSupplies((int)transferAmount, ri.location);
+	    		} else if(ri.type == RobotType.DRONE){
+	    			transferAmount = (2000 - Clock.getRoundNum())*4;
+	    			if(rc.getSupplyLevel() < transferAmount){
+	    				transferAmount = Math.min((rc.getSupplyLevel()-ri.supplyLevel)/2, 1500);
+	    			} 
+	    			rc.transferSupplies((int)transferAmount, ri.location);
+	    		} else if(ri.type == RobotType.MINER && Clock.getRoundNum() < 1000){
+	    			transferAmount = (2000 - Clock.getRoundNum())*4;
+	    			if(rc.getSupplyLevel() < transferAmount){
+	    				transferAmount = Math.min((rc.getSupplyLevel()-ri.supplyLevel)/2, 1500);
+	    			}
+	    			rc.transferSupplies((int)transferAmount, ri.location);
+	    		} 
+    		}
     	}
     }
     
@@ -343,8 +355,8 @@ public abstract class BaseRobot {
         }
     }
     
-    public static void transferSpecificSupplies(RobotType type, RobotController rc) throws GameActionException {
-        RobotInfo[] nearbyAllies = rc.senseNearbyRobots(rc.getLocation(),GameConstants.SUPPLY_TRANSFER_RADIUS_SQUARED,rc.getTeam());
+    public static void transferSpecificSupplies(RobotType type, RobotController rc, RobotInfo[] nearbyAllies) throws GameActionException {
+        //RobotInfo[] nearbyAllies = rc.senseNearbyRobots(rc.getLocation(),GameConstants.SUPPLY_TRANSFER_RADIUS_SQUARED,rc.getTeam());
         double lowestSupply = rc.getSupplyLevel();
         double transferAmount = 0;
         MapLocation suppliesToThisLocation = null;
@@ -375,6 +387,16 @@ public abstract class BaseRobot {
 		        rc.transferSupplies((int)transferAmount, suppliesToThisLocation);
 		    }
         }
+    }
+    
+    public static int numTanksSurrounding(RobotController rc, RobotInfo[] nearbyAllies) {
+    	int numTanks = 0;
+    	for( RobotInfo ri : nearbyAllies){
+    		if(ri.type == RobotType.TANK){
+    			numTanks ++;
+    		}
+    	}
+    	return numTanks;
     }
 
     

@@ -64,6 +64,8 @@ public class HQRobot extends BaseRobot {
             rc.broadcast(SUPPLIER_DRONES_CURRENT_CHAN, 0);
             int numSupplyDepots = rc.readBroadcast(SUPPLY_DEPOT_CURRENT_CHAN);
             rc.broadcast(SUPPLY_DEPOT_CURRENT_CHAN, 0);
+            int numTanks = rc.readBroadcast(TANK_CURRENT_CHAN);
+            rc.broadcast(TANK_CURRENT_CHAN, 0);
             
             rc.broadcast(MINER_FACT_PREVIOUS_CHAN, numMinerFactories);
             rc.broadcast(MINER_PREVIOUS_CHAN, numMiners);
@@ -72,6 +74,7 @@ public class HQRobot extends BaseRobot {
             rc.broadcast(DRONE_PREVIOUS_CHAN, numDrones);
             rc.broadcast(SUPPLIER_DRONES_PREVIOUS_CHAN, numSupplierDrones);
             rc.broadcast(SUPPLY_DEPOT_PREVIOUS_CHAN, numSupplyDepots);
+            rc.broadcast(TANK_PREVIOUS_CHAN, numTanks);
             
             RobotInfo[] enemies = getEnemiesInAttackingRange(RobotType.HQ);
             if(enemies.length>0 && rc.isWeaponReady()){

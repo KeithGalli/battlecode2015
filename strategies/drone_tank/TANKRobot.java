@@ -3,6 +3,7 @@ package drone_tank;
 import battlecode.common.Clock;
 import battlecode.common.Direction;
 import battlecode.common.GameActionException;
+import battlecode.common.GameConstants;
 import battlecode.common.MapLocation;
 import battlecode.common.RobotController;
 import battlecode.common.RobotInfo;
@@ -13,13 +14,14 @@ public class TANKRobot extends BaseRobot {
     
     public static Direction tarDir;
 
-
+    public boolean hasBeenSupplied;
 
 
 	public TANKRobot(RobotController rc) throws GameActionException {
 		super(rc);
 		NavSystem.UNITinit(rc);
 		MapEngine.UNITinit(rc);
+		hasBeenSupplied = false;
 	}
 
 	@Override
@@ -28,19 +30,36 @@ public class TANKRobot extends BaseRobot {
 		    DataCache.updateRoundVariables();
             RobotInfo[] enemyRobots = getEnemiesInAttackingRange(RobotType.TANK);
             MapLocation currentLocation = rc.getLocation();
+            RobotInfo[] nearbyAllies = rc.senseNearbyRobots(rc.getLocation(),GameConstants.SUPPLY_TRANSFER_RADIUS_SQUARED,rc.getTeam());
             double supplyLevel = rc.getSupplyLevel();
+            if(rc.getSupplyLevel() > 0){
+            	hasBeenSupplied = true;
+            }
             if (enemyRobots.length>0) {
                 if (rc.isWeaponReady()) {
                     attackLeastHealthEnemy(enemyRobots);
                 }
             }
+            if (rc.isCoreReady()) {
+                if ((supplyLevel < 50 && currentLocation.distanceSquaredTo(this.myHQ)<25) || !hasBeenSupplied) {
+                    NavSystem.dumbNav(this.myHQ);
+                }
+            }
             if (Clock.getRoundNum() < 1400) {
                 if (rc.isCoreReady()) {
+
                     if (supplyLevel < 50 && currentLocation.distanceSquaredTo(this.myHQ)<30) {
                         NavSystem.dumbNav(this.myHQ);
-                    } else if (rc.senseNearbyRobots(20, this.theirTeam).length < 1) {
+                    } else if (rc.senseNearbyRobots(20, this.theirTeam).length < 1 ) {
                         MapLocation ourClosest = getOurClosestTowerToThem();
-                        NavSystem.dumbNav(ourClosest);
+                        RobotInfo[] neighbors = rc.senseNearbyRobots(rc.getLocation(),1,rc.getTeam());
+                        //System.out.println(neighbors.length);
+                        int numTanks = numTanksSurrounding(rc,neighbors);
+                        System.out.println(numTanks);
+                        double radiusOfTanks = rc.readBroadcast(TANK_PREVIOUS_CHAN)/Math.PI;
+                        if(currentLocation.distanceSquaredTo(ourClosest) > radiusOfTanks || rc.canMove(currentLocation.directionTo(ourClosest)) ) {
+                        	NavSystem.dumbNav(ourClosest);
+                        }
                     }
                 }
             } else {
@@ -53,8 +72,7 @@ public class TANKRobot extends BaseRobot {
                     }
                 } 
             }
-            
-            transferSpecificSupplies(RobotType.TANK, rc);
+            transferSpecificSupplies(RobotType.TANK, rc, nearbyAllies);
             rc.broadcast(TANK_CURRENT_CHAN, rc.readBroadcast(TANK_CURRENT_CHAN)+1);
 
 
