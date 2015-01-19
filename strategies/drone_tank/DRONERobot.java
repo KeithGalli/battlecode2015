@@ -6,6 +6,7 @@ import java.util.Collections;
 import battlecode.common.Clock;
 import battlecode.common.Direction;
 import battlecode.common.GameActionException;
+import battlecode.common.GameConstants;
 import battlecode.common.MapLocation;
 import battlecode.common.RobotController;
 import battlecode.common.RobotInfo;
@@ -71,8 +72,8 @@ public class DRONERobot extends BaseRobot {
 //		        }
 //
 //		    }
-		    
-		    transferSpecificSupplies(RobotType.DRONE, rc);
+            RobotInfo[] nearbyAllies = rc.senseNearbyRobots(rc.getLocation(),GameConstants.SUPPLY_TRANSFER_RADIUS_SQUARED,rc.getTeam());
+		    transferSpecificSupplies(RobotType.DRONE, rc, nearbyAllies);
             rc.broadcast(DRONE_CURRENT_CHAN, rc.readBroadcast(DRONE_CURRENT_CHAN)+1);
 		} catch (Exception e) {
 			//                    System.out.println("caught exception before it killed us:");

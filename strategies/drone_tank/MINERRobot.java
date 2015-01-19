@@ -73,7 +73,8 @@ public class MINERRobot extends BaseRobot {
                     }
                 }			    
 			}
-			transferSpecificSupplies(RobotType.MINER, rc);
+			RobotInfo[] nearbyAllies = rc.senseNearbyRobots(rc.getLocation(),GameConstants.SUPPLY_TRANSFER_RADIUS_SQUARED,rc.getTeam());
+			transferSpecificSupplies(RobotType.MINER, rc, nearbyAllies);
 			rc.broadcast(MINER_CURRENT_CHAN, rc.readBroadcast(MINER_CURRENT_CHAN)+1);
 			
 		} catch (GameActionException e) {
