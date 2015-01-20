@@ -6,6 +6,7 @@ import battlecode.common.Direction;
 import battlecode.common.GameActionException;
 import battlecode.common.MapLocation;
 import battlecode.common.RobotController;
+import battlecode.common.RobotInfo;
 import battlecode.common.RobotType;
 import battlecode.common.Team;
 
@@ -29,10 +30,11 @@ public class BEAVERRobot extends BaseRobot {
 				int minerFactoriesBuilt = rc.readBroadcast(40);
 //				int helipads = rc.readBroadcast(HELIPAD_PREVIOUS_CHAN);
 				int helipadsBuilt = rc.readBroadcast(43);
-				
-			    if (getEnemiesInAttackingRange().length>0) {
+				int supplyDepotsBuilt = rc.readBroadcast(44);
+				RobotInfo[] enemyRobots = getEnemiesInAttackingRange(RobotType.BEAVER);
+			    if (enemyRobots.length>0) {
 	                if (rc.isWeaponReady()) {
-	                    attackLeastHealthEnemy(getEnemiesInAttackingRange());
+	                    attackLeastHealthEnemy(enemyRobots);
 	                }
 			    } else if( ore>= 500 && ((minerFactoriesBuilt < 1 ) || (minerFactoriesBuilt < 2 && helipadsBuilt > 0))) {
 		            Direction buildDirection = getBuildDirection(RobotType.MINERFACTORY);
@@ -46,7 +48,14 @@ public class BEAVERRobot extends BaseRobot {
                         rc.build(buildDirection, RobotType.HELIPAD);
                         rc.broadcast(43, helipadsBuilt+1);
                     }       
-			    } else if(rc.senseOre(rc.getLocation())>2){
+			    } else if(helipadsBuilt > 1 && ore >= 100 && rc.readBroadcast(44) < 3){
+			    	Direction buildDirection = getBuildDirection(RobotType.SUPPLYDEPOT);
+			    	if(buildDirection != null){
+			    		rc.build(buildDirection, RobotType.SUPPLYDEPOT);
+			    		rc.broadcast(44, supplyDepotsBuilt +1);
+			    	}
+			    }
+			    else if(rc.senseOre(rc.getLocation())>2){
 				    rc.mine();
 				} else if(rc.getLocation().distanceSquaredTo(rc.senseHQLocation())> 14){
 			        RobotPlayer.tryMove(rc.getLocation().directionTo(rc.senseHQLocation()));
@@ -56,7 +65,7 @@ public class BEAVERRobot extends BaseRobot {
 				}
 
 			}
-			transferSupplies(rc);
+			//transferSupplies(rc);
 			rc.broadcast(BEAVER_CURRENT_CHAN, rc.readBroadcast(BEAVER_CURRENT_CHAN)+1);
 		} catch (Exception e) {
 			//                    System.out.println("caught exception before it killed us:");

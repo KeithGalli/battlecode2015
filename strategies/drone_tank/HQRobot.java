@@ -1,4 +1,4 @@
-package drone_only_strategy;
+package drone_tank;
 
 
 import battlecode.common.Clock;
@@ -19,7 +19,8 @@ public class HQRobot extends BaseRobot {
 		super(rc);
 
 		//Init Systems//
-		NavSystem.init(rc);
+		NavSystem.HQinit(rc);
+		MapEngine.HQinit(rc);
 
 
 
@@ -43,8 +44,12 @@ public class HQRobot extends BaseRobot {
 //				rc.broadcast(104, 0);
 //				rc.broadcast(105,0);
 			}
+//			System.out.println("start channel " + rc.readBroadcast(SUPPLIER_START_QUEUE_CHAN));
+//			System.out.println("end channel " + rc.readBroadcast(SUPPLIER_END_QUEUE_CHAN));
 			//hqTransferSupplies(rc);
 			hqTransferAllSuppliesForRestOfGame(rc);
+			
+			
 		    int numMinerFactories = rc.readBroadcast(MINER_FACT_CURRENT_CHAN);
 		    rc.broadcast(MINER_FACT_CURRENT_CHAN, 0);
 		    int numMiners = rc.readBroadcast(MINER_CURRENT_CHAN);
@@ -59,6 +64,8 @@ public class HQRobot extends BaseRobot {
             rc.broadcast(SUPPLIER_DRONES_CURRENT_CHAN, 0);
             int numSupplyDepots = rc.readBroadcast(SUPPLY_DEPOT_CURRENT_CHAN);
             rc.broadcast(SUPPLY_DEPOT_CURRENT_CHAN, 0);
+            int numTanks = rc.readBroadcast(TANK_CURRENT_CHAN);
+            rc.broadcast(TANK_CURRENT_CHAN, 0);
             
             rc.broadcast(MINER_FACT_PREVIOUS_CHAN, numMinerFactories);
             rc.broadcast(MINER_PREVIOUS_CHAN, numMiners);
@@ -67,11 +74,12 @@ public class HQRobot extends BaseRobot {
             rc.broadcast(DRONE_PREVIOUS_CHAN, numDrones);
             rc.broadcast(SUPPLIER_DRONES_PREVIOUS_CHAN, numSupplierDrones);
             rc.broadcast(SUPPLY_DEPOT_PREVIOUS_CHAN, numSupplyDepots);
+            rc.broadcast(TANK_PREVIOUS_CHAN, numTanks);
             
             RobotInfo[] enemies = getEnemiesInAttackingRange(RobotType.HQ);
             if(enemies.length>0 && rc.isWeaponReady()){
             	attackLeastHealthEnemy(enemies);
-            } else if (rc.isCoreReady() && rc.getTeamOre() >= 100 && rc.readBroadcast(BEAVER_PREVIOUS_CHAN)<5) {
+            } else if (rc.isCoreReady() && rc.hasSpawnRequirements(RobotType.BEAVER) && rc.readBroadcast(BEAVER_PREVIOUS_CHAN)<5) {
                 RobotPlayer.trySpawn(RobotPlayer.directions[RobotPlayer.rand.nextInt(8)], RobotType.BEAVER);
             }
 

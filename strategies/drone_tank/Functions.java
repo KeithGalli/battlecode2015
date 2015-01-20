@@ -1,4 +1,4 @@
-package navbot;
+package drone_tank;
 
 import battlecode.common.*;
 import java.util.*;
@@ -71,27 +71,17 @@ public class Functions {
             return closestLoc;
         }
 
-    public static MapLocation locToInternalLoc(MapLocation m){
-        MapLocation temploc = m.add(-DataCache.mapCenter.x, -DataCache.mapCenter.y);
-        return temploc.add(MapEngine.internalMapCenter.x, MapEngine.internalMapCenter.y);
-    }
-
-    public static MapLocation internallocToLoc(MapLocation m){
-        MapLocation temploc = m.add(DataCache.mapCenter.x, DataCache.mapCenter.y);
-        return temploc.add(-MapEngine.internalMapCenter.x, -MapEngine.internalMapCenter.y);
-    }
-
     public static int locToInt(MapLocation m){
-            return (m.x*1000 + m.y);
+            return (m.x*100 + m.y);
         }
     public static MapLocation intToLoc(int i){
-            return new MapLocation(i/1000,i%1000);
+            return new MapLocation(i/100,i%100);
         }
 
     static void displayArray(int[][] intArray){
-        for(int y = 0;y<intArray[0].length;y++){
+        for(int x = 0;x<intArray.length;x++){
             String line = "";
-            for(int x=0;x<intArray.length;x++){
+            for(int y=0;y<intArray[0].length;y++){
                 //line+=(voidID[x][y]==-1)?"_":".";
                 int i = intArray[x][y];
                 if((Integer)i==null){//a path
@@ -105,4 +95,3 @@ public class Functions {
     }
 
 }
-    

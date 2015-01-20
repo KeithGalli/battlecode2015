@@ -1,4 +1,4 @@
-package drone_only_strategy;
+package drone_tank;
 
 import battlecode.common.Clock;
 import battlecode.common.Direction;
@@ -10,6 +10,7 @@ import battlecode.common.Team;
 
 
 public class HELIPADRobot extends BaseRobot {
+    
 	
 	public HELIPADRobot(RobotController rc) throws GameActionException {
 		super(rc);
@@ -18,10 +19,13 @@ public class HELIPADRobot extends BaseRobot {
 	@Override
 	public void run() {
 		try {
-            if (rc.getTeamOre() > 125) {
+		    int dronesBuilt = rc.readBroadcast(46);
+		    
+            if (dronesBuilt < 6 && rc.hasSpawnRequirements(RobotType.DRONE)) {
                 Direction newDir =  getSpawnDirection(RobotType.DRONE);
                 if (newDir != null) {
                     rc.spawn(newDir, RobotType.DRONE);
+                    rc.broadcast(46, dronesBuilt+1);
                 }
             }
             rc.broadcast(HELIPAD_CURRENT_CHAN, rc.readBroadcast(HELIPAD_CURRENT_CHAN)+1);

@@ -1,4 +1,4 @@
-package drone_only_strategy;
+package drone_tank;
 
 import battlecode.common.*;
 

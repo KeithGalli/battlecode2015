@@ -1,4 +1,4 @@
-package drone_only_strategy;
+package drone_tank;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -41,20 +41,17 @@ public class MINERRobot extends BaseRobot {
 			RobotInfo[] enemyRobots = getEnemiesInAttackingRange(RobotType.MINER);
 	        MapLocation currentLocation = rc.getLocation();
 	        double oreCurrentLocation = rc.senseOre(currentLocation);
-			if(rc.getSupplyLevel() > 15) supplied = true;
-			if(rc.getSupplyLevel() < 15 && supplied){
-				int endChannel = rc.readBroadcast(SUPPLIER_END_QUEUE_CHAN);
-				rc.broadcast(SUPPLIER_NEEDED, 1);
-				System.out.println("start channel" + rc.readBroadcast(SUPPLIER_START_QUEUE_CHAN));
-				System.out.println("end channel" + endChannel);
-				rc.broadcast(endChannel, rc.getLocation().x);
-				rc.broadcast(endChannel+1, rc.getLocation().y);
-				rc.broadcast(SUPPLIER_END_QUEUE_CHAN, endChannel+2);
-				supplied = false;
-//				if(rc.isCoreReady() && !supplied){
-//					rc.mine();
-//				}
-			}
+//			if(rc.getSupplyLevel() > 15) supplied = true;
+//			if(rc.getSupplyLevel() < 15 && supplied){
+//				int endChannel = rc.readBroadcast(SUPPLIER_END_QUEUE_CHAN);
+//				rc.broadcast(SUPPLIER_NEEDED, 1);
+//				System.out.println("start channel" + rc.readBroadcast(SUPPLIER_START_QUEUE_CHAN));
+//				System.out.println("end channel" + endChannel);
+//				rc.broadcast(endChannel, rc.getLocation().x);
+//				rc.broadcast(endChannel+1, rc.getLocation().y);
+//				rc.broadcast(SUPPLIER_END_QUEUE_CHAN, endChannel+2);
+//				supplied = false;
+//			}
 			if(rc.isCoreReady()) {
 			    if (rc.senseOre(rc.getLocation())>4 && rc.canMine()) {
                     rc.mine();
@@ -63,12 +60,12 @@ public class MINERRobot extends BaseRobot {
                 } else {
                     Direction[] directions = getDirectionsAway(this.myHQ);
                     Direction direction = moveToMaxOrRandom(directions);
-                    if(rc.canMove(direction) && senseNearbyTowersMiners(currentLocation, direction)==0) {
+                    if(rc.canMove(direction) && senseNearbyTowers(currentLocation, direction)==0) {
                         rc.move(direction);
                     } else {
                         int rv = RobotPlayer.rand.nextInt(8);
                         Direction randomDirection = RobotPlayer.directions[rv];
-                        if (senseNearbyTowersMiners(currentLocation, randomDirection)==0) {
+                        if (senseNearbyTowers(currentLocation, randomDirection)==0) {
                             if (rc.canMove(randomDirection)) {
                                 rc.move(randomDirection);
                             }
@@ -76,7 +73,8 @@ public class MINERRobot extends BaseRobot {
                     }
                 }			    
 			}
-			transferSpecificSupplies(RobotType.MINER, rc);
+			RobotInfo[] nearbyAllies = rc.senseNearbyRobots(rc.getLocation(),GameConstants.SUPPLY_TRANSFER_RADIUS_SQUARED,rc.getTeam());
+			transferSpecificSupplies(RobotType.MINER, rc, nearbyAllies);
 			rc.broadcast(MINER_CURRENT_CHAN, rc.readBroadcast(MINER_CURRENT_CHAN)+1);
 			
 		} catch (GameActionException e) {
