@@ -1,4 +1,4 @@
-package drone_tank;
+package tank_only_new;
 
 import java.util.ArrayList;
 import java.util.Arrays;

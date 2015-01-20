@@ -1,4 +1,4 @@
-package drone_tank;
+package only_tank_strategy;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -14,7 +14,16 @@ public class MINERRobot extends BaseRobot {
 	public final static int MINER_COST = 60;
 	
     private final static Direction[] directions = {Direction.NORTH, Direction.NORTH_EAST, Direction.EAST, Direction.SOUTH_EAST, Direction.SOUTH, Direction.SOUTH_WEST, Direction.WEST, Direction.NORTH_WEST};
+//	static boolean willMove = true;
 	public boolean supplied;
+//	
+//	private static Direction[] directionsForGroupZero = {Direction.NORTH_WEST, Direction.NORTH, Direction.NORTH_EAST};
+//	private static Direction[] directionsForGroupOne = {Direction.NORTH_EAST, Direction.EAST, Direction.SOUTH_EAST};
+//	private static Direction[] directionsForGroupTwo = {Direction.SOUTH_EAST, Direction.SOUTH, Direction.SOUTH_WEST};
+//	private static Direction[] directionsForGroupThree = {Direction.SOUTH_WEST, Direction.WEST, Direction.NORTH_WEST};
+//	private static Direction[][] groupDirections = {directionsForGroupZero, directionsForGroupOne, directionsForGroupTwo, directionsForGroupThree};
+//	
+	
 	
 	public MINERRobot(RobotController rc) throws GameActionException {
 		super(rc);
@@ -85,12 +94,43 @@ public class MINERRobot extends BaseRobot {
             }
         }
         return dir;
-    }    	
+    }
+    	
+//	private void minerMoveAwayFromHQ() {
+//		Direction dir = getDirectionAwayFromHQ();
+//		MapLocation startingLocation = rc.getLocation();
+//		try {
+//			tryMinerMove(dir);
+//			
+//			if(rc.getLocation() == startingLocation) {
+//				tryMinerMove(dir.opposite());
+//			}
+//			
+//		} catch (GameActionException e) {
+//			e.printStackTrace();
+//		}
+//	}
 
 	private Direction getDirectionAwayFromHQ() {
 		return (rc.getLocation().directionTo(rc.senseHQLocation()).opposite());
 	}
-	  
+	
+//    private static void tryMinerMove(Direction d) throws GameActionException {
+//        int offsetIndex = 0;
+//        int[] offsets = {0,1,-1,2,-2};
+//        int dirint = directionToInt(d);
+//        MapLocation myLocation = rc.getLocation();
+//        
+//        while ((offsetIndex < 5 && !rc.canMove(directions[(dirint+offsets[offsetIndex]+8)%8]))
+//        	|| isLocationInEnemyTerritory(myLocation.add(directions[(dirint+offsets[offsetIndex]+8)%8]))){
+//            offsetIndex++;
+//            System.out.println("isLocationInEnemyTerritory:" + isLocationInEnemyTerritory(myLocation.add(directions[(dirint+offsets[offsetIndex]+8)%8])));
+//        }
+//        if (offsetIndex < 5) {
+//            rc.move(directions[(dirint+offsets[offsetIndex]+8)%8]);
+//        } else tryMinerMove(d.opposite());
+//    }
+    
     static int directionToInt(Direction d) {
         switch(d) {
             case NORTH:
@@ -113,7 +153,44 @@ public class MINERRobot extends BaseRobot {
                 return -1;
         }
     }
-
+    
+//	private static void minerMoveAround() throws GameActionException {
+//		Random generator = new Random();
+//		Direction nextDir = directions[generator.nextInt(8)];
+//		
+//		if(rand.nextDouble()<0.05){
+//			if(rand.nextDouble()<0.5) nextDir = nextDir.rotateLeft();
+//			else nextDir = nextDir.rotateRight();
+//		}
+//		
+//		//check that we are not facing off the edge of the map
+//		if(rc.senseTerrainTile(rc.getLocation().add(nextDir))!=TerrainTile.NORMAL){
+//			nextDir = nextDir.rotateLeft();
+//		}
+//		
+//		//try to move in the facing direction
+//		if(rc.isCoreReady()&&rc.canMove(nextDir)){
+//			rc.move(nextDir);
+//		}
+//	}
+	
+//	private static void moveToMaxAdjacentOre() throws GameActionException {
+//		List<MapLocation> adjacentLocations = new ArrayList<MapLocation>();
+//		MapLocation myLocation = rc.getLocation();
+//		MapLocation maxAdjacentOreLocation = myLocation.add(directions[0]);
+//		
+//		for(int index = 1; index < 8; index ++){
+//			adjacentLocations.add(myLocation.add(directions[index]));
+//		}
+//		
+//		for(MapLocation otherLocation : adjacentLocations) {
+//			if( rc.senseOre(otherLocation) > rc.senseOre(maxAdjacentOreLocation) ) {
+//				maxAdjacentOreLocation = otherLocation;
+//			}
+//		}
+//		tryMinerMove(myLocation.directionTo(maxAdjacentOreLocation));
+//	}
+//	
 	private static void attackEnemyZero() throws GameActionException {
 		RobotInfo[] nearbyEnemies = rc.senseNearbyRobots(rc.getLocation(),rc.getType().attackRadiusSquared,rc.getTeam().opponent());
 		if(nearbyEnemies.length>0){//there are enemies nearby
