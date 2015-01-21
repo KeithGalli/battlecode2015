@@ -60,20 +60,20 @@ public class BEAVERRobot extends BaseRobot {
 //                        rc.build(buildDirection, RobotType.HELIPAD);
 //                        rc.broadcast(43, helipadsBuilt+1);
 //                    }     
-			    } else if (rc.hasBuildRequirements(RobotType.SUPPLYDEPOT) && supplyDepotsBuilt < 2) {
+			    } else if (rc.hasBuildRequirements(RobotType.SUPPLYDEPOT) && supplyDepotsBuilt < 2 && minerFactoriesBuilt >0) {
                     Direction buildDirection = getBuildDirection(RobotType.SUPPLYDEPOT);
                     if (buildDirection!=null) {
                         rc.build(buildDirection, RobotType.SUPPLYDEPOT);
                         rc.broadcast(44, supplyDepotsBuilt+1);
 
                     }     			        
-			    } else if (rc.hasBuildRequirements(RobotType.BARRACKS) && barracksBuilt < 1) {
+			    } else if (rc.hasBuildRequirements(RobotType.BARRACKS) && barracksBuilt < 1 && minerFactoriesBuilt> 0) {
                     Direction buildDirection = getBuildDirection(RobotType.BARRACKS);
                     if (buildDirection!=null) {
                         rc.build(buildDirection, RobotType.BARRACKS);
                         rc.broadcast(41, barracksBuilt+1);
                     }       
-			    } else if (rc.hasBuildRequirements(RobotType.TANKFACTORY) && tankFactoriesBuilt < 4) {
+			    } else if (rc.hasBuildRequirements(RobotType.TANKFACTORY) && tankFactoriesBuilt < 4 && minerFactoriesBuilt > 0) {
 			        Direction buildDirection = getBuildDirection(RobotType.TANKFACTORY);
 			        if (buildDirection != null) {
 			            rc.build(buildDirection, RobotType.TANKFACTORY);
