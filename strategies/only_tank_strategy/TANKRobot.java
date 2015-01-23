@@ -15,6 +15,7 @@ public class TANKRobot extends BaseRobot {
     public static Direction tarDir;
 
     public boolean hasBeenSupplied;
+    public MapLocation targetToProtect;
 
 
 	public TANKRobot(RobotController rc) throws GameActionException {
@@ -22,6 +23,7 @@ public class TANKRobot extends BaseRobot {
 		NavSystem.UNITinit(rc);
 		MapEngine.UNITinit(rc);
 		hasBeenSupplied = false;
+		targetToProtect = getOurClosestTowerToThem();
 	}
 
 	@Override
@@ -56,8 +58,20 @@ public class TANKRobot extends BaseRobot {
                         int numTanks = numTanksSurrounding(rc,neighbors);
                         System.out.println(numTanks);
                         double radiusOfTanks = rc.readBroadcast(TANK_PREVIOUS_CHAN)/Math.PI;
-                        if(currentLocation.distanceSquaredTo(ourClosest) > radiusOfTanks || rc.canMove(currentLocation.directionTo(ourClosest)) ) {
-                        	NavSystem.dumbNav(ourClosest);
+                        for(MapLocation towerLoc : rc.senseEnemyTowerLocations()){
+                        	Direction directionTowardsTower = targetToProtect.directionTo(towerLoc);
+                        	MapLocation furthestTank = targetToProtect.add(directionTowardsTower, (int) Math.sqrt(radiusOfTanks));
+                        	int distance = towerLoc.distanceSquaredTo(furthestTank);
+                        	if(distance <=24){
+                        		int difference = 24 - distance;
+                        		int changeInTarget = (int)Math.sqrt(difference);
+                        		Direction dirFromTowerToLoc = towerLoc.directionTo(targetToProtect);
+                        		targetToProtect = targetToProtect.add(dirFromTowerToLoc,changeInTarget);
+                        		System.out.println("changing target");
+                        	}
+                        }
+                        if(currentLocation.distanceSquaredTo(targetToProtect) > radiusOfTanks || rc.canMove(currentLocation.directionTo(targetToProtect)) ) {
+                        	NavSystem.dumbNav(targetToProtect);
                         }
                     }
                 }
