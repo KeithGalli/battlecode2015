@@ -27,6 +27,13 @@ public abstract class BaseRobot {
     public final static int HAND_STATION_PREVIOUS_CHAN = 31, HAND_STATION_CURRENT_CHAN = 32;
     public final static int MINER_FACT_PREVIOUS_CHAN = 33, MINER_FACT_CURRENT_CHAN = 34;
     public final static int MINER_PREVIOUS_CHAN = 35, MINER_CURRENT_CHAN = 36;
+    public final static int SUPPLIER_DRONES_PREVIOUS_CHAN = 37, SUPPLIER_DRONES_CURRENT_CHAN= 38;
+    
+    public final static int SUPPLIER_NEEDED = 100;
+    public final static int SUPPLIER_START_QUEUE_CHAN = 101;
+    public final static int SUPPLIER_END_QUEUE_CHAN = 102;
+    public final static int SUPPLIER_ID_CHAN = 103;
+    public final static int SUPPLIER_TWO_ID_CHAN = 99;
     
 	public static int SUPPLYDEPOT_COST = 100;
 	public static int TECHNOLOGYINSTITUTE_COST = 200;
@@ -41,7 +48,7 @@ public abstract class BaseRobot {
 	public static int COMPUTER_COST = 10;
 	public static int SOLDIER_COST = 60;
 	public static int BASHER_COST = 80;
-	public static int MINER_COST = 50;
+	public static int MINER_COST = 60;
 	public static int DRONE_COST = 125;
 	public static int TANK = 250;
 	public static int COMMANDER = 100;
@@ -52,6 +59,9 @@ public abstract class BaseRobot {
     static ArrayList<MapLocation> path = new ArrayList<MapLocation>();
     protected MapLocation myHQ, theirHQ;
     protected Team myTeam, theirTeam;
+    public int startSupplierQueue;
+    public int endSupplierQueue;
+    public int supplierID;
     //private static HashSet<MapLocation> enemyTerritory = new HashSet<MapLocation>();
     
 
@@ -64,6 +74,9 @@ public abstract class BaseRobot {
         this.theirHQ = rc.senseEnemyHQLocation();
         this.myTeam = rc.getTeam();
         this.theirTeam = this.myTeam.opponent();
+        this.startSupplierQueue = 101;
+        this.endSupplierQueue =101;
+        this.supplierID = 0;
 
         DataCache.init(this); //MUST COME FIRST
         BroadcastSystem.init(this);
@@ -116,10 +129,30 @@ public abstract class BaseRobot {
         }
         return count;
     }
+    
+    public int senseNearbyTowersMiners(MapLocation location, Direction direction) {
+        MapLocation[] enemyTowers = rc.senseEnemyTowerLocations();
+        MapLocation newLocation = rc.getLocation().add(direction);
+        int count = 0;
+        for (MapLocation tower : enemyTowers) {
+            if (newLocation.distanceSquaredTo(tower)<=24)
+                count += 1;
+        }
+        if (newLocation.distanceSquaredTo(this.theirHQ)<=24) {
+            count+=1;
+        }
+        return count;
+    }
 
     
     public boolean withinRange(int unitCount1, int unitCount2, double idealValue, double threshold) {
         return ((unitCount1*1.0/unitCount2-idealValue)<threshold);
+    }
+    
+    public Direction[] getDirectionsAway(MapLocation awayFrom) {
+        Direction away = rc.getLocation().directionTo(awayFrom).opposite();
+        Direction[] dirs = {away, away.rotateLeft(), away.rotateRight(), away.rotateLeft().rotateLeft(), away.rotateRight().rotateRight()};
+        return dirs;
     }
     
     public Direction[] getDirectionsToward(MapLocation dest) {
@@ -202,20 +235,100 @@ public abstract class BaseRobot {
         MapLocation suppliesToThisLocation = null;
         for(RobotInfo ri:nearbyAllies){
             RobotType type = ri.type;
-            if(ri.supplyLevel<lowestSupply && !(type== RobotType.BARRACKS || type == RobotType.HELIPAD || type == RobotType.MINERFACTORY || type == RobotType.TANKFACTORY || type == RobotType.HQ)){
-                lowestSupply = ri.supplyLevel;
-              if(type == RobotType.DRONE){
-                  transferAmount = 6*(rc.getSupplyLevel()-ri.supplyLevel)/8;
-              } else {
-                  transferAmount = (rc.getSupplyLevel()-ri.supplyLevel)/4;
-              }
-                suppliesToThisLocation = ri.location;
+//            if(ri.supplyLevel == 0){
+//            	if(type == RobotType.DRONE){
+//            		transferAmount = Math.min(3*(rc.getSupplyLevel()-ri.supplyLevel)/4, 2000);
+//	            	lowestSupply = ri.supplyLevel;
+//	            	rc.transferSupplies((int)transferAmount, ri.location);
+//	            	//return;
+//            	} else if(type == RobotType.BEAVER) {
+//            		transferAmount = Math.min((rc.getSupplyLevel()-ri.supplyLevel)/4, 500);
+//            		rc.transferSupplies((int)transferAmount, ri.location);
+//            		//return;
+//            	} else if(type == RobotType.MINER) {
+//            		transferAmount = Math.min((rc.getSupplyLevel()-ri.supplyLevel)/2, 1500);
+//            		rc.transferSupplies((int)transferAmount, ri.location);
+//            		//return;
+//            	} //else {
+////            		continue;
+////            	}
+//            } else if(ri.supplyLevel<lowestSupply && !(type== RobotType.BARRACKS || type == RobotType.HELIPAD || type == RobotType.MINERFACTORY || type == RobotType.TANKFACTORY || type == RobotType.HQ)){
+//                lowestSupply = ri.supplyLevel;
+////              if(type == RobotType.DRONE){
+////                  transferAmount = 6*(rc.getSupplyLevel()-ri.supplyLevel)/8;
+////              } else {
+////                  transferAmount = (rc.getSupplyLevel()-ri.supplyLevel)/4;
+////              }
+//                transferAmount = Math.min((rc.getSupplyLevel()-ri.supplyLevel)/4, 500);
+//                suppliesToThisLocation = ri.location;
+//            }
+            
+            if(ri.supplyLevel < 50){
+            	if(type == RobotType.DRONE){
+            		transferAmount = Math.min(3*(rc.getSupplyLevel()-ri.supplyLevel)/4, 2000);
+            		rc.transferSupplies((int)transferAmount, ri.location);
+            	} else if( type == RobotType.BEAVER){
+            		transferAmount = Math.min((rc.getSupplyLevel()-ri.supplyLevel)/4, 500);
+            		rc.transferSupplies((int)transferAmount, ri.location);
+            	} else if( type == RobotType.MINER){
+            		transferAmount = Math.min((rc.getSupplyLevel()-ri.supplyLevel)/2, 1500);
+            		rc.transferSupplies((int)transferAmount, ri.location);
+            	}
             }
 
         }
-        if(suppliesToThisLocation!=null){
-            rc.transferSupplies((int)transferAmount, suppliesToThisLocation);
-        }
+//        if(suppliesToThisLocation!=null){
+//            rc.transferSupplies((int)transferAmount, suppliesToThisLocation);
+//        }
+    }
+    
+    public static void hqTransferSupplies(RobotController rc) throws GameActionException {
+    	RobotInfo[] nearbyAllies = rc.senseNearbyRobots(rc.getLocation(),GameConstants.SUPPLY_TRANSFER_RADIUS_SQUARED,rc.getTeam());
+    	
+    	for (RobotInfo ri : nearbyAllies){
+    		double transferAmount = 0;
+    		RobotType type = ri.type;
+    		if(ri.ID== rc.readBroadcast(SUPPLIER_ID_CHAN) || ri.ID == rc.readBroadcast(SUPPLIER_TWO_ID_CHAN)){
+    			transferAmount =  Math.min(3*rc.getSupplyLevel()/4, 20000);
+    			rc.transferSupplies((int) transferAmount , ri.location);
+    		} else if(ri.supplyLevel < 50){
+            	if(type == RobotType.DRONE){
+            		transferAmount = Math.min(3*(rc.getSupplyLevel()-ri.supplyLevel)/4, 2000);
+            		rc.transferSupplies((int)transferAmount, ri.location);
+            	} else if( type == RobotType.BEAVER){
+            		transferAmount = Math.min((rc.getSupplyLevel()-ri.supplyLevel)/4, 500);
+            		rc.transferSupplies((int)transferAmount, ri.location);
+            	} else if( type == RobotType.MINER){
+            		transferAmount = Math.min((rc.getSupplyLevel()-ri.supplyLevel)/2, 1500);
+            		rc.transferSupplies((int)transferAmount, ri.location);
+            	}
+            }
+    	}
+    }
+    
+    public static void hqTransferAllSuppliesForRestOfGame(RobotController rc) throws GameActionException {
+    	RobotInfo[] nearbyAllies = rc.senseNearbyRobots(rc.getLocation(),GameConstants.SUPPLY_TRANSFER_RADIUS_SQUARED,rc.getTeam());
+    	for(RobotInfo ri : nearbyAllies){
+    		double transferAmount = 0;
+    		if(ri.type == RobotType.BEAVER && Clock.getRoundNum() < 1000){
+    			if(ri.supplyLevel < 10){
+	    			transferAmount = Math.min((rc.getSupplyLevel()-ri.supplyLevel)/4, 20);
+	    			rc.transferSupplies((int)transferAmount, ri.location);
+    			}
+    		} else if(ri.type == RobotType.DRONE){
+    			transferAmount = (2000 - Clock.getRoundNum())*4;
+    			if(rc.getSupplyLevel() < transferAmount){
+    				transferAmount = Math.min((rc.getSupplyLevel()-ri.supplyLevel)/2, 1500);
+    			} 
+    			rc.transferSupplies((int)transferAmount, ri.location);
+    		} else if(ri.type == RobotType.MINER && Clock.getRoundNum() < 1000){
+    			transferAmount = (2000 - Clock.getRoundNum())*4;
+    			if(rc.getSupplyLevel() < transferAmount){
+    				transferAmount = Math.min((rc.getSupplyLevel()-ri.supplyLevel)/2, 1500);
+    			}
+    			rc.transferSupplies((int)transferAmount, ri.location);
+    		}
+    	}
     }
     
     public static void transferDroneSupplies(RobotController rc) throws GameActionException {
@@ -241,7 +354,15 @@ public abstract class BaseRobot {
         double transferAmount = 0;
         MapLocation suppliesToThisLocation = null;
         for(RobotInfo ri:nearbyAllies){
-            if(ri.type == type && ri.supplyLevel<lowestSupply ){
+        	if(ri.supplyLevel == 0 && ri.type == type){
+        		lowestSupply = ri.supplyLevel;
+                transferAmount = (rc.getSupplyLevel()-ri.supplyLevel)/2;
+                suppliesToThisLocation = ri.location;
+                if(Clock.getBytecodesLeft() > 520){
+                	rc.transferSupplies((int)transferAmount, suppliesToThisLocation);
+                }
+                return;
+        	} else if(ri.type == type && ri.supplyLevel<lowestSupply ){
                 lowestSupply = ri.supplyLevel;
                 transferAmount = (rc.getSupplyLevel()-ri.supplyLevel)/2;
                 suppliesToThisLocation = ri.location;

@@ -8,7 +8,9 @@ import battlecode.common.RobotController;
 import battlecode.common.RobotType;
 import battlecode.common.Team;
 
+
 public class HELIPADRobot extends BaseRobot {
+	
 	public HELIPADRobot(RobotController rc) throws GameActionException {
 		super(rc);
 	}
@@ -30,4 +32,5 @@ public class HELIPADRobot extends BaseRobot {
 			//e.printStackTrace();
 		}
 	}
+	
 }

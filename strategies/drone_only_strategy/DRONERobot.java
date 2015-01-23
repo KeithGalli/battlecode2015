@@ -12,7 +12,7 @@ import battlecode.common.Team;
 public class DRONERobot extends BaseRobot {
 
 
-
+	//static int supplierID = 0;
 
 	public DRONERobot(RobotController rc) throws GameActionException {
 		super(rc);
@@ -21,14 +21,6 @@ public class DRONERobot extends BaseRobot {
 	@Override
 	public void run() {
 		try {
-//		    boolean towerOrHQNearby = false;
-//            RobotInfo[] robotsNearby = rc.senseNearbyRobots(24, this.theirTeam);
-//            for (RobotInfo robot : robotsNearby) {
-//                if (robot.type == RobotType.TOWER || robot.type == RobotType.HQ) {
-//                    towerOrHQNearby = true;
-//                    break;
-//                }
-//            }
             RobotInfo[] enemyRobots = getEnemiesInAttackingRange(RobotType.DRONE);
             if (enemyRobots.length>0) {
                 if (rc.isWeaponReady()) {
@@ -36,9 +28,9 @@ public class DRONERobot extends BaseRobot {
                 }
             }
 		    if (Clock.getRoundNum() < 1900) {
-		        if (rc.isCoreReady() && rc.getSupplyLevel()<60 && rc.getLocation().distanceSquaredTo(this.myHQ)<40) {
-		            RobotPlayer.tryMove(rc.getLocation().directionTo(rc.senseHQLocation()));
-		        }
+//		        if (rc.isCoreReady() && rc.getSupplyLevel()<60 && rc.getLocation().distanceSquaredTo(this.myHQ)<40) {
+//		            RobotPlayer.tryMove(rc.getLocation().directionTo(rc.senseHQLocation()));
+//		        }
 		        
 		        if (rc.isCoreReady() && senseNearbyTowers(rc.getLocation())==0) {
 
@@ -48,11 +40,13 @@ public class DRONERobot extends BaseRobot {
 		                  Direction[] directions = getDirectionsToward(this.theirHQ);
 		                  Direction direction = directions[fate];
 		                  RobotPlayer.tryMove(direction);
-		            } else RobotPlayer.tryMove(rc.getLocation().directionTo(this.theirHQ));
+		            } else {
+		                RobotPlayer.tryMove(rc.getLocation().directionTo(this.theirHQ));
+		            }
 		        }
 		    } else {
 		        MapLocation closest  = getClosestTower();
-		        if (closest!=null) {
+		        if (closest != null) {
 		            RobotPlayer.tryMove(rc.getLocation().directionTo(closest));
 		        } else {
 		            RobotPlayer.tryMove(rc.getLocation().directionTo(this.theirHQ));
@@ -68,4 +62,8 @@ public class DRONERobot extends BaseRobot {
 			//e.printStackTrace();
 		}
 	}
+	
+//	public static int getSupplierID(){
+//		return supplierID;
+//	}
 }

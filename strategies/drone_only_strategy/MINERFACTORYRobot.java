@@ -4,7 +4,7 @@ import battlecode.common.*;
 
 public class MINERFACTORYRobot extends BaseRobot {
 
-	public final static int MAX_MINERS = 30;
+	public final static int MAX_MINERS = 25;
 	public final static int MINER_FACT_COST = 500;
 	public MINERFACTORYRobot(RobotController rc) throws GameActionException {
 		super(rc);
@@ -15,10 +15,10 @@ public class MINERFACTORYRobot extends BaseRobot {
 		try {
 			if(rc.isCoreReady()){
 				//might be worth considering spawning miners AWAY from the HQ 
-				if(rc.readBroadcast(MINER_PREVIOUS_CHAN) < MAX_MINERS && rc.getTeamOre() >= MINERRobot.MINER_COST){
+				if(rc.readBroadcast(MINER_PREVIOUS_CHAN) < MAX_MINERS && rc.getTeamOre() >= MINER_COST){
 						RobotPlayer.trySpawn(RobotPlayer.directions[RobotPlayer.rand.nextInt(8)], RobotType.MINER);
 				}
-		        else if (rc.readBroadcast(MINER_PREVIOUS_CHAN)<25 && rc.getTeamOre() > 50) {
+		        else if (rc.readBroadcast(MINER_PREVIOUS_CHAN)<25 && rc.getTeamOre() >= MINER_COST) {
 			        Direction spawnDirection = getSpawnDirection(RobotType.MINER);
 			        if (spawnDirection != null)
 			            rc.spawn(spawnDirection, RobotType.MINER);

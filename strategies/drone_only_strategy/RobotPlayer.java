@@ -14,7 +14,7 @@ public class RobotPlayer {
     static Random rand;
     static MapLocation[] theMap;
     static Direction[] directions = {Direction.NORTH, Direction.NORTH_EAST, Direction.EAST, Direction.SOUTH_EAST, Direction.SOUTH, Direction.SOUTH_WEST, Direction.WEST, Direction.NORTH_WEST};
-
+    static int numSuppliers = 0;
     static int numUnknown=0;
     static int numOffmap=0;
     static int numNormal=0;
@@ -126,7 +126,17 @@ public class RobotPlayer {
                     break;   
 
             case DRONE:
-                    robot = new DRONERobot(rc);
+//            	if(rc.readBroadcast(BaseRobot.SUPPLIER_DRONES_PREVIOUS_CHAN) <1){
+//            		rc.broadcast(BaseRobot.SUPPLIER_ID_CHAN, rc.getID());
+//            		robot = new SUPPLIERRobot(rc);
+//            	} //else if(rc.readBroadcast(BaseRobot.SUPPLIER_DRONES_PREVIOUS_CHAN) <2){
+////            		rc.broadcast(BaseRobot.SUPPLIER_TWO_ID_CHAN, rc.getID());
+////            		robot = new SUPPLIERRobot(rc);
+////            	} 
+//            	else{
+//                    robot = new DRONERobot(rc);
+//            	}
+            	robot = new DRONERobot(rc);
                     break;    
 
             case LAUNCHER:
