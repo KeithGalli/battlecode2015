@@ -52,45 +52,56 @@ public class HQRobot extends BaseRobot {
 				count = 1;
         	}
 
+            //ARBITRARY 100 RD Counter
 
         	if (broadcastCount > 100){
         		broadcastCount = 0;
 
 
-
+                //senseQueueHQ: [(x1,y1), (x2,y2)] of locations that a robot has been at
         		for (MapLocation loc: MapEngine.senseQueueHQ){
         			
+                    //If its a new location
                     if (!MapEngine.prevSensedLocs.contains(loc)){
-                        
+                        //Get all visible tiles from that location
                         testRobotSeenLocs = MapEngine.unitScan(loc);
+                        //Scan all visible tiles from that location
                         MapEngine.scanTiles(testRobotSeenLocs);
+                        //Add that location to previously seen locations
                         MapEngine.prevSensedLocs.add(loc);
                     }
         			
 
         		}
 
-
+                //Prepare the map for broadcasting.
         		MapEngine.resetMapAndPrep();
 
+                //Send the map data dict
         		BroadcastSystem.prepareandsendMapDataDict(MapEngine.sensedDictHQ);
-        		
+        		//Send the waypoint data dict
         		BroadcastSystem.prepareandsendWaypointDict(MapEngine.waypointDictHQ);
                 
+                //Tell the robot the dictionaries are ready for download.
                 BroadcastSystem.write(2001, 1);
         	}
 
 
-
+            //Get the test robots internal loc 
+            //REMEMBER ALL BROADCAST LOCATIONS ARE INTERNAL
         	testRobotInternalLoc = Functions.intToLoc(rc.readBroadcast(TESTCHANNEL));
 
+            //Convert to real maplocation
         	testRobotLoc = Functions.internallocToLoc(testRobotInternalLoc);
 
+            //If the robot is at a new location
             if(!MapEngine.prevSensedLocs.contains(testRobotLoc)){
 
+                //if the location is not it's last one
             	if (prevRobotLoc.x==testRobotLoc.x && prevRobotLoc.y==testRobotLoc.y){
             		
             	} else if (prevRobotLoc.x != -1 && prevRobotLoc.y != -1){
+                    //Add it's location to the queue
             		MapEngine.senseQueueHQ.add(testRobotLoc);
             	}
             }

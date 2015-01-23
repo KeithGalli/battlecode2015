@@ -17,17 +17,24 @@ public class BroadcastSystem {
 
 	static int[] lengthOfEachPath = new int[100];
 	
+	//channel that we begin sending waypoints (corners)
 	public static int waypointBand = 10000;
+
+	//channel that we send map data
 	public static int dataBand = 30000;
 
+	//sending the map dimensions
 	public static int xdimBand = 205;
 	public static int ydimBand = 206;
 
+
+	//INITIALIZATION
 	public static void init(BaseRobot myRobot) {
 		robot = myRobot;
 		rc = robot.rc;
 	}
 
+	//READ BROADCAST w/ error message
 	public static int read(int channel) {
 		try {
 			if (rc != null) {
@@ -40,29 +47,32 @@ public class BroadcastSystem {
 		}
 	}
 
+	//WRITE BROADCAST w/ error message
 	public static void write(int channel, int message) {
 		if (rc != null) {
 			try {
 				rc.broadcast(channel, message);
-
 			} catch (Exception e) {
 				                  e.printStackTrace();
 			}
 		}
 	}
 
+	//Broadcast a 2D array of information
+	//CHANNELS: refchannel + ydim*xdim (~10,000)
+	//USED IN: old method for hq to broadcast map information
 	static void broadcastMapArray(int refchannel, int[][] dataArray) throws GameActionException{
 		for(int x=MapEngine.xdim;--x>=0;){
-
 			for(int y=MapEngine.ydim;--y>=0;){
-
 				int index = y*MapEngine.xdim+x+refchannel;
-
 				rc.broadcast(index, dataArray[x][y]);
 			}
 		}
 	}
 
+	//Download a 2D array of information
+	//CHANNELS: refchannel + ydim*xdim (~10,000)
+	//USED IN: old method for robots to download map information
 	static int[][] downloadMapArray(int refchannel) throws GameActionException {
 		int[][] dataArray = new int[MapEngine.xdim][MapEngine.ydim];
 		for(int x=MapEngine.xdim;--x>=0;){
@@ -71,6 +81,7 @@ public class BroadcastSystem {
 				int index = y*MapEngine.xdim+x+refchannel;
 				dataArray[x][y] = rc.readBroadcast(index);
 			}
+
 		}
 		return dataArray;
 	}
@@ -98,26 +109,11 @@ public class BroadcastSystem {
 	// }
 	
 	
-	public static Dictionary<Integer,MapLocation[]> receiveWaypointDict(){
-		Dictionary<Integer,MapLocation[]> datadict = new Hashtable<Integer,MapLocation[]>();
-		int size = BroadcastSystem.read(waypointBand);
-		int arraysize = 0;
-		int count = 1;
-		for (int i = 3; i<size; i++){
-			arraysize = read(waypointBand+count);
-			MapLocation[] locs = new MapLocation[arraysize];
-			count++;
-			for (int j = 0; j<arraysize; j++){
-				locs[j] = Functions.intToLoc(read(waypointBand+count));
-				count++;
-			}
-			datadict.put(i, locs);
-			
-		}
-		return datadict;
-		
-		
-	}
+	
+	//BROADCAST MAP DATA DICTIONARY
+	//dataDict = {(x1,y1):1, (x2,y2):1, ... (xn,yn):4}
+	//USED IN: method for HQ to send map information (normals, void numbers, etc)
+	//CHANNELS: dataBand + 2*dataDict.size() + 1
 
 	public static void prepareandsendMapDataDict(Dictionary<MapLocation, Integer> dataDict){
 		write(dataBand, dataDict.size());
@@ -136,27 +132,30 @@ public class BroadcastSystem {
 		}
 	}
 
+	//DOWNLOAD MAP DATA DICTIONARY
+	//USED IN: method for robots to efficiently download map information
+	//CHANNELS: dataBand + 2*dataDict.size() + 1
+
 	public static void receiveMapDataDict(){
 		int size = BroadcastSystem.read(dataBand);
 		//System.out.println(size);
 		int count = 1;
 		for (int i=0; i<size; i++){
 
-			//System.out.println(read(dataBand+count));
-			//System.out.println(dataBand+count);
 
 			MapLocation loc = Functions.intToLoc(read(dataBand+count));
-			//System.out.println(loc);
 			count++;
 			int val = read(dataBand+count);
-			//System.out.println(val);
 
 			count++;
 			MapEngine.map[loc.x][loc.y] = val;
 		}
 	}
 
-
+	//BROADCAST WAYPOINT DATA DICTIONARY
+	//USED IN: method for hq to efficiently broadcast corner information
+	//dataDict = {3: [(x1,y1)...(xn,yn)], 4: [(x1,y1)...(xn,yn)]... n: [(x1,y1)...(xn,yn)]}
+	//CHANNELS: dataBand + dataDict.size() + sum(dataDict.get(i).size()) for all i
 	
 	public static void prepareandsendWaypointDict(Dictionary<Integer,ArrayList<MapLocation>> dataDict){
 
@@ -171,6 +170,31 @@ public class BroadcastSystem {
 				count++;
 			}
 		}
+	}
+
+	//DOWNLOAD WAYPOINT DATA DICTIONARY
+	//USED IN: method for robot to efficiently download corner information
+	//dataDict = {3: [(x1,y1)...(xn,yn)], 4: [(x1,y1)...(xn,yn)]... n: [(x1,y1)...(xn,yn)]}
+	//CHANNELS: dataBand + dataDict.size() + sum(dataDict.get(i).size()) for all i
+
+	public static Dictionary<Integer,MapLocation[]> receiveWaypointDict(){
+		Dictionary<Integer,MapLocation[]> datadict = new Hashtable<Integer,MapLocation[]>();
+		int size = BroadcastSystem.read(waypointBand);
+		int arraysize = 0;
+		int count = 1;
+		for (int i = 3; i<size; i++){
+			arraysize = read(waypointBand+count);
+			MapLocation[] locs = new MapLocation[arraysize];
+			count++;
+			for (int j = 0; j<arraysize; j++){
+				locs[j] = Functions.intToLoc(read(waypointBand+count));
+				count++;
+			}
+			datadict.put(i, locs);
+			
+		}
+		return datadict;
+		
 		
 	}
 }

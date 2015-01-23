@@ -28,6 +28,7 @@ public class DataCache {
 	public static List<MapLocation> seenLocs=new ArrayList<MapLocation>();
 
 
+	//INITIALIZATION
 	public static void init(BaseRobot myRobot) {
 		robot = myRobot;
 		rc = robot.rc;
@@ -39,13 +40,13 @@ public class DataCache {
 		mapCenter = new MapLocation((ourHQ.x+enemyHQ.x)/2, (ourHQ.y+enemyHQ.y)/2);
 		xmodifier = ourHQ.x;
 		ymodifier = ourHQ.y;
-		//System.out.println(mapCenter);
-
 	}
 
+	//UPDATE CURRENT LOCATION
 	public static void updateRoundVariables() throws GameActionException {
 		currentLoc = rc.getLocation();
 		internalLoc = Functions.locToInternalLoc(currentLoc);
+		//MOVE ENEMYROBOT CHECKING TO HERE
 	}
 
 	public static void updateSeenLocs(List<MapLocation> newLocs){

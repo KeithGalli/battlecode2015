@@ -65,7 +65,7 @@ public class Functions {
      //MapLocation[] manyLocs: array of MapLocations to find the closest one.
      //MapLocation point: the reference point.
      //OUTPUTS:
-    //Maplocation: the closest maplocation in manyLocs to point.
+     //Maplocation: the closest maplocation in manyLocs to point.
         public static MapLocation findClosest(MapLocation[] manyLocs, MapLocation point){
             int closestDist = 10000000;
             int challengerDist = closestDist;
