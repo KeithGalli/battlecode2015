@@ -35,8 +35,15 @@ public class MapEngine {
 
 	public static MapLocation internalMapCenter;
 
-	public static List<MapLocation> senseQueue=new ArrayList<MapLocation>();
+	public static List<MapLocation> prevSensedLocs = new ArrayList<MapLocation>();
+	public static List<MapLocation> senseQueueHQ=new ArrayList<MapLocation>();
 
+	public static Dictionary<MapLocation,Integer> sensedDictHQ = new Hashtable<MapLocation,Integer>();
+
+	//Key: integer represeting the "wall" from (3, infinity)
+	//Value: MapLocation[] or ArrayList representing waypoints (or wall corners)
+	//Reason for waypointDictHQ vs waypointDict:
+	//The HQ version needs to support adding corners to each value, while the Robot version only needs to download a static list.
 	public static Dictionary<Integer,ArrayList<MapLocation>> waypointDictHQ = new Hashtable<Integer,ArrayList<MapLocation>>();
 	public static Dictionary<Integer,MapLocation[]> waypointDict = new Hashtable<Integer,MapLocation[]>();
 
@@ -44,44 +51,56 @@ public class MapEngine {
 
 	public static void HQinit(RobotController myRC) {
 		rc = myRC;
+
+		//Get the "box" of towers/hq's
 		getMapParams();
+		//Using the "box", get the edges
 		getMapEdges();
+		//Set the map dimensions
 		setMapDim();
+
+		//Broadcast out the dimensions so robots don't have to repeat the above.
 		BroadcastSystem.write(BroadcastSystem.xdimBand, xdim);
 		BroadcastSystem.write(BroadcastSystem.ydimBand, ydim);
-		//System.out.println("test");
-		//Functions.displayArray(map);
-		//System.out.println("test2");
-		//System.out.println(xdim);
-		//System.out.println(ydim);
-		//System.out.println(Functions.locToInternalLoc(DataCache.ourHQ));
+
 	}
 	public static void STRUCTinit(RobotController myRC) {
 		rc = myRC;
 
 	}
 
-
 	public static void UNITinit(RobotController myRC) {
 		rc = myRC;
+		//Receive the dimensions
 		xdim = BroadcastSystem.read(BroadcastSystem.xdimBand);
 		ydim = BroadcastSystem.read(BroadcastSystem.ydimBand);
+		//Find the center, this is for converting from original maplocation to internal.
 		internalMapCenter = new MapLocation(xdim/2, ydim/2);
+		map = new int[xdim][ydim];
 	}
 
+	//PURPOSE: prepare the map and waypoint dictionary for broadcasting
+	//USED IN: HQRobot
 	public static void resetMapAndPrep(){
-		senseQueue = new ArrayList<MapLocation>();
+		//reset the sense queue, since this will only be called after iterating through all senseable locations
+		senseQueueHQ = new ArrayList<MapLocation>();
+		//reset the waypoint dictionary, as we will be renumbering the voids
 		waypointDictHQ = new Hashtable<Integer,ArrayList<MapLocation>>();
 
+		//reset all void numbers to 2
 		resetVoidNums();
+		//set all void "walls" to unique identifiers and populate the waypoint dictionary
 		setVoidNums();
-		BroadcastSystem.write(2001, 1);
+		
 	}
 
+	//Purpose: Scan all newly discovered tiles, and updates the internal map accordingly
+	//Input:
+	//MapLocation[] inputTiles: all tiles within viewing of a point (previously called getAllVisibleMapLocations or w/e and passed into this)
 	public static void scanTiles(MapLocation[] inputTiles){
 		for (MapLocation tile: inputTiles){
 			MapLocation internalTile = Functions.locToInternalLoc(tile);
-			if (internalTile.x<xdim && internalTile.y<ydim){
+			if (internalTile.x<xdim && internalTile.y<ydim && internalTile.x>-1 && internalTile.y>-1){
 			if (map[internalTile.x][internalTile.y] == 0){
 				TerrainTile tileType = rc.senseTerrainTile(tile);
 				if (tileType == TerrainTile.NORMAL){
@@ -91,12 +110,15 @@ public class MapEngine {
 				} else if (tileType == TerrainTile.OFF_MAP){
 					map[internalTile.x][internalTile.y] = -1;
 				}
+				sensedDictHQ.put(internalTile, map[internalTile.x][internalTile.y]);
 
 			}
 		}
 		}
 	}
 
+	//Purpose: reset all the void "wall" numbers. This is because sometimes as you discover new void tiles, no matter how you iterate
+	//through it can mess up the numbering. 
 	public static void resetVoidNums(){
 		for(int x=xdim;--x>=0;){
 			for(int y=ydim;--y>=0;){
@@ -106,7 +128,8 @@ public class MapEngine {
 			}
 		}
 	}
-
+	
+	//Called after setVoidNums() 
 	public static void setVoidNums(){
 		voidID = 3;
 		for(int x=xdim;--x>=0;){
@@ -128,6 +151,7 @@ public class MapEngine {
 				if (map[x][y]==2){
 
 					map[x][y] = id;
+					sensedDictHQ.put(new MapLocation(x,y), id);
 					int sum = 0; 
 					sum |= propagateVoid(x-1, y, id);
 					sum |= propagateVoid(x, y-1, id) << 1;

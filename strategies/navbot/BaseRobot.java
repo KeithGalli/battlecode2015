@@ -10,7 +10,7 @@ import battlecode.common.RobotType;
 public abstract class BaseRobot {
 
 	public static int TESTCHANNEL = 2000;
-	public static int REFCHANNEL = 20000;
+	//public static int REFCHANNEL = 20000;
 
 	public static int SUPPLYDEPOT_COST = 100;
 	public static int TECHNOLOGYINSTITUTE_COST = 200;
@@ -45,10 +45,6 @@ public abstract class BaseRobot {
 		Functions.init(this);
 		BroadcastSystem.init(this);
 
-		// DataCache.init(this); // this must come first
-		// BroadcastSystem.init(this);
-		// Functions.init(rc);
-		
 	}
 
 	// Actions for a specific robot

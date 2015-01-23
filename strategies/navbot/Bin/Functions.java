@@ -38,6 +38,8 @@ public class Functions {
         }
     }
 
+    //NOT USED YET
+    //TAKES IN AN ARRAY OF MAPLOCATIONS AND OUTPUTS A SINGLE INTEGER
     public static int locsToInt(MapLocation[] pastrs){
          int pastrInt = 0;
          int multiplier = 1;
@@ -57,6 +59,13 @@ public class Functions {
      //     return pastrs;
      // }
      
+     //PURPOSE:
+     //Used in NavSystem to find the closest waypoint
+     //INPUTS:
+     //MapLocation[] manyLocs: array of MapLocations to find the closest one.
+     //MapLocation point: the reference point.
+     //OUTPUTS:
+    //Maplocation: the closest maplocation in manyLocs to point.
         public static MapLocation findClosest(MapLocation[] manyLocs, MapLocation point){
             int closestDist = 10000000;
             int challengerDist = closestDist;
@@ -71,16 +80,39 @@ public class Functions {
             return closestLoc;
         }
 
+    //PURPOSE:
+    //Used in NavSystem to convert original to internal
+    //Used in MapEngine to convert original to internal
+    //Used in BroadcastSystem to convert for integer broadcasting
+    //INPUT:
+    //MapLocation m: the original maplocation as given by the battlecode map, example: (-13140,141593)
+    //OUTPUT:
+    //MapLocation: converted maplocation to internal coordinates, example: (30, 40)
     public static MapLocation locToInternalLoc(MapLocation m){
         MapLocation temploc = m.add(-DataCache.mapCenter.x, -DataCache.mapCenter.y);
         return temploc.add(MapEngine.internalMapCenter.x, MapEngine.internalMapCenter.y);
     }
 
+    //PURPOSE:
+    //Used in NavSystem to convert internal to original
+    //Used in MapEngine to convert internal to original
+    //Used in BroadcastSystem to convert from integer broadcasting
+    //INPUT:
+    //MapLocation m: an internal maplocation, example: (30,40)
+    //OUTPUT:
+    //MapLocation: converted maplocation to original maplocation as given by the battlecode map, example: (-13140,141593)
     public static MapLocation internallocToLoc(MapLocation m){
         MapLocation temploc = m.add(DataCache.mapCenter.x, DataCache.mapCenter.y);
         return temploc.add(-MapEngine.internalMapCenter.x, -MapEngine.internalMapCenter.y);
     }
 
+    //PURPOSE:
+    //Used in BroadcastSystem to broadcast maplocations
+    //IMPORTANT: MUST BE AN INTERNAL MAPLOCATION, ORIGINAL MAPLOCATION WILL NOT WORK!
+    //INPUT:
+    //MapLocation m: an internal maplocation, example: (30,40) 
+    //OUTPUT:
+    //int: integer storing the maplocation information
     public static int locToInt(MapLocation m){
             return (m.x*1000 + m.y);
         }
@@ -88,6 +120,8 @@ public class Functions {
             return new MapLocation(i/1000,i%1000);
         }
 
+    //PURPOSE:
+    //Used in debugging to display an array.
     static void displayArray(int[][] intArray){
         for(int y = 0;y<intArray[0].length;y++){
             String line = "";

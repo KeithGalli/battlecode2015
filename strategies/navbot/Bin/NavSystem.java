@@ -93,11 +93,18 @@ public class NavSystem {
 		}
 	}
 
+	public static void resetNav() throws GameActionException{
+		currentWaypoint = new MapLocation(-1, -1);
+		previousWaypoint = new MapLocation(-1, -1);
+		pathToGoal = false;
+		atGoal = false;
+	}
+
 	public static void smartNav(MapLocation goal) throws GameActionException{
 		MapLocation internalGoal = Functions.locToInternalLoc(goal);
 		//rc.setIndicatorString(1, Integer.toString(Functions.locToInt(internalGoal)));
-		rc.setIndicatorString(1, Integer.toString(Functions.locToInt(currentWaypoint)));
-		rc.setIndicatorString(2, Integer.toString(pathExists(DataCache.internalLoc, internalGoal)));
+		//rc.setIndicatorString(1, Integer.toString(Functions.locToInt(currentWaypoint)));
+		//rc.setIndicatorString(2, Integer.toString(pathExists(DataCache.internalLoc, internalGoal)));
 		//rc.setIndicatorString(2, Integer.toString(Functions.locToInt(DataCache.internalLoc)));
 
 		atGoal = false;
