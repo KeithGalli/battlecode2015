@@ -12,6 +12,9 @@ import battlecode.common.Team;
 public class HQRobot extends BaseRobot {
 
 	public static int count= 0;
+	public static int broadcastCount = 0;
+
+	public static MapLocation prevRobotLoc = new MapLocation(-1, -1);
 
 	public static MapLocation testRobotLoc;
 	public static MapLocation testRobotInternalLoc;
@@ -28,12 +31,9 @@ public class HQRobot extends BaseRobot {
 		//Init Systems//
 		NavSystem.HQinit(rc);
 		MapEngine.HQinit(rc);
-		BroadcastSystem.write(2001, 1);
-
-
-		
-
-
+		BroadcastSystem.write(2001, 0);
+		testHQLocs = MapEngine.structScan(rc.getLocation());
+		MapEngine.scanTiles(testHQLocs);
 
 	}
 
@@ -45,68 +45,68 @@ public class HQRobot extends BaseRobot {
 
 			broadcastReady = BroadcastSystem.read(2001);
 
+
 			if (rc.isCoreReady() && rc.getTeamOre() >= 100 && count ==0) {
 				rc.setIndicatorString(0, "trying to spawn");
 				rc.spawn(rc.getLocation().directionTo(DataCache.enemyHQ),RobotType.BEAVER);
 				count = 1;
-	            	//RobotPlayer.trySpawn(RobotPlayer.directions[RobotPlayer.rand.nextInt(8)], RobotType.BEAVER);
         	}
 
-        	if (broadcastReady == 1){
+            //ARBITRARY 100 RD Counter
 
-        		//System.out.println("/////////////////////////");
-        		BroadcastSystem.broadcastMapArray(REFCHANNEL, MapEngine.map);
-        		// System.out.println("Test");
-        		BroadcastSystem.prepareandsendMapDataDict(MapEngine.waypointDictHQ);
-        		//testmap = BroadcastSystem.downloadMapArray(REFCHANNEL);
-        		
-        		// int[][] thirdMap = new int[MapEngine.xdim][MapEngine.ydim];
-        		// for (int x=0;x<MapEngine.xdim;x++){
-        		// 	for (int y=0;y<MapEngine.ydim;y++){
-        		// 		if (MapEngine.map[x][y]==testmap[x][y]){
-        		// 			thirdMap[x][y] = 1;
-        		// 		}
-        		// 		else{
-        		// 			thirdMap[x][y] = 9;
-        		// 		}
-        		// 	}
-        		// }
-        		// System.out.println("/////////////////////////");
-        		// Functions.displayArray(testmap);
-        		// System.out.println("/////////////////////////");
-        		//BroadcastSystem.write(2001, 0);
+        	if (broadcastCount > 100){
+        		broadcastCount = 0;
+
+
+                //senseQueueHQ: [(x1,y1), (x2,y2)] of locations that a robot has been at
+        		for (MapLocation loc: MapEngine.senseQueueHQ){
+        			
+                    //If its a new location
+                    if (!MapEngine.prevSensedLocs.contains(loc)){
+                        //Get all visible tiles from that location
+                        testRobotSeenLocs = MapEngine.unitScan(loc);
+                        //Scan all visible tiles from that location
+                        MapEngine.scanTiles(testRobotSeenLocs);
+                        //Add that location to previously seen locations
+                        MapEngine.prevSensedLocs.add(loc);
+                    }
+        			
+
+        		}
+
+                //Prepare the map for broadcasting.
+        		MapEngine.resetMapAndPrep();
+
+                //Send the map data dict
+        		BroadcastSystem.prepareandsendMapDataDict(MapEngine.sensedDictHQ);
+        		//Send the waypoint data dict
+        		BroadcastSystem.prepareandsendWaypointDict(MapEngine.waypointDictHQ);
+                
+                //Tell the robot the dictionaries are ready for download.
+                BroadcastSystem.write(2001, 1);
         	}
 
 
-
+            //Get the test robots internal loc 
+            //REMEMBER ALL BROADCAST LOCATIONS ARE INTERNAL
         	testRobotInternalLoc = Functions.intToLoc(rc.readBroadcast(TESTCHANNEL));
 
+            //Convert to real maplocation
         	testRobotLoc = Functions.internallocToLoc(testRobotInternalLoc);
-        	//System.out.println(testRobotLoc);
-        	//System.out.println(testRobotLoc);
-        	testHQLocs = MapEngine.structScan(rc.getLocation());
 
-        	testRobotSeenLocs = MapEngine.unitScan(testRobotLoc);
+            //If the robot is at a new location
+            if(!MapEngine.prevSensedLocs.contains(testRobotLoc)){
 
-        		// for (MapLocation loc: testHQLocs){
-        		// 	rc.setIndicatorDot(loc, 255, 255, 255);
-        		// }
-
-        	//System.out.println(testRobotSeenLocs);
-        	//MapEngine.scanTiles(testRobotSeenLocs);
-        	MapEngine.scanTiles(testHQLocs);
-        	MapEngine.scanTiles(testRobotSeenLocs);
-
-        	//System.out.println(MapEngine.waypointDictHQ);
-
-        	// System.out.println("/////////////////////////");
-        	// Functions.displayArray(MapEngine.map);
-        	// System.out.println("/////////////////////////");
-
-        	//System.out.println(testRobotLoc);
-
-
-
+                //if the location is not it's last one
+            	if (prevRobotLoc.x==testRobotLoc.x && prevRobotLoc.y==testRobotLoc.y){
+            		
+            	} else if (prevRobotLoc.x != -1 && prevRobotLoc.y != -1){
+                    //Add it's location to the queue
+            		MapEngine.senseQueueHQ.add(testRobotLoc);
+            	}
+            }
+        	prevRobotLoc = testRobotLoc;
+        	broadcastCount++;
 
 		} catch (Exception e) {
 			//                    System.out.println("caught exception before it killed us:");
