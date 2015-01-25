@@ -9,7 +9,7 @@ import battlecode.common.RobotType;
 
 public abstract class BaseRobot {
 
-	public static int TESTCHANNEL = 2000;
+	public static int DISTRIBUTECHANNEL = 2000;
 	//public static int REFCHANNEL = 20000;
 
 	public static int SUPPLYDEPOT_COST = 100;

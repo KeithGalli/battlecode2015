@@ -21,6 +21,7 @@ public class DataCache {
 
 	public static MapLocation currentLoc;
 	public static MapLocation internalLoc;
+	public static MapLocation prevRobotLoc = new MapLocation(-1, -1);
 
 	public static int xmodifier;
 	public static int ymodifier;
@@ -47,6 +48,29 @@ public class DataCache {
 		currentLoc = rc.getLocation();
 		internalLoc = Functions.locToInternalLoc(currentLoc);
 		//MOVE ENEMYROBOT CHECKING TO HERE
+	}
+
+	public static boolean hasMoved() throws	GameActionException {
+		if (currentLoc.equals(prevRobotLoc)){
+			return false;
+		} else {
+			prevRobotLoc = currentLoc;
+			return true;
+		}
+	}
+
+	public static boolean withinStructRange(MapLocation loc){
+		if (loc.distanceSquaredTo(enemyHQ)<25){
+			return true;
+		} else{
+			for (MapLocation tower: enemyTowers){
+				if (loc.distanceSquaredTo(tower)<25){
+					return true;
+				}
+			}
+
+		}
+		return false;
 	}
 
 	public static void updateSeenLocs(List<MapLocation> newLocs){

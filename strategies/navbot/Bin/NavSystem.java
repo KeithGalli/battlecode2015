@@ -9,6 +9,8 @@ public class NavSystem {
 
 	public static RobotController rc;
 
+	public static MapLocation prevGoal = new MapLocation(-1, -1);
+
 	public static MapLocation currentWaypoint = new MapLocation(-1, -1);
 	public static MapLocation previousWaypoint = new MapLocation(-1, -1);
 
@@ -107,7 +109,15 @@ public class NavSystem {
 	////////////////////////////////////////////////////////////////////////////////////////////////////////
 	//Smart Navigation
 	////////////////////////////////////////////////////////////////////////////////////////////////////////
-	public static void smartNav(MapLocation goal) throws GameActionException{
+	public static void smartNav(MapLocation goal, boolean vip) throws GameActionException{
+		if (!goal.equals(prevGoal)){
+			currentWaypoint=new MapLocation(-1, -1);
+			previousWaypoint=new MapLocation(-1, -1);
+		}
+
+		prevGoal = goal;
+
+
 		MapLocation internalGoal = Functions.locToInternalLoc(goal);
 
 		atGoal = false;
@@ -121,11 +131,20 @@ public class NavSystem {
 			smartPathTo(internalGoal);
 			if(pathToGoal){
 				Direction dir = DataCache.currentLoc.directionTo(goal);
-				snailNav(dir);
+				if (vip){
+					snailVIPNav(dir);
+				} else{ 
+					snailNav(dir);
+				}
+				
 			}
 			else{
 				Direction dir = DataCache.currentLoc.directionTo(Functions.internallocToLoc(currentWaypoint));
-				snailNav(dir);
+				if (vip){
+					snailVIPNav(dir);
+				} else{ 
+					snailNav(dir);
+				}
 			}
 		}
 		if (DataCache.internalLoc.equals(currentWaypoint)){
@@ -139,22 +158,45 @@ public class NavSystem {
 				if(pathToGoal){
 
 					Direction dir = DataCache.currentLoc.directionTo(goal);
-					snailNav(dir);
+					if (vip){
+						snailVIPNav(dir);
+					} else{ 
+						snailNav(dir);
+					}	
 				}
 				else{
 					Direction dir = DataCache.currentLoc.directionTo(Functions.internallocToLoc(currentWaypoint));
-					snailNav(dir);
+					if (vip){
+						snailVIPNav(dir);
+					} else{ 
+						snailNav(dir);
+					}
 				}
 			}
 
 		}
 		else{
-			
+			smartPathTo(internalGoal);
+			if(pathToGoal){
+				Direction dir = DataCache.currentLoc.directionTo(goal);
+				if (vip){
+					snailVIPNav(dir);
+				} else{ 
+					snailNav(dir);
+				}
+			}
 			/////STANDIN IDEALLY WE NEED ANOTHER BREAKPOINT HERE FOR BLIND
-			smartPathTo(currentWaypoint);
+			//
 			/////
-			Direction dir = DataCache.currentLoc.directionTo(Functions.internallocToLoc(currentWaypoint));
-			snailNav(dir);
+			else{
+				smartPathTo(currentWaypoint);
+				Direction dir = DataCache.currentLoc.directionTo(Functions.internallocToLoc(currentWaypoint));
+				if (vip){
+					snailVIPNav(dir);
+				} else{ 
+					snailNav(dir);
+				}
+			}
 		}
 	}
 
@@ -166,11 +208,20 @@ public class NavSystem {
 		snailNav(DataCache.currentLoc.directionTo(loc));
 	}
 
+	public static void dumbVIPNav(MapLocation loc) throws GameActionException{
+		snailVIPNav(DataCache.currentLoc.directionTo(loc));
+	}
+
 	public static void snailNav(Direction chosenDirection) throws GameActionException{
 		tryToMove(chosenDirection, true, rc, directionalLooks, allDirections);
 	}
 
+	public static void snailVIPNav(Direction chosenDirection) throws GameActionException{
+		tryToVIPMove(chosenDirection, true, rc, directionalLooks, allDirections);
+	}
+
 	static ArrayList<MapLocation> snailTrail = new ArrayList<MapLocation>();
+
 
 	static boolean canMove(Direction dir, boolean selfAvoiding,RobotController rc){
 		if(selfAvoiding){
@@ -187,7 +238,43 @@ public class NavSystem {
 		return rc.canMove(dir);
 	}
 
+	static boolean canVIPMove(Direction dir, boolean selfAvoiding,RobotController rc){
+		if(selfAvoiding){
+			MapLocation resultingLocation = rc.getLocation().add(dir);
+			for(int i=0;i<snailTrail.size();i++){
+				MapLocation m = snailTrail.get(i);
+				if(!m.equals(rc.getLocation())){
+					if(resultingLocation.isAdjacentTo(m)||resultingLocation.equals(m)||DataCache.withinStructRange(resultingLocation)){
+						return false;
+					}
+				}
+			}
+		}
+		return rc.canMove(dir);
+	}
+
 	private static void tryToMove(Direction chosenDirection,boolean selfAvoiding,RobotController rc, int[] directionalLooks, Direction[] allDirections) throws GameActionException{
+		while(snailTrail.size()<2)
+			snailTrail.add(new MapLocation(-1,-1));
+		if(rc.isCoreReady()){
+			snailTrail.remove(0);
+			snailTrail.add(rc.getLocation());
+			for(int directionalOffset:directionalLooks){
+
+				int forwardInt = chosenDirection.ordinal();
+				Direction trialDir = allDirections[(forwardInt+directionalOffset+8)%8];
+				if(canMove(trialDir,selfAvoiding,rc)){
+
+					rc.move(trialDir);
+
+					break;
+				}
+
+			}
+		}
+	}
+
+	private static void tryToVIPMove(Direction chosenDirection,boolean selfAvoiding,RobotController rc, int[] directionalLooks, Direction[] allDirections) throws GameActionException{
 		while(snailTrail.size()<2)
 			snailTrail.add(new MapLocation(-1,-1));
 		if(rc.isCoreReady()){

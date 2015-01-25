@@ -14,7 +14,6 @@ public class RobotPlayer {
 	static int myRange;
 	static Random rand;
 	static MapLocation[] theMap;
-    static Direction[] directions = {Direction.NORTH, Direction.NORTH_EAST, Direction.EAST, Direction.SOUTH_EAST, Direction.SOUTH, Direction.SOUTH_WEST, Direction.WEST, Direction.NORTH_WEST};
 
 
 	static int numUnknown=0;
@@ -156,18 +155,7 @@ public class RobotPlayer {
         	//e.printStackTrace();
     	}
     }
-    static void trySpawn(Direction d, RobotType type) throws GameActionException {
-        int offsetIndex = 0;
-        int[] offsets = {0,1,-1,2,-2,3,-3,4};
-        int dirint = Functions.directionToInt(d);
-        boolean blocked = false;
-        while (offsetIndex < 8 && !rc.canSpawn(directions[(dirint+offsets[offsetIndex]+8)%8], type)) {
-            offsetIndex++;
-        }
-        if (offsetIndex < 8) {
-            rc.spawn(directions[(dirint+offsets[offsetIndex]+8)%8], type);
-        }
-    }
+    
     
 }
 
