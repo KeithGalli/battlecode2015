@@ -37,7 +37,7 @@ public class TANKRobot extends BaseRobot {
             }
             if (enemyRobots.length>0) {
                 if (rc.isWeaponReady()) {
-                    attackLeastHealthEnemy(enemyRobots);
+                    attackLeastHealthEnemyTanks(enemyRobots);
                 }
             }
             if (rc.isCoreReady()) {
@@ -47,7 +47,6 @@ public class TANKRobot extends BaseRobot {
             }
             if (Clock.getRoundNum() < 1400) {
                 if (rc.isCoreReady()) {
-
                     if (supplyLevel < 50 && currentLocation.distanceSquaredTo(this.myHQ)<30) {
                         NavSystem.dumbNav(this.myHQ);
                     } else if (rc.senseNearbyRobots(20, this.theirTeam).length < 1 ) {

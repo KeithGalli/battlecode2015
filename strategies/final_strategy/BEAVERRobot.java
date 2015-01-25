@@ -32,6 +32,7 @@ public class BEAVERRobot extends BaseRobot {
 	@Override
 	public void run() {
 		try {
+		    boolean building = false;
 			if(rc.isCoreReady()){
 				double ore = rc.getTeamOre();
 //				int minerFactories = rc.readBroadcast(MINER_FACT_PREVIOUS_CHAN);
@@ -49,44 +50,58 @@ public class BEAVERRobot extends BaseRobot {
 	                    attackLeastHealthEnemy(enemyRobots);
 	                }
 			    } else if (rc.hasBuildRequirements(RobotType.MINERFACTORY) && minerFactoriesBuilt <2) {
-                    Direction buildDirection = getBuildDirection(RobotType.MINERFACTORY);
+			        System.out.println(building);
+                    Direction buildDirection = getBuildDirectionCheckerBoard(RobotType.MINERFACTORY);
                     if (buildDirection!=null) {
                         rc.build(buildDirection, RobotType.MINERFACTORY);
                         rc.broadcast(40, minerFactoriesBuilt+1);
-                    }			        
+                        building=true;
+                    }			   
+                    System.out.println(building);
 			    } else if (rc.hasBuildRequirements(RobotType.HELIPAD) && helipadsBuilt < 1) {
-                    Direction buildDirection = getBuildDirection(RobotType.HELIPAD);
+			        System.out.println(building);
+                    Direction buildDirection = getBuildDirectionCheckerBoard(RobotType.HELIPAD);
                     if (buildDirection!=null) {
                         rc.build(buildDirection, RobotType.HELIPAD);
                         rc.broadcast(43, helipadsBuilt+1);
-                    }     
+                        building=true;
+                    }
+                    System.out.println(building);
 			    } else if (rc.hasBuildRequirements(RobotType.SUPPLYDEPOT) && supplyDepotsBuilt < 2) {
-                    Direction buildDirection = getBuildDirection(RobotType.SUPPLYDEPOT);
+                    Direction buildDirection = getBuildDirectionCheckerBoard(RobotType.SUPPLYDEPOT);
                     if (buildDirection!=null) {
                         rc.build(buildDirection, RobotType.SUPPLYDEPOT);
                         rc.broadcast(44, supplyDepotsBuilt+1);
-
+                        building=true;
                     }     			        
 			    } else if (rc.hasBuildRequirements(RobotType.BARRACKS) && barracksBuilt < 1) {
-                    Direction buildDirection = getBuildDirection(RobotType.BARRACKS);
+                    Direction buildDirection = getBuildDirectionCheckerBoard(RobotType.BARRACKS);
                     if (buildDirection!=null) {
                         rc.build(buildDirection, RobotType.BARRACKS);
                         rc.broadcast(41, barracksBuilt+1);
+                        building=true;
                     }       
 			    } else if (rc.hasBuildRequirements(RobotType.TANKFACTORY) && tankFactoriesBuilt < 4) {
-			        Direction buildDirection = getBuildDirection(RobotType.TANKFACTORY);
+			        Direction buildDirection = getBuildDirectionCheckerBoard(RobotType.TANKFACTORY);
 			        if (buildDirection != null) {
 			            rc.build(buildDirection, RobotType.TANKFACTORY);
 			            rc.broadcast(42, tankFactoriesBuilt+1);
+			            building=true;
 			        }
-			    } else if(rc.senseOre(rc.getLocation())>2){
-				    rc.mine();
-				} else if(rc.getLocation().distanceSquaredTo(rc.senseHQLocation())> 22){
-			        RobotPlayer.tryMove(rc.getLocation().directionTo(rc.senseHQLocation()));
-				} else{
-					RobotPlayer.tryMove(RobotPlayer.directions[RobotPlayer.rand.nextInt(8)]);
+			    } 
+			    if (!building) {
+			        
+			        System.out.println("I'm here!!!");
+	                if(rc.senseOre(rc.getLocation())>5){
+	                    rc.mine();
+	                } else if(rc.getLocation().distanceSquaredTo(rc.senseHQLocation())> 22){
+	                    RobotPlayer.tryMove(rc.getLocation().directionTo(rc.senseHQLocation()));
+	                } else{
+	                    System.out.println("inside move randomly");
+	                    moveRandomly();
+	                }			        
+			    }
 
-				}
 
 			}
 			//transferSupplies(rc);

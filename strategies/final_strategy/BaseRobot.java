@@ -63,6 +63,7 @@ public abstract class BaseRobot {
     public int startSupplierQueue;
     public int endSupplierQueue;
     public int supplierID;
+    Direction[] udlrDirections = {Direction.NORTH, Direction.EAST, Direction.WEST, Direction.SOUTH};
     //private static HashSet<MapLocation> enemyTerritory = new HashSet<MapLocation>();
     
 
@@ -140,6 +141,15 @@ public abstract class BaseRobot {
 
     }
     
+    public static void moveRandomly() throws GameActionException {
+        Direction[] directions = RobotPlayer.directions;
+        Collections.shuffle(Arrays.asList(directions));
+        for (Direction dir : directions) {
+            if (rc.canMove(dir))
+                rc.move(dir);
+        }
+    }
+    
 
     
     public int senseNearbyTowers(MapLocation currentLocation, Direction direction) {
@@ -209,6 +219,31 @@ public abstract class BaseRobot {
         }
         return null;
     }
+    
+    public Direction getBuildDirectionCheckerBoard(RobotType type) throws GameActionException {
+        Direction[] dirs = RobotPlayer.directions;
+        for (Direction d : dirs) {
+            if (buildDirectionCheck(d)) {
+                return d;
+            }
+            
+        }
+        return null;
+    }
+    
+    public boolean buildDirectionCheck(Direction direction) throws GameActionException {
+        int count = 0;
+        for (Direction d : udlrDirections) {
+            MapLocation surroundingPosition = rc.getLocation().add(direction).add(d);
+            RobotInfo robotAtPosition = rc.senseRobotAtLocation(surroundingPosition);
+            if (robotAtPosition==null&& rc.senseTerrainTile(surroundingPosition).isTraversable()) {
+                count+=1;
+            } else if (robotAtPosition!=null && robotAtPosition.type.canMove()) {
+                count+=1;
+            }
+        }
+        return (count>=3);
+    }
 
     public RobotInfo[] getAllies() {
         RobotInfo[] allies = rc.senseNearbyRobots(Integer.MAX_VALUE, myTeam);
@@ -238,6 +273,32 @@ public abstract class BaseRobot {
             if (info.health < minEnergon) {
                 toAttack = info.location;
                 minEnergon = info.health;
+            }
+        }
+
+        rc.attackLocation(toAttack);
+    }
+    
+    public void attackLeastHealthEnemyTanks(RobotInfo[] enemies) throws GameActionException {
+        if (enemies.length==0) {
+            return;
+        }
+        double minHealth = Double.MAX_VALUE;
+        MapLocation toAttack = null;
+        for (RobotInfo info : enemies) {
+            if(info.type == RobotType.TOWER){
+                rc.attackLocation(info.location);
+                return;
+            } else if(info.type == RobotType.HQ){
+                rc.attackLocation(info.location);
+                return;
+            } else if (info.type==RobotType.LAUNCHER) {
+                rc.attackLocation(info.location);
+                return;
+            }
+            if (info.health < minHealth) {
+                toAttack = info.location;
+                minHealth = info.health;
             }
         }
 
