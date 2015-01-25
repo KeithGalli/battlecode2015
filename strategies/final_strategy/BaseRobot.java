@@ -223,7 +223,7 @@ public abstract class BaseRobot {
     public Direction getBuildDirectionCheckerBoard(RobotType type) throws GameActionException {
         Direction[] dirs = RobotPlayer.directions;
         for (Direction d : dirs) {
-            if (buildDirectionCheck(d)) {
+            if (buildDirectionCheck(d) && rc.canBuild(d, RobotType.SUPPLYDEPOT)) {
                 return d;
             }
             

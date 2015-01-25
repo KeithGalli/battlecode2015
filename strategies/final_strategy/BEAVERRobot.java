@@ -89,15 +89,13 @@ public class BEAVERRobot extends BaseRobot {
 			            building=true;
 			        }
 			    } 
-			    if (!building) {
-			        
-			        System.out.println("I'm here!!!");
-	                if(rc.senseOre(rc.getLocation())>5){
+			    if (!building) {		        
+	                if(rc.senseOre(rc.getLocation())>3){
+	                    System.out.println("ore " + rc.senseOre(rc.getLocation()));
 	                    rc.mine();
-	                } else if(rc.getLocation().distanceSquaredTo(rc.senseHQLocation())> 22){
+	                } else if(rc.getLocation().distanceSquaredTo(rc.senseHQLocation())> 18){
 	                    RobotPlayer.tryMove(rc.getLocation().directionTo(rc.senseHQLocation()));
 	                } else{
-	                    System.out.println("inside move randomly");
 	                    moveRandomly();
 	                }			        
 			    }
