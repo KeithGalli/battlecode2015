@@ -130,7 +130,66 @@ public class Functions {
                 int i = intArray[x][y];
                 if((Integer)i==null){//a path
                     line+="X";
-                }else{
+                }
+                else{
+                    line+=i;
+                }
+            }
+            System.out.println(line);
+        }
+    }
+
+     //PURPOSE:
+    //Used in debugging to display an array.
+    static void displayWallArray(int[][] intArray){
+        for(int y = 0;y<intArray[0].length;y++){
+            String line = "";
+            for(int x=0;x<intArray.length;x++){
+                //line+=(voidID[x][y]==-1)?"_":".";
+                int i = intArray[x][y];
+                if((Integer)i==null){//a path
+                    line+="X";
+                }
+
+                else if(i<-1){
+                    line+=1;
+                }
+
+                else if(i>9){
+                    line+=9;
+                }
+
+                else{
+                    line+=i;
+                }
+            }
+            System.out.println(line);
+        }
+    }
+
+
+     //PURPOSE:
+    //Used in debugging to display an array.
+    static void displayOREArray(int[][] intArray){
+        for(int y = 0;y<intArray[0].length;y++){
+            String line = "";
+            for(int x=0;x<intArray.length;x++){
+                //line+=(voidID[x][y]==-1)?"_":".";
+                int i = intArray[x][y];
+                if((Integer)i==null){//a path
+                    line+="X";
+                }
+
+                else if(i<-9){
+                    line+=8;
+                }
+                else if(i<-1){
+                    line+=-i-1;
+                } else if (i>1){
+                    line+=9;
+                }
+
+                else{
                     line+=i;
                 }
             }

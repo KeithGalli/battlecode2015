@@ -23,6 +23,8 @@ public class BroadcastSystem {
 	//channel that we send map data
 	public static int dataBand = 30000;
 
+	public static int dataBandORE = 40000;
+
 	//sending the map dimensions
 	public static int xdimBand = 205;
 	public static int ydimBand = 206;
@@ -107,6 +109,44 @@ public class BroadcastSystem {
 	// 	}
 	// 	return dataArray;
 	// }
+
+	public static void prepareandsendLocsDataList(List<MapLocation> dataList, int refchannel){
+		if (dataList.size()==0){
+			write(refchannel, -1);
+		}else {
+			write(refchannel, dataList.size());
+			int count = 1;
+
+			for (MapLocation loc: dataList){
+				write(refchannel+count, Functions.locToInt(Functions.locToInternalLoc(loc)));
+				count++;
+			}
+		}
+	}
+
+	public static int receiveLocsDataList(int refchannel){
+		int size = BroadcastSystem.read(refchannel);
+		if (size == -1){
+			return 1;
+		}
+		if (size==0){
+			return 0;
+		}
+		else{
+		//System.out.println(size);
+			int count = 1;
+			for (int i=0; i<size; i++){
+
+				MapLocation loc = Functions.internallocToLoc(Functions.intToLoc(read(refchannel+count)));
+				if(!MapEngine.senseQueueHQ.contains(loc)){
+					MapEngine.senseQueueHQ.add(loc);
+				}
+				count++;
+			}
+			BroadcastSystem.write(refchannel,0);
+			return 1;
+		}
+	}
 	
 	
 	
@@ -115,18 +155,18 @@ public class BroadcastSystem {
 	//USED IN: method for HQ to send map information (normals, void numbers, etc)
 	//CHANNELS: dataBand + 2*dataDict.size() + 1
 
-	public static void prepareandsendMapDataDict(Dictionary<MapLocation, Integer> dataDict){
-		write(dataBand, dataDict.size());
+	public static void prepareandsendMapDataDict(Dictionary<MapLocation, Integer> dataDict, int refchannel){
+		write(refchannel, dataDict.size());
 		int count = 1;
 
 		Enumeration<MapLocation> enumKey = dataDict.keys();
 		while(enumKey.hasMoreElements()){
 			MapLocation key = enumKey.nextElement();
 			Integer val = dataDict.get(key);
-			write(dataBand+count, Functions.locToInt(key));
+			write(refchannel+count, Functions.locToInt(key));
 
 			count++;
-			write(dataBand+count, val);
+			write(refchannel+count, val);
 
 			count++;
 		}
@@ -136,16 +176,16 @@ public class BroadcastSystem {
 	//USED IN: method for robots to efficiently download map information
 	//CHANNELS: dataBand + 2*dataDict.size() + 1
 
-	public static void receiveMapDataDict(){
-		int size = BroadcastSystem.read(dataBand);
+	public static void receiveMapDataDict(int refchannel){
+		int size = BroadcastSystem.read(refchannel);
 		//System.out.println(size);
 		int count = 1;
 		for (int i=0; i<size; i++){
 
 
-			MapLocation loc = Functions.intToLoc(read(dataBand+count));
+			MapLocation loc = Functions.intToLoc(read(refchannel+count));
 			count++;
-			int val = read(dataBand+count);
+			int val = read(refchannel+count);
 
 			count++;
 			MapEngine.map[loc.x][loc.y] = val;

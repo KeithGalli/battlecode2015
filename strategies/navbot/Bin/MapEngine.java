@@ -26,6 +26,8 @@ public class MapEngine {
 	public static int xmod = 0;
 	public static int ymod = 0;
 
+	public static double ore = 0;
+
 	public static int voidID=3;
 
 	public static int xdim;
@@ -37,11 +39,15 @@ public class MapEngine {
 
 	//Used to high-level eliminate certain locations before calling getAllMapLocations
 	public static List<MapLocation> prevSensedLocs = new ArrayList<MapLocation>();
+
+	public static List<MapLocation> prevSensedORELocs = new ArrayList<MapLocation>();
 	//Populated with robot locations, and reset each time the map is updated
 	public static List<MapLocation> senseQueueHQ=new ArrayList<MapLocation>();
+	public static List<MapLocation> senseQueue = new ArrayList<MapLocation>();
 
 	//Dictionary of (x,y): # for all sensed coordinates
-	public static Dictionary<MapLocation,Integer> sensedDictHQ = new Hashtable<MapLocation,Integer>();
+	public static Dictionary<MapLocation,Integer> sensedMAINDictHQ = new Hashtable<MapLocation,Integer>();
+	public static Dictionary<MapLocation,Integer> sensedOREDictHQ = new Hashtable<MapLocation,Integer>();
 
 	//Key: integer represeting the "wall" from (3, infinity)
 	//Value: MapLocation[] or ArrayList representing waypoints (or wall corners)
@@ -82,6 +88,36 @@ public class MapEngine {
 		map = new int[xdim][ydim];
 	}
 
+	public static void resetOreList(){
+		prevSensedORELocs = new ArrayList<MapLocation>();
+	}
+
+	public static void reportOreMapGivenLoc(MapLocation givenLoc, int refchannel){
+		//resetSensedOREDict();
+		MapLocation[] locs = unitScan(givenLoc);
+		for (MapLocation loc: locs){
+			MapLocation internalLoc = Functions.locToInternalLoc(loc);
+			//System.out.println(loc);
+			if (internalLoc.x<xdim && internalLoc.y<ydim && internalLoc.x>-1 && internalLoc.y>-1){
+				if (map[internalLoc.x][internalLoc.y]<-1){
+					ore = rc.senseOre(loc);
+					map[internalLoc.x][internalLoc.y]=- (int) ore-3;
+					sensedOREDictHQ.put(new MapLocation(internalLoc.x,internalLoc.y), map[internalLoc.x][internalLoc.y]);
+				}
+			}
+		}
+		//System.out.println("MAPENG TEST");
+	}
+
+	//PURPOSE: prepare the map and waypoint dictionary for broadcasting
+	//USED IN: HQRobot
+	public static void resetSenseQueue(){
+		//reset the sense queue, since this will only be called after iterating through all senseable locations
+		senseQueue = new ArrayList<MapLocation>();
+		
+	}
+
+
 	//PURPOSE: prepare the map and waypoint dictionary for broadcasting
 	//USED IN: HQRobot
 	public static void resetMapAndPrep(){
@@ -107,17 +143,26 @@ public class MapEngine {
 			if (map[internalTile.x][internalTile.y] == 0){
 				TerrainTile tileType = rc.senseTerrainTile(tile);
 				if (tileType == TerrainTile.NORMAL){
-					map[internalTile.x][internalTile.y] = 1;
+					ore = rc.senseOre(tile);
+					map[internalTile.x][internalTile.y] = - (int) ore-3;
 				} else if (tileType == TerrainTile.VOID){
 					map[internalTile.x][internalTile.y] = 2;
 				} else if (tileType == TerrainTile.OFF_MAP){
 					map[internalTile.x][internalTile.y] = -1;
 				}
-				sensedDictHQ.put(internalTile, map[internalTile.x][internalTile.y]);
+				sensedMAINDictHQ.put(internalTile, map[internalTile.x][internalTile.y]);
 
 			}
 		}
 		}
+	}
+
+	public static void resetSensedMAINDict(){
+		sensedMAINDictHQ = new Hashtable<MapLocation,Integer>();
+	}
+
+	public static void resetSensedOREDict(){
+		sensedOREDictHQ = new Hashtable<MapLocation,Integer>();
 	}
 
 	//Purpose: reset all the void "wall" numbers. This is because sometimes as you discover new void tiles, no matter how you iterate
@@ -125,7 +170,7 @@ public class MapEngine {
 	public static void resetVoidNums(){
 		for(int x=xdim;--x>=0;){
 			for(int y=ydim;--y>=0;){
-				if (map[x][y]>1){
+				if (map[x][y]>2){
 					map[x][y]=2;
 				}
 			}
@@ -156,7 +201,7 @@ public class MapEngine {
 				if (map[x][y]==2){
 
 					map[x][y] = id;
-					sensedDictHQ.put(new MapLocation(x,y), id);
+					sensedMAINDictHQ.put(new MapLocation(x,y), id);
 					int sum = 0; 
 					sum |= propagateVoid(x-1, y, id);
 					sum |= propagateVoid(x, y-1, id) << 1;
