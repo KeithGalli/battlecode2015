@@ -26,6 +26,15 @@ public class DataCache {
 	public static int xmodifier;
 	public static int ymodifier;
 
+
+	public static MapLocation bestOreLoc = new MapLocation(-1, -1);
+
+	public static MapLocation secondbestOreLoc = new MapLocation(-1, -1);
+	
+	public static MapLocation thirdbestOreLoc = new MapLocation(-1, -1);
+
+
+
 	public static List<MapLocation> seenLocs=new ArrayList<MapLocation>();
 
 
@@ -41,12 +50,16 @@ public class DataCache {
 		mapCenter = new MapLocation((ourHQ.x+enemyHQ.x)/2, (ourHQ.y+enemyHQ.y)/2);
 		xmodifier = ourHQ.x;
 		ymodifier = ourHQ.y;
+
 	}
 
 	//UPDATE CURRENT LOCATION
 	public static void updateRoundVariables() throws GameActionException {
 		currentLoc = rc.getLocation();
 		internalLoc = Functions.locToInternalLoc(currentLoc);
+
+		int myAliveCount = BroadcastSystem.read(BroadcastSystem.myAliveChannel);
+		BroadcastSystem.write(BroadcastSystem.myAliveChannel,myAliveCount+1);
 		//MOVE ENEMYROBOT CHECKING TO HERE
 	}
 

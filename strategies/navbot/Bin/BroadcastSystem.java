@@ -21,19 +21,45 @@ public class BroadcastSystem {
 	public static int waypointBand = 10000;
 
 	//channel that we send map data
-	public static int dataBand = 30000;
+	public static int dataBand = 15000;
 
-	public static int dataBandORE = 40000;
+	public static int bigBand = 25000;
+
 
 	//sending the map dimensions
 	public static int xdimBand = 205;
 	public static int ydimBand = 206;
+
+	public static int robotCountBand = 210;
+	public static int structCountBand = 209;
+	public static int distributionBand = 211;
+
+	public static int hqBand = 220;
+	public static int broadcastBand = 208;
+
+
+	public static int minxBand = 230;
+	public static int minyBand = 231;
+	public static int maxxBand = 232;
+	public static int maxyBand = 233;
+
+	public static int structureRefBand = 800;
+	public static int unitInstrRefBand = 1000;
+	public static int unitAliveRefBand = 3000;
+	public static int unitCollectingRefBand = 5000;
+	public static int myInstrChannel;
+	public static int myAliveChannel;
+	public static int myCollectingChannel;
+
 
 
 	//INITIALIZATION
 	public static void init(BaseRobot myRobot) {
 		robot = myRobot;
 		rc = robot.rc;
+		myInstrChannel = BroadcastSystem.read(distributionBand);
+		myAliveChannel = myInstrChannel+2000;
+		myCollectingChannel = myInstrChannel+4000;
 	}
 
 	//READ BROADCAST w/ error message
@@ -58,6 +84,14 @@ public class BroadcastSystem {
 				                  e.printStackTrace();
 			}
 		}
+	}
+
+	static void setCollecting() throws GameActionException{
+		write(myCollectingChannel, 1);
+	}
+
+	static void setNotCollecting() throws GameActionException{
+		write(myCollectingChannel, 0);
 	}
 
 	//Broadcast a 2D array of information
@@ -138,7 +172,7 @@ public class BroadcastSystem {
 			for (int i=0; i<size; i++){
 
 				MapLocation loc = Functions.internallocToLoc(Functions.intToLoc(read(refchannel+count)));
-				if(!MapEngine.senseQueueHQ.contains(loc)){
+				if(!MapEngine.senseQueueHQ.contains(loc)&&!MapEngine.prevSensedLocs.contains(loc)){
 					MapEngine.senseQueueHQ.add(loc);
 				}
 				count++;
