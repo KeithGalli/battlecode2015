@@ -15,6 +15,53 @@ public class Functions {
         rc = robot.rc;
     }
 
+    public static RobotType consToRobot(int cons){
+        if (cons==1){
+            return RobotType.AEROSPACELAB;
+        } else if (cons==2){
+            return RobotType.BARRACKS;
+        } else if (cons==3){
+            return RobotType.BASHER; 
+        } else if (cons==4){
+            return RobotType.BEAVER;
+        } else if (cons==5){
+            return RobotType.COMMANDER;
+        } else if (cons==6){
+            return RobotType.COMPUTER;
+        } else if (cons==7){
+            return RobotType.DRONE;
+        } else if (cons==8){
+            return RobotType.HANDWASHSTATION;
+        } else if (cons==9){
+            return RobotType.HELIPAD;
+        } else if (cons==10){
+            return RobotType.HQ;
+        } else if (cons==11){
+            return RobotType.LAUNCHER;
+        } else if (cons==12){
+            return RobotType.MINER;
+        } else if (cons==13){
+            return RobotType.MINERFACTORY;
+        } else if (cons==14){
+            return RobotType.MISSILE;
+        } else if (cons==15){
+            return RobotType.SOLDIER;
+        } else if (cons==16){
+            return RobotType.SUPPLYDEPOT;
+        } else if (cons==17){
+            return RobotType.TANK;
+        } else if (cons==18){
+            return RobotType.TANKFACTORY;
+        } else if (cons==19){
+            return RobotType.TECHNOLOGYINSTITUTE;
+        } else if (cons==20){
+            return RobotType.TOWER;
+        } else if (cons==21){
+            return RobotType.TRAININGFIELD;
+        }
+        return null;
+    }
+
     static int directionToInt(Direction d) {
         switch(d) {
             case NORTH:
@@ -154,6 +201,9 @@ public class Functions {
                 else if(i<-1){
                     line+=1;
                 }
+                else if (i==-1){
+                    line+="-";
+                }
 
                 else if(i>9){
                     line+=9;
@@ -184,7 +234,7 @@ public class Functions {
                     line+=8;
                 }
                 else if(i<-1){
-                    line+=-i-1;
+                    line+=-i-3;
                 } else if (i>1){
                     line+=9;
                 }

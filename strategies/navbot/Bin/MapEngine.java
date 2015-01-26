@@ -35,7 +35,10 @@ public class MapEngine {
 
 	public static int[][] map;
 
+	public static double[][] oreDensityMap;
+
 	public static MapLocation internalMapCenter;
+
 
 	//Used to high-level eliminate certain locations before calling getAllMapLocations
 	public static List<MapLocation> prevSensedLocs = new ArrayList<MapLocation>();
@@ -47,7 +50,6 @@ public class MapEngine {
 
 	//Dictionary of (x,y): # for all sensed coordinates
 	public static Dictionary<MapLocation,Integer> sensedMAINDictHQ = new Hashtable<MapLocation,Integer>();
-	public static Dictionary<MapLocation,Integer> sensedOREDictHQ = new Hashtable<MapLocation,Integer>();
 
 	//Key: integer represeting the "wall" from (3, infinity)
 	//Value: MapLocation[] or ArrayList representing waypoints (or wall corners)
@@ -72,6 +74,11 @@ public class MapEngine {
 		BroadcastSystem.write(BroadcastSystem.xdimBand, xdim);
 		BroadcastSystem.write(BroadcastSystem.ydimBand, ydim);
 
+		BroadcastSystem.write(BroadcastSystem.minxBand, minx);
+		BroadcastSystem.write(BroadcastSystem.minyBand, miny);
+		BroadcastSystem.write(BroadcastSystem.maxxBand, maxx);
+		BroadcastSystem.write(BroadcastSystem.maxyBand, maxy);
+
 	}
 	public static void STRUCTinit(RobotController myRC) {
 		rc = myRC;
@@ -86,14 +93,55 @@ public class MapEngine {
 		//Find the center, this is for converting from original maplocation to internal.
 		internalMapCenter = new MapLocation(xdim/2, ydim/2);
 		map = new int[xdim][ydim];
+		
 	}
+
+
+	public static void makeOreDensityMap(){
+		for(int x=xdim;--x>=0;){
+			for(int y=ydim;--y>=0;){
+				oreDensityMap[x][y] = calcOREDensity(x,y);
+			}
+
+		}
+
+	}
+
+	public static void setBestOreLocs(){
+		double bestOreNum = -1;
+		double secondbestOreNum = -1;
+		double thirdbestOreNum = -1;
+		DataCache.bestOreLoc= new MapLocation(-1, -1);
+		DataCache.secondbestOreLoc = new MapLocation(-1, -1);
+		DataCache.thirdbestOreLoc= new MapLocation(-1, -1);
+		for(int x=xdim;--x>=0;){
+			for(int y=ydim;--y>=0;){
+				if (oreDensityMap[x][y]>bestOreNum){
+					thirdbestOreNum = secondbestOreNum;
+					DataCache.thirdbestOreLoc = DataCache.secondbestOreLoc;
+					secondbestOreNum = bestOreNum;
+					DataCache.secondbestOreLoc = DataCache.bestOreLoc;
+					bestOreNum = oreDensityMap[x][y];
+					DataCache.bestOreLoc = new MapLocation(x,y);
+				} else if (oreDensityMap[x][y]>secondbestOreNum){
+					thirdbestOreNum = secondbestOreNum;
+					DataCache.thirdbestOreLoc = DataCache.secondbestOreLoc;
+					secondbestOreNum = oreDensityMap[x][y];
+					DataCache.secondbestOreLoc = new MapLocation(x,y);
+				} else if (oreDensityMap[x][y]>thirdbestOreNum){
+					thirdbestOreNum = oreDensityMap[x][y];
+					DataCache.thirdbestOreLoc = new MapLocation(x,y);
+				}
+			}
+		}
+	}
+
 
 	public static void resetOreList(){
 		prevSensedORELocs = new ArrayList<MapLocation>();
 	}
 
-	public static void reportOreMapGivenLoc(MapLocation givenLoc, int refchannel){
-		//resetSensedOREDict();
+	public static void rescanOreMapGivenLoc(MapLocation givenLoc){
 		MapLocation[] locs = unitScan(givenLoc);
 		for (MapLocation loc: locs){
 			MapLocation internalLoc = Functions.locToInternalLoc(loc);
@@ -102,7 +150,6 @@ public class MapEngine {
 				if (map[internalLoc.x][internalLoc.y]<-1){
 					ore = rc.senseOre(loc);
 					map[internalLoc.x][internalLoc.y]=- (int) ore-3;
-					sensedOREDictHQ.put(new MapLocation(internalLoc.x,internalLoc.y), map[internalLoc.x][internalLoc.y]);
 				}
 			}
 		}
@@ -157,12 +204,30 @@ public class MapEngine {
 		}
 	}
 
-	public static void resetSensedMAINDict(){
-		sensedMAINDictHQ = new Hashtable<MapLocation,Integer>();
+	public static double calcOREDensity(int x, int y){
+		if (map[x][y]<-1){
+
+			double oreDensity = - map[x][y] - 3;
+			for (int i=-3;i<4;i++){
+				for (int j=-3;j<4;j++){
+					if (i!=0 && j!=0){
+						if ((x+i)<xdim && (y+j)<ydim && (x+i)>-1 && (y+j)>-1){
+							if (map[x+i][y+j]<-1){
+								oreDensity += (-map[x+i][y+j]-3)/Math.sqrt(Math.pow(i,2)+Math.pow(j,2));
+							}
+						}
+					}
+				}
+			}
+			return oreDensity;
+		} else{
+			return 0;
+		}
+		
 	}
 
-	public static void resetSensedOREDict(){
-		sensedOREDictHQ = new Hashtable<MapLocation,Integer>();
+	public static void resetSensedMAINDict(){
+		sensedMAINDictHQ = new Hashtable<MapLocation,Integer>();
 	}
 
 	//Purpose: reset all the void "wall" numbers. This is because sometimes as you discover new void tiles, no matter how you iterate
@@ -295,6 +360,7 @@ public class MapEngine {
 		}
 		//initialized to 0. we'll do 1 for void and 2 for normal. 0 for unknown.
 		map = new int[xdim][ydim];
+		oreDensityMap = new double[xdim][ydim];
 		internalMapCenter = new MapLocation(xdim/2, ydim/2);
 
 	}
