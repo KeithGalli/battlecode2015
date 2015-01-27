@@ -95,17 +95,17 @@ public abstract class BaseRobot {
         return oreDensity;
     }
     
-    public MapLocation getBestOreLocation(MapLocation location) {
-        MapLocation[] surroundingLocations = MapLocation.getAllMapLocationsWithinRadiusSq(location, 15);
-        Collections.shuffle(Arrays.asList(surroundingLocations));
-        MapLocation moveLocation = surroundingLocations[0];
-        for (MapLocation loc: surroundingLocations) {
-            if (rc.senseOre(loc)>4) {
-                moveLocation = loc;
-            }
-        }
-        return moveLocation;
-    }
+//    public MapLocation getBestOreLocation(MapLocation location) {
+//        MapLocation[] surroundingLocations = MapLocation.getAllMapLocationsWithinRadiusSq(location, 15);
+//        Collections.shuffle(Arrays.asList(surroundingLocations));
+//        MapLocation moveLocation = surroundingLocations[0];
+//        for (MapLocation loc: surroundingLocations) {
+//            if (rc.senseOre(loc)>4) {
+//                moveLocation = loc;
+//            }
+//        }
+//        return moveLocation;
+//    }
     
     public MapLocation getOurClosestTowerToThem() {
         MapLocation[] ourTowers = rc.senseTowerLocations();
@@ -166,14 +166,7 @@ public abstract class BaseRobot {
         return count;
     }
     
-    public int distanceFromEnemyHQ(MapLocation location) {
-        return location.distanceSquaredTo(this.theirHQ);
-    }
-
     
-    public boolean withinRange(int unitCount1, int unitCount2, double idealValue, double threshold) {
-        return ((unitCount1*1.0/unitCount2-idealValue)<threshold);
-    }
     
     public Direction[] getDirectionsAway(MapLocation awayFrom) {
         Direction away = rc.getLocation().directionTo(awayFrom).opposite();
@@ -192,6 +185,7 @@ public abstract class BaseRobot {
 
     public Direction getMoveDir(MapLocation dest) {
         Direction[] dirs = getDirectionsToward(dest);
+        Collections.shuffle(Arrays.asList(dirs));
         for (Direction d : dirs) {
             if (rc.canMove(d)) {
                 return d;

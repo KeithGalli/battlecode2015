@@ -26,6 +26,7 @@ public class TANKFACTORYRobot extends BaseRobot {
                 Direction newDir =  getSpawnDirection(RobotType.TANK);
                 if (newDir != null) {
                     rc.spawn(newDir, RobotType.TANK);
+
                 }
             }
 

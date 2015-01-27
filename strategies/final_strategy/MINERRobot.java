@@ -49,7 +49,7 @@ public class MINERRobot extends BaseRobot {
 			            supplied = true;
 			        }
 			    } 
-			else if (rc.senseOre(rc.getLocation())>4 && rc.canMine()) {
+			    else if (rc.senseOre(rc.getLocation())>4 && rc.canMine()) {
                     rc.mine();
                 } else {
                     Direction[] directions = getDirectionsAway(this.myHQ);

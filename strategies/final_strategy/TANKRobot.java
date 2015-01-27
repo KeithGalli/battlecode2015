@@ -45,7 +45,7 @@ public class TANKRobot extends BaseRobot {
                     NavSystem.dumbNav(this.myHQ);
                 }
             }
-            if (Clock.getRoundNum() < 1400) {
+            if (Clock.getRoundNum() < (rc.getRoundLimit()*.8-100)) {
                 if (rc.isCoreReady()) {
                     if (supplyLevel < 50 && currentLocation.distanceSquaredTo(this.myHQ)<30) {
                         NavSystem.dumbNav(this.myHQ);
@@ -54,7 +54,6 @@ public class TANKRobot extends BaseRobot {
                         RobotInfo[] neighbors = rc.senseNearbyRobots(rc.getLocation(),1,rc.getTeam());
                         //System.out.println(neighbors.length);
                         int numTanks = numTanksSurrounding(rc,neighbors);
-                        System.out.println(numTanks);
                         double radiusOfTanks = rc.readBroadcast(TANK_PREVIOUS_CHAN)/Math.PI;
                         if(currentLocation.distanceSquaredTo(ourClosest) > radiusOfTanks || rc.canMove(currentLocation.directionTo(ourClosest)) ) {
                         	NavSystem.dumbNav(ourClosest);

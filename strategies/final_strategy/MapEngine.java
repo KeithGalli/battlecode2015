@@ -39,7 +39,7 @@ public class MapEngine {
 		getMapEdges();
 		setMapDim();
 		//System.out.println("test");
-		Functions.displayArray(map);
+		//Functions.displayArray(map);
 		//System.out.println("test2");
 		//System.out.println(xdim);
 		//System.out.println(ydim);

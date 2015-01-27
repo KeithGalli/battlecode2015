@@ -50,38 +50,34 @@ public class BEAVERRobot extends BaseRobot {
 	                    attackLeastHealthEnemy(enemyRobots);
 	                }
 			    } else if (rc.hasBuildRequirements(RobotType.MINERFACTORY) && minerFactoriesBuilt <2) {
-			        System.out.println(building);
                     Direction buildDirection = getBuildDirectionCheckerBoard(RobotType.MINERFACTORY);
                     if (buildDirection!=null) {
                         rc.build(buildDirection, RobotType.MINERFACTORY);
                         rc.broadcast(40, minerFactoriesBuilt+1);
                         building=true;
                     }			   
-                    System.out.println(building);
-			    } else if (rc.hasBuildRequirements(RobotType.HELIPAD) && helipadsBuilt < 1) {
-			        System.out.println(building);
+			    } else if (rc.hasBuildRequirements(RobotType.HELIPAD) && helipadsBuilt < 1 && minerFactoriesBuilt>0) {
                     Direction buildDirection = getBuildDirectionCheckerBoard(RobotType.HELIPAD);
                     if (buildDirection!=null) {
                         rc.build(buildDirection, RobotType.HELIPAD);
                         rc.broadcast(43, helipadsBuilt+1);
                         building=true;
                     }
-                    System.out.println(building);
-			    } else if (rc.hasBuildRequirements(RobotType.SUPPLYDEPOT) && supplyDepotsBuilt < 2) {
+			    } else if (rc.hasBuildRequirements(RobotType.SUPPLYDEPOT) && supplyDepotsBuilt < 2 || ore>2000 && supplyDepotsBuilt < 5) {
                     Direction buildDirection = getBuildDirectionCheckerBoard(RobotType.SUPPLYDEPOT);
                     if (buildDirection!=null) {
                         rc.build(buildDirection, RobotType.SUPPLYDEPOT);
                         rc.broadcast(44, supplyDepotsBuilt+1);
                         building=true;
                     }     			        
-			    } else if (rc.hasBuildRequirements(RobotType.BARRACKS) && barracksBuilt < 1) {
+			    } else if (rc.hasBuildRequirements(RobotType.BARRACKS) && barracksBuilt < 1 && minerFactoriesBuilt>0) {
                     Direction buildDirection = getBuildDirectionCheckerBoard(RobotType.BARRACKS);
                     if (buildDirection!=null) {
                         rc.build(buildDirection, RobotType.BARRACKS);
                         rc.broadcast(41, barracksBuilt+1);
                         building=true;
                     }       
-			    } else if (rc.hasBuildRequirements(RobotType.TANKFACTORY) && tankFactoriesBuilt < 4) {
+			    } else if (rc.hasBuildRequirements(RobotType.TANKFACTORY) && tankFactoriesBuilt < 4 || ore>2000 && tankFactoriesBuilt < 5) {
 			        Direction buildDirection = getBuildDirectionCheckerBoard(RobotType.TANKFACTORY);
 			        if (buildDirection != null) {
 			            rc.build(buildDirection, RobotType.TANKFACTORY);
@@ -94,7 +90,10 @@ public class BEAVERRobot extends BaseRobot {
 	                    System.out.println("ore " + rc.senseOre(rc.getLocation()));
 	                    rc.mine();
 	                } else if(rc.getLocation().distanceSquaredTo(rc.senseHQLocation())> 18){
-	                    RobotPlayer.tryMove(rc.getLocation().directionTo(rc.senseHQLocation()));
+	                    Direction moveDir = getMoveDir(this.myHQ);
+	                    if (moveDir!=null) {
+	                        rc.move(moveDir);
+	                    }
 	                } else{
 	                    moveRandomly();
 	                }			        

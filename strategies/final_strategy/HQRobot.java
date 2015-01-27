@@ -37,6 +37,8 @@ public class HQRobot extends BaseRobot {
 			
 			rc.broadcast(200, 0);
 			
+			int beaversBuilt = rc.readBroadcast(39);
+			
 			
 		    int numMinerFactories = rc.readBroadcast(MINER_FACT_CURRENT_CHAN);
 		    rc.broadcast(MINER_FACT_CURRENT_CHAN, 0);
@@ -67,8 +69,13 @@ public class HQRobot extends BaseRobot {
             RobotInfo[] enemies = getEnemiesInAttackingRange(RobotType.HQ);
             if(enemies.length>0 && rc.isWeaponReady()){
             	attackLeastHealthEnemy(enemies);
-            } else if (rc.isCoreReady() && rc.hasSpawnRequirements(RobotType.BEAVER) && rc.readBroadcast(BEAVER_PREVIOUS_CHAN)<5) {
-                RobotPlayer.trySpawn(RobotPlayer.directions[RobotPlayer.rand.nextInt(8)], RobotType.BEAVER);
+            } else if (rc.isCoreReady() && rc.hasSpawnRequirements(RobotType.BEAVER) && beaversBuilt<5) {
+                Direction newDir =  getSpawnDirection(RobotType.BEAVER);
+                if (newDir != null) {
+                    rc.spawn(newDir, RobotType.BEAVER);
+                    rc.broadcast(39, beaversBuilt+1);
+                }
+
             }
 
 		} catch (Exception e) {
