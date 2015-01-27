@@ -78,8 +78,13 @@ public class NavSystem {
                 //rc.setIndicatorString(2, "notmoving in a direction");
                 int forwardInt = chosenDirection.ordinal();
                 Direction trialDir = allDirections[(forwardInt+directionalOffset+8)%8];
-                if(rc.getType() == RobotType.SOLDIER  || rc.getType() == RobotType.LAUNCHER){
+                if(rc.getType() == RobotType.SOLDIER  ){
                 	if( canMove(trialDir,selfAvoiding,rc) && BaseRobot.senseNearbyTowersStat(rc.getLocation().add(trialDir))==0){
+                		return trialDir;
+                	}
+                }
+                else if(rc.getType()== RobotType.LAUNCHER){
+                	if(canMove(trialDir,selfAvoiding,rc) && BaseRobot.senseNearbyTowersStat(rc.getLocation().add(trialDir))==0 ){
                 		return trialDir;
                 	}
                 }
