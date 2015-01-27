@@ -33,8 +33,10 @@ public class LAUNCHERRobot extends BaseRobot {
 			DataCache.updateRoundVariables();
 			MapLocation currentLocation = rc.getLocation();
 			double supplyLevel = rc.getSupplyLevel();
-			RobotInfo[] enemiesNearby = rc.senseNearbyRobots(25,theirTeam);
+			RobotInfo[] enemiesNearby = rc.senseNearbyRobots(24,theirTeam);
+			RobotInfo[] nearbyAllies = rc.senseNearbyRobots(24,myTeam);
 			int numLaunchers = rc.readBroadcast(LAUNCHER_PREVIOUS_CHAN);
+			int attack = rc.readBroadcast(LAUNCHERS_ATTACK);
 			if(rc.getMissileCount() ==5){
 				readyToFire = true;
 			}
@@ -47,15 +49,39 @@ public class LAUNCHERRobot extends BaseRobot {
 			if (rc.isCoreReady()) {
                 if ((supplyLevel < 50 && currentLocation.distanceSquaredTo(this.myHQ)<25) || !hasBeenSupplied) {
                     Direction dirToMove = NavSystem.dumbNav(this.myHQ);
-                    move(dirToMove, rc.getLocation());
+                    moveLauncher(dirToMove, rc.getLocation());
                 }
             }
+			boolean towerToShoot = false;
+			int min = Integer.MAX_VALUE;
+			MapLocation locToShoot = null;
+			for(MapLocation loc : rc.senseEnemyTowerLocations()){
+				System.out.println(currentLocation.distanceSquaredTo(loc));
+				if(currentLocation.distanceSquaredTo(loc) < min){
+					min = currentLocation.distanceSquaredTo(loc);
+				}
+				if(currentLocation.distanceSquaredTo(loc)<=36){
+					towerToShoot = true;
+					locToShoot = loc;
+					break;
+				}
+			}
+			rc.setIndicatorString(0,"min "+ min);
+			
+			if(towerToShoot  ){
+				Direction dirToTarget = currentLocation.directionTo(locToShoot);
+				if(rc.canLaunch(dirToTarget)){
+					rc.launchMissile(dirToTarget);
+				}
+			}
 			if(enemiesNearby.length > 0){
 				RobotInfo robotToAvoid = enemiesNearby[0];
 				boolean tanksOrLaunchers = false;
 				int distance = currentLocation.distanceSquaredTo(robotToAvoid.location);
 				RobotInfo furthest = enemiesNearby[0];
 				int furthestDist = currentLocation.distanceSquaredTo(furthest.location);
+				RobotInfo closest = enemiesNearby[0];
+				int closestDist = currentLocation.distanceSquaredTo(closest.location);
 					for(RobotInfo ri: enemiesNearby){
 						RobotType type = ri.type;
 						int currentDistance = ri.location.distanceSquaredTo(currentLocation);
@@ -64,7 +90,11 @@ public class LAUNCHERRobot extends BaseRobot {
 							furthestDist = currentDistance;
 							furthest = ri;
 						}
-						if(type == RobotType.TANK && currentDistance <= 25){
+						if(currentDistance < closestDist){
+							closestDist = currentDistance;
+							closest = ri;
+						}
+						if(type == RobotType.TANK && currentDistance <= 15){
 							tanksOrLaunchers = true;
 							robotToAvoid = ri;
 							break;
@@ -95,32 +125,41 @@ public class LAUNCHERRobot extends BaseRobot {
 							}
 						} 
 					}
-					boolean towerToShoot = false;
-					MapLocation locToShoot = null;
-					for(MapLocation loc : rc.senseEnemyTowerLocations()){
-						if(currentLocation.distanceSquaredTo(loc)<=26){
-							towerToShoot = true;
-							locToShoot = loc;
-						}
-					}
-					if(towerToShoot && readyToFire){
-						Direction dirToTarget = currentLocation.directionTo(locToShoot);
-						if(rc.canLaunch(dirToTarget)){
-							rc.launchMissile(dirToTarget);
-						}
-					}
+//					boolean towerToShoot = false;
+//					int min = Integer.MAX_VALUE;
+//					MapLocation locToShoot = null;
+//					for(MapLocation loc : rc.senseEnemyTowerLocations()){
+//						System.out.println(currentLocation.distanceSquaredTo(loc));
+//						if(currentLocation.distanceSquaredTo(loc) < min){
+//							min = currentLocation.distanceSquaredTo(loc);
+//						}
+//						if(currentLocation.distanceSquaredTo(loc)<=36){
+//							towerToShoot = true;
+//							locToShoot = loc;
+//							break;
+//						}
+//					}
+//					rc.setIndicatorString(0,"min "+ min);
+					
+//					if(towerToShoot  ){
+//						Direction dirToTarget = currentLocation.directionTo(locToShoot);
+//						if(rc.canLaunch(dirToTarget)){
+//							rc.launchMissile(dirToTarget);
+//						}
+//					}
 				
-					if(furthestDist ==24){
-						Direction dirToTarget = currentLocation.directionTo(furthest.location);
-						if(rc.canLaunch(dirToTarget)){
-							rc.launchMissile(dirToTarget);
-						}
-					}
+//					if(furthestDist ==24){
+//						Direction dirToTarget = currentLocation.directionTo(furthest.location);
+//						if(rc.canLaunch(dirToTarget)){
+//							rc.launchMissile(dirToTarget);
+//						}
+//					}
 					if(tanksOrLaunchers){
 						Direction dirToMove = NavSystem.dumbNav(currentLocation.add(robotToAvoid.location.directionTo(currentLocation)));
-						move(dirToMove, currentLocation);
-					} else if(readyToFire) {
-						Direction dirToTarget = currentLocation.directionTo(furthest.location);
+						moveLauncher(dirToMove, currentLocation);
+					}
+					if( pathToFree(currentLocation,nearbyAllies, closest.location)) {
+						Direction dirToTarget = currentLocation.directionTo(closest.location);
 						if(rc.canLaunch(dirToTarget)){
 							rc.launchMissile(dirToTarget);
 						}
@@ -130,7 +169,7 @@ public class LAUNCHERRobot extends BaseRobot {
 			else if (numLaunchers < 7 ) {
                 if (supplyLevel < 50 && currentLocation.distanceSquaredTo(this.myHQ)<25 ) {
                     Direction dirToMove = NavSystem.dumbNav(this.myHQ);
-                    move(dirToMove, rc.getLocation());
+                    moveLauncher(dirToMove, rc.getLocation());
                     rc.setIndicatorString(0, "moving to hq");
                 } else  {
 //                    MapLocation ourClosest = getOurClosestTowerToThem();
@@ -151,14 +190,10 @@ public class LAUNCHERRobot extends BaseRobot {
                     }
                     rc.setIndicatorString(1," " + radiusOfLaunchers);
                     rc.setIndicatorString(2, " " + currentLocation.distanceSquaredTo(targetToProtect));
-                    System.out.println("launcher rad " + radiusOfLaunchers);
                     int distance = currentLocation.distanceSquaredTo(targetToProtect);
-                    System.out.println("distance " + distance);
                     if(distance > radiusOfLaunchers || rc.canMove(currentLocation.directionTo(targetToProtect)) ) {
-                    	System.out.println("moving");
                     	Direction dirToMove = NavSystem.dumbNav(targetToProtect);
-                    	System.out.println(dirToMove.toString());
-                    	move(dirToMove, currentLocation);
+                    	moveLauncher(dirToMove, currentLocation);
 //                    	rc.setIndicatorString(1,"moving");
 //                    	System.out.println("moving");
                     }

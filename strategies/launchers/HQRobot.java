@@ -51,6 +51,11 @@ public class HQRobot extends BaseRobot {
 			//hqTransferSupplies(rc);
 			hqTransferAllSuppliesForRestOfGame(rc);
 			
+			if(Clock.getRoundNum() % 10 ==0){
+				rc.broadcast(LAUNCHERS_ATTACK, 1);
+			}else {
+				rc.broadcast(LAUNCHERS_ATTACK, 0);
+			}
 			
 		    int numMinerFactories = rc.readBroadcast(MINER_FACT_CURRENT_CHAN);
 		    rc.broadcast(MINER_FACT_CURRENT_CHAN, 0);

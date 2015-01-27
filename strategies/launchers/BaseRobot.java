@@ -40,6 +40,7 @@ public abstract class BaseRobot {
     public final static int MINERS_TO_ATTACK_Y = 51;
     public final static int NUM_MINERS_IN_POSITION = 52;
     
+    public final static int LAUNCHERS_ATTACK = 53;
     
     public static int TESTCHANNEL = 2000;
     
@@ -170,11 +171,16 @@ public abstract class BaseRobot {
     }
     
     public void move(Direction dirToMove, MapLocation location) throws GameActionException {
-    	if(dirToMove != null && senseNearbyTowers(location.add(dirToMove))==0){
+    	
+    	if(dirToMove != null && senseNearbyTowers(location.add(dirToMove))==0 ){
     		rc.move(dirToMove);
     	}
     }
-    
+    public void moveLauncher(Direction dirToMove, MapLocation location) throws GameActionException {
+    	if(dirToMove != null && senseNearbyTowers(location.add(dirToMove))==0 && tankFreeLoc(rc.getLocation(),rc.senseNearbyRobots(24,myTeam),dirToMove) ){
+    		rc.move(dirToMove);
+    	}
+    }
     public int senseNearbyTowers(MapLocation currentLocation, Direction direction) {
         MapLocation[] enemyTowers = rc.senseEnemyTowerLocations();
         MapLocation newLocation = currentLocation.add(direction);
@@ -202,6 +208,31 @@ public abstract class BaseRobot {
             count+=1;
         }
         return count;
+    }
+    
+    public boolean pathToFree(MapLocation location, RobotInfo[] allies, MapLocation locationAttacking) throws GameActionException{
+    	for(int i=2 ; i<=3; i++){
+    		MapLocation newLoc = location.add(location.directionTo(locationAttacking),i);
+//    		if(rc.isLocationOccupied(newLoc)){
+//    			return false;
+//    		}
+    		for(RobotInfo ally : allies){
+    			if(newLoc.distanceSquaredTo(ally.location)<=2){
+    				return false;
+    			}
+    		}
+    	}
+    	return true;
+    }
+    
+    public static boolean tankFreeLoc(MapLocation location, RobotInfo[] allies, Direction toMove){
+    	MapLocation newLoc = location.add(toMove);
+    	for(RobotInfo ally : allies){
+    		if(ally.type == RobotType.TANK && newLoc.distanceSquaredTo(ally.location)<=16){
+    			return false;
+    		}
+    	}
+    	return true;
     }
     
     public int senseNearbyTowers(MapLocation location) {
