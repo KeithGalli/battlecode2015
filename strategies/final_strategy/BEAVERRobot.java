@@ -87,7 +87,6 @@ public class BEAVERRobot extends BaseRobot {
 			    } 
 			    if (!building) {		        
 	                if(rc.senseOre(rc.getLocation())>3){
-	                    System.out.println("ore " + rc.senseOre(rc.getLocation()));
 	                    rc.mine();
 	                } else if(rc.getLocation().distanceSquaredTo(rc.senseHQLocation())> 18){
 	                    Direction moveDir = getMoveDir(this.myHQ);

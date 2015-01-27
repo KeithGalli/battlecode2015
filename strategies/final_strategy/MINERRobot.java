@@ -28,77 +28,89 @@ public class MINERRobot extends BaseRobot {
 
 		
 		try {
-		    DataCache.updateRoundVariables();
-			RobotInfo[] enemyRobots = getEnemiesInAttackingRange(RobotType.MINER);
-	        MapLocation currentLocation = rc.getLocation();
-	        double oreCurrentLocation = rc.senseOre(currentLocation);
-	        double supplyLevel = rc.getSupplyLevel();
+            DataCache.updateRoundVariables();
+            RobotInfo[] enemyRobots = getEnemiesInAttackingRange(RobotType.MINER);
+            MapLocation currentLocation = rc.getLocation();
+            double oreCurrentLocation = rc.senseOre(currentLocation);
+            double supplyLevel = rc.getSupplyLevel();
             double oreDensity = getOreDensity(currentLocation);
-            if (oreDensity > rc.readBroadcast(200) && oreDensity>150) {
-                rc.broadcast(200, (int)oreDensity);
-                rc.broadcast(201, currentLocation.x);
-                rc.broadcast(202, currentLocation.y);
+            if (enemyRobots.length>0 && rc.isWeaponReady()) {
+                attackLeastHealthEnemy(enemyRobots);
             }
-			if(rc.isCoreReady()) {
-			    if (enemyRobots.length>0 && rc.isWeaponReady()) {
-			        attackLeastHealthEnemy(enemyRobots);
-			    }
-			    else if (!supplied) {
-			        NavSystem.dumbNav(myHQ);
-			        if (supplyLevel>100 || Clock.getRoundNum()>1000) {
-			            supplied = true;
-			        }
-			    } 
-			    else if (rc.senseOre(rc.getLocation())>4 && rc.canMine()) {
-                    rc.mine();
-                } else {
-                    Direction[] directions = getDirectionsAway(this.myHQ);
-                    List<Integer> directionList = moveToMaxOrRandomList(directions);
-                    int ore = directionList.get(1);
-                    Direction direction = RobotPlayer.directions[directionList.get(0)];
-                    if(rc.canMove(direction) && senseNearbyTowers(currentLocation, direction)==0 && ore > 4) {
-                        rc.move(direction);
+		    if (Clock.getRoundNum() < rc.getRoundLimit()*0.85) {
+	            if (oreDensity > rc.readBroadcast(200) && oreDensity>150) {
+	                rc.broadcast(200, (int)oreDensity);
+	                rc.broadcast(201, currentLocation.x);
+	                rc.broadcast(202, currentLocation.y);
+	            }
+	            if(rc.isCoreReady()) {
+	                if (!supplied) {
+	                    NavSystem.dumbNav(myHQ);
+	                    if (supplyLevel>100 || Clock.getRoundNum()>1000) {
+	                        supplied = true;
+	                    }
+	                } 
+	                else if (rc.senseOre(rc.getLocation())>4 && rc.canMine()) {
+	                    rc.mine();
+	                } else {
+	                    Direction[] directions = getDirectionsAway(this.myHQ);
+	                    List<Integer> directionList = moveToMaxOrRandomList(directions);
+	                    int ore = directionList.get(1);
+	                    Direction direction = RobotPlayer.directions[directionList.get(0)];
+	                    if(rc.canMove(direction) && senseNearbyTowers(currentLocation, direction)==0 && ore > 4) {
+	                        rc.move(direction);
+	                    } else {
+	                        if (oreDensity <100 ) {
+	                            int xCoordinate = rc.readBroadcast(201);
+	                            int yCoordinate = rc.readBroadcast(202);
+	                            MapLocation oreLocation = new MapLocation(xCoordinate, yCoordinate); 
+	                                if (rc.readBroadcast(200) !=0) {
+	                                    NavSystem.dumbNav(oreLocation);
+	                                } else {
+	                                    int fate = RobotPlayer.rand.nextInt(100);
+	                                    if (fate<50) {
+	                                        int rv = RobotPlayer.rand.nextInt(8);
+	                                        Direction randomDirection = RobotPlayer.directions[rv];
+	                                        if (senseNearbyTowers(currentLocation, randomDirection)==0) {
+	                                            if (rc.canMove(randomDirection)) {
+	                                                rc.move(randomDirection);
+	                                            }
+	                                        }
+	                                    } else {
+	                                        int rv = RobotPlayer.rand.nextInt(5);
+	                                        Direction randomDirection = getDirectionsAway(this.myHQ)[rv];
+	                                        if (senseNearbyTowers(currentLocation, randomDirection)==0) {
+	                                            if (rc.canMove(randomDirection)) {
+	                                                rc.move(randomDirection);
+	                                            }
+	                                        }
+	                                    }
+
+	                                }
+	                        } else {
+	                            int rv = RobotPlayer.rand.nextInt(8);
+	                            Direction randomDirection = RobotPlayer.directions[rv];
+	                            if (senseNearbyTowers(currentLocation, randomDirection)==0) {
+	                                if (rc.canMove(randomDirection)) {
+	                                    rc.move(randomDirection);
+	                                }
+	                            }
+	                        }
+
+	                    }
+	                }               
+	            }		        
+		    } else {
+                if (rc.isCoreReady()) {
+                    MapLocation closest  = getClosestTower();
+                    if (closest != null) {                        
+                        NavSystem.dumbNav(closest);
                     } else {
-                        if (oreDensity <100 ) {
-                            int xCoordinate = rc.readBroadcast(201);
-                            int yCoordinate = rc.readBroadcast(202);
-                            MapLocation oreLocation = new MapLocation(xCoordinate, yCoordinate); 
-                                if (rc.readBroadcast(200) !=0) {
-                                    NavSystem.dumbNav(oreLocation);
-                                } else {
-                                    int fate = RobotPlayer.rand.nextInt(100);
-                                    if (fate<50) {
-                                        int rv = RobotPlayer.rand.nextInt(8);
-                                        Direction randomDirection = RobotPlayer.directions[rv];
-                                        if (senseNearbyTowers(currentLocation, randomDirection)==0) {
-                                            if (rc.canMove(randomDirection)) {
-                                                rc.move(randomDirection);
-                                            }
-                                        }
-                                    } else {
-                                        int rv = RobotPlayer.rand.nextInt(5);
-                                        Direction randomDirection = getDirectionsAway(this.myHQ)[rv];
-                                        if (senseNearbyTowers(currentLocation, randomDirection)==0) {
-                                            if (rc.canMove(randomDirection)) {
-                                                rc.move(randomDirection);
-                                            }
-                                        }
-                                    }
-
-                                }
-                        } else {
-                            int rv = RobotPlayer.rand.nextInt(8);
-                            Direction randomDirection = RobotPlayer.directions[rv];
-                            if (senseNearbyTowers(currentLocation, randomDirection)==0) {
-                                if (rc.canMove(randomDirection)) {
-                                    rc.move(randomDirection);
-                                }
-                            }
-                        }
-
+                        NavSystem.dumbNav(DataCache.enemyHQ);
                     }
-                }			    
-			}
+                }   
+		    }
+		    
 			RobotInfo[] nearbyAllies = rc.senseNearbyRobots(rc.getLocation(),GameConstants.SUPPLY_TRANSFER_RADIUS_SQUARED,rc.getTeam());
 			transferSpecificSupplies(RobotType.MINER, rc, nearbyAllies);
 			rc.broadcast(MINER_CURRENT_CHAN, rc.readBroadcast(MINER_CURRENT_CHAN)+1);

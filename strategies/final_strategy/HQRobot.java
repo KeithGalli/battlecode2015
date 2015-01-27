@@ -30,9 +30,6 @@ public class HQRobot extends BaseRobot {
 	@Override
 	public void run() {
 		try {
-//			if(Clock.getRoundNum()%50==0){
-//			    rc.broadcast(200, 0);
-//			}
 			hqTransferAllSuppliesForRestOfGame(rc);
 			
 			rc.broadcast(200, 0);
@@ -69,7 +66,7 @@ public class HQRobot extends BaseRobot {
             RobotInfo[] enemies = getEnemiesInAttackingRange(RobotType.HQ);
             if(enemies.length>0 && rc.isWeaponReady()){
             	attackLeastHealthEnemy(enemies);
-            } else if (rc.isCoreReady() && rc.hasSpawnRequirements(RobotType.BEAVER) && beaversBuilt<5) {
+            } else if (rc.isCoreReady() && rc.hasSpawnRequirements(RobotType.BEAVER) && (beaversBuilt<5 || rc.readBroadcast(BEAVER_PREVIOUS_CHAN)<2)) {
                 Direction newDir =  getSpawnDirection(RobotType.BEAVER);
                 if (newDir != null) {
                     rc.spawn(newDir, RobotType.BEAVER);
