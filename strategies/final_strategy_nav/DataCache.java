@@ -1,5 +1,4 @@
-package navbot;
-
+package final_strategy_nav;
 import battlecode.common.*;
 import java.util.*;
 import java.util.List;
@@ -25,6 +24,8 @@ public class DataCache {
 
 	public static int xmodifier;
 	public static int ymodifier;
+
+	public static boolean collecting = false;
 
 
 	public static MapLocation bestOreLoc = new MapLocation(-1, -1);
@@ -60,6 +61,10 @@ public class DataCache {
 
 		int myAliveCount = BroadcastSystem.read(BroadcastSystem.myAliveChannel);
 		BroadcastSystem.write(BroadcastSystem.myAliveChannel,myAliveCount+1);
+
+		// if (Clock.getRoundNum() > 500){
+		// 	BroadcastSystem.setNotCollecting();
+		// }
 		//MOVE ENEMYROBOT CHECKING TO HERE
 	}
 
@@ -67,6 +72,18 @@ public class DataCache {
 		if (currentLoc.equals(prevRobotLoc)){
 			return false;
 		} else {
+			prevRobotLoc = currentLoc;
+			return true;
+		}
+	}
+
+	public static boolean hasMovedAndCollecting() throws	GameActionException {
+		if (currentLoc.equals(prevRobotLoc)){
+			return false;
+		} else if (!collecting){
+			return false;
+		}
+		else {
 			prevRobotLoc = currentLoc;
 			return true;
 		}

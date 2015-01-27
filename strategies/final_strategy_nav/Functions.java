@@ -1,5 +1,4 @@
-package navbot;
-
+package final_strategy_nav;
 import battlecode.common.*;
 import java.util.*;
 import java.util.ArrayList;

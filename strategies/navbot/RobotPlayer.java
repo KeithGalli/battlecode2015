@@ -61,6 +61,7 @@ public class RobotPlayer {
             switch(rc.getType()) {
 
             case HQ:
+                rc.broadcast(211,1000);
             	robot = new HQRobot(rc);
             	break;       
 

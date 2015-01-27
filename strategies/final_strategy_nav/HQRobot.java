@@ -1,9 +1,8 @@
-package navbot;
+package final_strategy_nav;
 
 import java.util.ArrayList;
-import java.util.*;
 import java.util.List;
-
+import java.util.*;
 import battlecode.common.Clock;
 import battlecode.common.Direction;
 import battlecode.common.GameActionException;
@@ -15,7 +14,7 @@ import battlecode.common.Team;
 
 public class HQRobot extends BaseRobot {
 
-    public static int prevRobotCount = 0;
+	public static int prevRobotCount = 0;
 	public static int robotCount = 0;
     public static int structCount = 0;
 	public static int broadcastCount = 0;
@@ -33,6 +32,8 @@ public class HQRobot extends BaseRobot {
     public static boolean receivedAllPaths = false;
 
     public static boolean broadcastMode = false;
+
+    public static boolean sentBroadcast = false;
 
     public static boolean waitingOnPaths = false;
 
@@ -52,9 +53,6 @@ public class HQRobot extends BaseRobot {
 
 	public static int[][] testmap;
 
-    static Direction[] directions = {Direction.NORTH, Direction.NORTH_EAST, Direction.EAST, Direction.SOUTH_EAST, Direction.SOUTH, Direction.SOUTH_WEST, Direction.WEST, Direction.NORTH_WEST};
-
-
 
 	public HQRobot(RobotController rc) throws GameActionException {
 		super(rc);
@@ -67,71 +65,68 @@ public class HQRobot extends BaseRobot {
 		testHQLocs = MapEngine.structScan(rc.getLocation());
 		MapEngine.scanTiles(testHQLocs);
 
+
 	}
 
 	@Override
 	public void run() {
 		try {
-           // System.out.println("TEST CHECK -1");
-            robotCount = BroadcastSystem.read(BroadcastSystem.robotCountBand);///////////////////////////////
+//			if(Clock.getRoundNum()%50==0){
+//			    rc.broadcast(200, 0);
+//			}
+
+			robotCount = BroadcastSystem.read(BroadcastSystem.robotCountBand);///////////////////////////////
 
             updateRobots();
-            
-            if (aliveTurnCount>40){
+           // System.out.println("HQ START");
+            if (aliveTurnCount>400){
              //   System.out.println("TEST CHECK -1");
 
                 checkAlive();
              //   System.out.println("TEST CHECK 0");
                 aliveTurnCount=0;
             }
-            //System.out.println("TEST CHECK 1");
 
-           
-           
+			hqTransferAllSuppliesForRestOfGame(rc);
+			
+			rc.broadcast(200, 0);
+			
+		    int numMinerFactories = rc.readBroadcast(MINER_FACT_CURRENT_CHAN);
+		    rc.broadcast(MINER_FACT_CURRENT_CHAN, 0);
+		    int numMiners = rc.readBroadcast(MINER_CURRENT_CHAN);
+		    rc.broadcast(MINER_CURRENT_CHAN, 0);
+		    int numBeavers = rc.readBroadcast(BEAVER_CURRENT_CHAN);
+            rc.broadcast(BEAVER_CURRENT_CHAN, 0);
+            int numHelipads = rc.readBroadcast(HELIPAD_CURRENT_CHAN);
+            rc.broadcast(HELIPAD_CURRENT_CHAN, 0);
+            int numDrones = rc.readBroadcast(DRONE_CURRENT_CHAN);
+            rc.broadcast(DRONE_CURRENT_CHAN, 0);
+            int numSupplierDrones = rc.readBroadcast(SUPPLIER_DRONES_CURRENT_CHAN);
+            rc.broadcast(SUPPLIER_DRONES_CURRENT_CHAN, 0);
+            int numSupplyDepots = rc.readBroadcast(SUPPLY_DEPOT_CURRENT_CHAN);
+            rc.broadcast(SUPPLY_DEPOT_CURRENT_CHAN, 0);
+            int numTanks = rc.readBroadcast(TANK_CURRENT_CHAN);
+            rc.broadcast(TANK_CURRENT_CHAN, 0);
+            
+            rc.broadcast(MINER_FACT_PREVIOUS_CHAN, numMinerFactories);
+            rc.broadcast(MINER_PREVIOUS_CHAN, numMiners);
+            rc.broadcast(BEAVER_PREVIOUS_CHAN, numBeavers);
+            rc.broadcast(HELIPAD_PREVIOUS_CHAN, numHelipads);
+            rc.broadcast(DRONE_PREVIOUS_CHAN, numDrones);
+            rc.broadcast(SUPPLIER_DRONES_PREVIOUS_CHAN, numSupplierDrones);
+            rc.broadcast(SUPPLY_DEPOT_PREVIOUS_CHAN, numSupplyDepots);
+            rc.broadcast(TANK_PREVIOUS_CHAN, numTanks);
+            
+            RobotInfo[] enemies = getEnemiesInAttackingRange(RobotType.HQ);
+            if(enemies.length>0 && rc.isWeaponReady()){
+            	attackLeastHealthEnemy(enemies);
+            } else if (rc.isCoreReady() && rc.hasSpawnRequirements(RobotType.BEAVER) && rc.readBroadcast(BEAVER_PREVIOUS_CHAN)<5) {
+                RobotPlayer.trySpawn(RobotPlayer.directions[RobotPlayer.rand.nextInt(8)], RobotType.BEAVER);
+            }
 
-			if (rc.isCoreReady() && rc.getTeamOre() >= 100) {
-				rc.setIndicatorString(0, "trying to spawn");
-				trySpawn(rc.getLocation().directionTo(DataCache.enemyHQ),RobotType.BEAVER);
-   //             receivedPaths.add(0);
-   //             robotAlive.add(true);
-   //             robotChannels.add(distributeMod);
-     //           BroadcastSystem.write(BroadcastSystem.distributionChannel, distributeMod);
-     //           distributeMod+=200;
-	//			count ++;
-        	}
-            // System.out.println("Beginning of test");
-            // System.out.println(receivedPaths);
-            // System.out.println(robotAlive);
-            // System.out.println(robotInstrChannels);
-            // System.out.println(robotTypes);
-            // System.out.println("End of test");
-            // if (oreLocCount>500){
-            //     oreLocCount=0;
-            //     System.out.println("///////START OF ORE FUNCTION////////");
-
-
-            //     MapEngine.makeOreDensityMap();
-            //     MapEngine.setBestOreLocs();
-            //     // System.out.println("///////Main Map////////");
-            //     // Functions.displayWallArray(MapEngine.map);
-            //     // System.out.println("///////ORE Map////////");
-            //     // Functions.displayOREArray(MapEngine.map);
-            //     // System.out.println("///////ORE LOCS////////");
-            //     //System.out.println(Functions.internallocToLoc(DataCache.bestOreLoc));
-            //  //   System.out.println(Functions.internallocToLoc(DataCache.secondbestOreLoc));
-            //   //  System.out.println(Functions.internallocToLoc(DataCache.thirdbestOreLoc));
-            //     System.out.println("///////END OF ORE FUNCTION////////");
-
-
-
-            // }
-
-            //ARBITRARY 100 RD Counter
-            // SPLIT ORE COUNT
-            if (broadcastCount>100){
-                //System.out.println("TEST CHECK 0");
+            if (broadcastCount>30000 && Clock.getRoundNum()<1000){
+               // System.out.println("TEST CHECK 0");
                 mod = 0;
-                BroadcastSystem.write(robotCollectingChannels.get(0), 1);
 
                 for (int i=0; i<robotCount;i++){///////////////////////////////
                     if (robotAlive.get(i)){
@@ -139,7 +134,7 @@ public class HQRobot extends BaseRobot {
                             collectingPaths.set(i, 1);///////////////////////////////
                             BroadcastSystem.write(robotInstrChannels.get(i), BroadcastSystem.bigBand+mod);
                             dynamicRobotChannels.set(i, BroadcastSystem.bigBand+mod);
-                            mod+=200; ///////////////////////////////
+                            mod+=00; ///////////////////////////////
                         }
                     }
                 }
@@ -147,15 +142,21 @@ public class HQRobot extends BaseRobot {
                // System.out.println(dynamicRobotChannels);
               //  System.out.println(collectingPaths);
                 receivedAllPaths = false;
-                broadcastMode = true;
+                if (mod>0){
+                    broadcastMode = true;
+                } else{
+                     broadcastMode = false;
+                }
+               
                 broadcastCount = 0;
-                System.out.println("HQ TEST");
+                //System.out.println("HQ TEST");
             }
 
             if (broadcastMode == true){
                 if (!receivedAllPaths){
-                   System.out.println("TEST CHECK 2");
-                   // System.out.println(receivedPaths);
+                   // System.out.println("/////TANKING PART 1///////////");
+                   //System.out.println("TEST CHECK 2");
+                   //System.out.println(receivedPaths);
 
                     receivedAllPaths = true;
                     for (int i=0; i<robotCount;i++){
@@ -163,6 +164,10 @@ public class HQRobot extends BaseRobot {
                             if (robotAlive.get(i)){//////////////////////////////////
                                 if (receivedPaths.get(i)==0){
                                     //System.out.println("Test");
+                                    // System.out.println("/////TEST//////////");
+                                    // System.out.println(i);
+                                    // System.out.println(robotTypes.get(i));
+                                    // System.out.println("/////TEST//////////");
                                     receivedPaths.set(i, BroadcastSystem.receiveLocsDataList(dynamicRobotChannels.get(i)));///////
                                     if (receivedPaths.get(i)==0){
                                         receivedAllPaths = false;
@@ -173,10 +178,10 @@ public class HQRobot extends BaseRobot {
                             }
                         }
                     }
-                    System.out.println("TEST CHECK 2 END");
+                   // System.out.println("TEST CHECK 2 END");
                 } else {
                    
-                   System.out.println("HQ TEST 2");
+                //   System.out.println("//////TANKING PART 2////////");
                     //System.out.println(MapEngine.senseQueueHQ);
 
 
@@ -211,106 +216,24 @@ public class HQRobot extends BaseRobot {
                     for (int i=0; i<receivedPaths.size();i++){
                         receivedPaths.set(i, 0);
                     }
-                    System.out.println("HQ TEST 2 END");
+                   // System.out.println("HQ TEST 2 END");
                     
                     //Tell the robot the dictionaries are ready for download.
                     for (int channel: robotInstrChannels){
                         BroadcastSystem.write(channel, 2);
                     }
                     broadcastMode = false;
-                    System.out.println("///////Main Map////////");
-                    Functions.displayWallArray(MapEngine.map);
-                    System.out.println("///////////////////////");
-                //    System.out.println("HQ TEST END");
+                    // System.out.println("///////Main Map////////");
+                    // Functions.displayWallArray(MapEngine.map);
+                    // System.out.println("///////////////////////");
+                // //    System.out.println("HQ TEST END");
                 }
             } else {
                 broadcastCount++;
                 oreLocCount++;
                 aliveTurnCount++;
             }
- 
-            
-
-
-        	// if (broadcastCount > 300){
-         //        System.out.println("HQ TEST");
-         //        for (int channel: robotChannels){
-         //           // System.out.println("HQBOT");
-         //           // System.out.println(channel);
-         //            BroadcastSystem.write(channel, 1);
-         //        }
-         //        System.out.println(receivedPaths);
-         //        receivedAllPaths = false;
-         //        while(!receivedAllPaths){
-
-         //            receivedAllPaths = true;
-         //            for (int i=0; i<receivedPaths.size();i++){
-         //                if (receivedPaths.get(i)==0){
-         //                    receivedPaths.set(i, BroadcastSystem.receiveLocsDataList(robotChannels.get(i)+5));
-         //                    if (receivedPaths.get(i)==0){
-         //                        receivedAllPaths = false;
-         //                    }
-         //                }
-         //            }
-         //        }
-         //       // System.out.println(receivedPaths);
-         //        //System.out.println(MapEngine.senseQueueHQ);
-
-                
-        	// 	broadcastCount = 0;
-         //        //MapEngine.resetOreList();
-         //        //System.out.println(MapEngine.senseQueueHQ);
-
-         //        System.out.println("HQ TEST MIDDLE 1");
-         //        //senseQueueHQ: [(x1,y1), (x2,y2)] of locations that a robot has been at
-        	// 	for (MapLocation loc: MapEngine.senseQueueHQ){
-
-        	// 		//MapEngine.rescanOreMapGivenLoc(loc);
-                    
-                    
-         //            //If its a new location
-         //            if (!MapEngine.prevSensedLocs.contains(loc)){
-         //                //Get all visible tiles from that location
-         //                testRobotSeenLocs = MapEngine.unitScan(loc);
-         //                //Scan all visible tiles from that location
-         //                MapEngine.scanTiles(testRobotSeenLocs);
-         //                //Add that location to previously seen locations
-         //                MapEngine.prevSensedLocs.add(loc);
-         //            }
-         //            //System.out.println("HQ TEST3");
-        			
-
-        	// 	}
-         //        System.out.println("HQ TEST MIDDLE 2");
-                
-
-         //        //Prepare the map for broadcasting.
-        	// 	MapEngine.resetMapAndPrep();
-
-         //        //Send the map data dict
-        	// 	BroadcastSystem.prepareandsendMapDataDict(MapEngine.sensedMAINDictHQ,BroadcastSystem.dataBand);
-        	// 	//Send the waypoint data dict
-        	// 	BroadcastSystem.prepareandsendWaypointDict(MapEngine.waypointDictHQ);
-         //        //System.out.println(MapEngine.waypointDictHQ);
-         //        MapEngine.resetSensedMAINDict();
-
-         //        for (int i=0; i<receivedPaths.size();i++){
-         //            receivedPaths.set(i, 0);
-         //        }
-         //        //System.out.println("HQ TEST END");
-                
-         //        //Tell the robot the dictionaries are ready for download.
-         //        for (int channel: robotChannels){
-         //            BroadcastSystem.write(channel, 2);
-         //        }
-         //        System.out.println("HQ TEST END");
-        	// }
-
-         //    broadcastCount++;
-
-            ///////
-
-
+           // System.out.println("HQ END");
 
 		} catch (Exception e) {
 			//                    System.out.println("caught exception before it killed us:");
@@ -319,7 +242,7 @@ public class HQRobot extends BaseRobot {
 		}
 	}
 
-    static void updateRobots(){
+	static void updateRobots(){
         if (robotCount!=prevRobotCount){
             //System.out.println("TEST CHECK 2");
             for (int i = prevRobotCount+1;i<=robotCount;i++){
@@ -349,26 +272,6 @@ public class HQRobot extends BaseRobot {
                     robotPrevCount.set(i, newRobotCount);
                 }
             }
-        }
-    }
-
-    static void updateStructures(){
-    }
-
-
-    static void trySpawn(Direction d, RobotType type) throws GameActionException {
-        int offsetIndex = 0;
-        int[] offsets = {0,1,-1,2,-2,3,-3,4};
-        int dirint = Functions.directionToInt(d);
-        boolean blocked = false;
-        while (offsetIndex < 8 && !rc.canSpawn(directions[(dirint+offsets[offsetIndex]+8)%8], type)) {
-            offsetIndex++;
-        }
-        if (offsetIndex < 8) {
-            int count = BroadcastSystem.read(BroadcastSystem.robotCountBand);
-            BroadcastSystem.write(BroadcastSystem.distributionBand,BroadcastSystem.unitInstrRefBand+count+1);
-            rc.spawn(directions[(dirint+offsets[offsetIndex]+8)%8], type);
-            BroadcastSystem.write(BroadcastSystem.robotCountBand, count+1);
         }
     }
 }

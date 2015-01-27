@@ -1,5 +1,4 @@
-package navbot;
-
+package final_strategy_nav;
 
 import java.util.ArrayList;
 import java.util.Dictionary;
@@ -87,10 +86,12 @@ public class BroadcastSystem {
 	}
 
 	static void setCollecting() throws GameActionException{
+		DataCache.collecting = true;
 		write(myCollectingChannel, 1);
 	}
 
 	static void setNotCollecting() throws GameActionException{
+		DataCache.collecting = false;
 		write(myCollectingChannel, 0);
 	}
 

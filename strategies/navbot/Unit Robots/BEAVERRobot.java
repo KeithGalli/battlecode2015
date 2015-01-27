@@ -14,8 +14,6 @@ import battlecode.common.Team;
 public class BEAVERRobot extends BaseRobot {
 
 
-	public static int myChannel;
-	public static int myLocChannel;
 
 	public static MapLocation tile;
 	public static MapLocation[] visibleTiles;
@@ -25,7 +23,6 @@ public class BEAVERRobot extends BaseRobot {
 	public static Random random = new Random();
 
 	public static int downloadReady;
-	public static int oreReady;
 	public static List<MapLocation> newLocs=new ArrayList<MapLocation>();
 
 	public static int indx = 0;
@@ -33,13 +30,27 @@ public class BEAVERRobot extends BaseRobot {
 	public static boolean ourTowersFound = false;
 	public static boolean enemyTowersFound = false;
 
+	public static int minx;
+	public static int maxx;
+	public static int miny;
+	public static int maxy;
+
+
 	public BEAVERRobot(RobotController rc) throws GameActionException {
 		super(rc);
 		NavSystem.UNITinit(rc);
 		MapEngine.UNITinit(rc);
 		goal = rc.senseEnemyHQLocation();
-		myChannel = BroadcastSystem.read(DISTRIBUTECHANNEL);
-		myLocChannel = myChannel+5;
+		//System.out.println("THIS IS BEAVER:"+BroadcastSystem.myChannel);
+		BroadcastSystem.write(BroadcastSystem.myInstrChannel, BEAVER_CONS);
+		BroadcastSystem.setNotCollecting();
+
+		minx = BroadcastSystem.read(BroadcastSystem.minxBand);
+		maxx = BroadcastSystem.read(BroadcastSystem.maxxBand);
+		miny = BroadcastSystem.read(BroadcastSystem.minyBand);
+		maxy = BroadcastSystem.read(BroadcastSystem.maxyBand);
+		random.setSeed((long) rc.getID());
+
 
 	}
 
@@ -52,88 +63,98 @@ public class BEAVERRobot extends BaseRobot {
 			DataCache.updateRoundVariables();
 			//TELL THE HQ WHERE WE ARE
 			if (DataCache.hasMoved()){
-				//System.out.println(DataCache.currentLoc);
 				MapEngine.senseQueue.add(DataCache.currentLoc);
 			}
 			//rc.broadcast(TESTCHANNEL, Functions.locToInt(Functions.locToInternalLoc(DataCache.currentLoc)));
 
 
-			//IF WERE AT OUR CURRENT GOAL PICK A NEW ONE AT RANDOM
 			if (DataCache.currentLoc.distanceSquaredTo(goal)<5){
-				if (hqFound){
-					if (enemyTowersFound){
-						if (ourTowersFound){
-							//
-						}
-						else{
-							if (indx==DataCache.ourTowers.length){
-								ourTowersFound = true;
-								indx = 0;
-								goal = Functions.internallocToLoc(MapEngine.internalMapCenter);
-							}
-							else{
-								indx++;
-								goal = DataCache.ourTowers[indx];
-							}
-						}
-					}
-					else{
-						if (indx==DataCache.enemyTowers.length){
-							enemyTowersFound = true;
-							indx = 0;
-							goal = DataCache.ourTowers[indx];
-						}
-						else{
-							indx++;
-							goal = DataCache.enemyTowers[indx];
-						}
+				boolean goalFound = false;
+				while (!goalFound){
+					int tempx = random.nextInt(maxx-minx)+minx;
+					int tempy = random.nextInt(maxy-miny)+miny;
+					MapLocation internalTempLoc = Functions.locToInternalLoc(new MapLocation(tempx,tempy));
+
+					if (MapEngine.map[internalTempLoc.x][internalTempLoc.y]==0 || MapEngine.map[internalTempLoc.x][internalTempLoc.y]<-1){
+						goal = new MapLocation(tempx, tempy);
+						goalFound = true;
 					}
 				}
-				else {
-					hqFound = true;
-					goal = DataCache.enemyTowers[indx];
-				}
+				
 			}
 
+			// //IF WERE AT OUR CURRENT GOAL PICK A NEW ONE AT RANDOM
+			// if (DataCache.currentLoc.distanceSquaredTo(goal)<5){
+			// 	if (hqFound){
+			// 		if (enemyTowersFound){
+			// 			if (ourTowersFound){
+			// 				//
+			// 			}
+			// 			else{
+			// 				if (indx==DataCache.ourTowers.length){
+			// 					ourTowersFound = true;
+			// 					indx = 0;
+			// 					goal = Functions.internallocToLoc(MapEngine.internalMapCenter);
+			// 				}
+			// 				else{
+			// 					indx++;
+			// 					goal = DataCache.ourTowers[indx];
+			// 				}
+			// 			}
+			// 		}
+			// 		else{
+			// 			if (indx==DataCache.enemyTowers.length){
+			// 				enemyTowersFound = true;
+			// 				indx = 0;
+			// 				goal = DataCache.ourTowers[indx];
+			// 			}
+			// 			else{
+			// 				indx++;
+			// 				goal = DataCache.enemyTowers[indx];
+			// 			}
+			// 		}
+			// 	}
+			// 	else {
+			// 		hqFound = true;
+			// 		goal = DataCache.enemyTowers[indx];
+			// 	}
+			// }
+
 
 			
 			
-			downloadReady = BroadcastSystem.read(myChannel);
+			downloadReady = BroadcastSystem.read(BroadcastSystem.myInstrChannel);
 
-			oreReady = BroadcastSystem.read(2002);
 			//IF THE DATA IS READY TO DOWNLOAD
-			if (downloadReady==1){
-				System.out.println("BEAVER TEST");
-				BroadcastSystem.prepareandsendLocsDataList(MapEngine.senseQueue, myLocChannel);
+			if (downloadReady>=25000){
+				//System.out.println("BEAVER TEST");
+				//rc.setIndicatorString(1, "messaging");
+				BroadcastSystem.prepareandsendLocsDataList(MapEngine.senseQueue, downloadReady);
 				//System.out.println(MapEngine.senseQueue);
 				MapEngine.resetSenseQueue();
-				BroadcastSystem.write(myChannel,0);
-				System.out.println("BEAVER TESTCHANNEL");
+				BroadcastSystem.write(BroadcastSystem.myInstrChannel,0);
+				//System.out.println("BEAVER TEST END");
+			//	System.out.println("BEAVER TESTCHANNEL");
 			}
 			if (downloadReady==2){
-				//System.out.println("Test");
+				//System.out.println("BEAVER TEST 2");
 
-				System.out.println("BEAVER TEST 2");
+				//rc.setIndicatorString(1, "downloading");
 				BroadcastSystem.receiveMapDataDict(BroadcastSystem.dataBand);
 				// System.out.println("/////////////////////////");
-    //     		Functions.displayOREArray(MapEngine.map);
-	      		System.out.println("/////////////////////////");
-	      		Functions.displayWallArray(MapEngine.map);
-	      		// //System.out.println(MapEngine.waypointDict);
-	      		System.out.println("/////////////////////////");
+    // // //     		Functions.displayOREArray(MapEngine.map);
+	   //    		System.out.println("/////////////////////////");
+	   //    		Functions.displayWallArray(MapEngine.map);
+	   // //    		// //System.out.println(MapEngine.waypointDict);
+	   //    		System.out.println("/////////////////////////");
 				MapEngine.waypointDict = BroadcastSystem.receiveWaypointDict();
-				System.out.println("BEAVER TEST 2 END");
+				//System.out.println("BEAVER TEST 2 END");
 				//System.out.println(MapEngine.waypointDict);
 				//System.out.println("Test2");
-				BroadcastSystem.write(myChannel, 0);
+				//rc.setIndicatorString(1, "not downloading");
+				BroadcastSystem.write(BroadcastSystem.myInstrChannel, 0);
 			}
 
-			if (oreReady==1){
-				System.out.println("BEAVER TEST 3");
-				BroadcastSystem.receiveMapDataDict(BroadcastSystem.dataBandORE);
-				System.out.println("BEAVER TEST 3 END");
-				BroadcastSystem.write(2002, 0);
-			}
 			//System.out.println("BEAVER TEST");
 			rc.setIndicatorString(1,goal.toString());
 			NavSystem.smartNav(goal, false);
